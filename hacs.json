@@ -1,0 +1,7 @@
+{
+  "name": "Wifi QR Card",
+  "description": "Lovelace card displaying a WiFi QR code for easy guest network access — zero external dependencies",
+  "render_readme": true,
+  "content_in_root": false,
+  "filename": "wifi-card.js"
+}
