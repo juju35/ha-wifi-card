@@ -1,6 +1,6 @@
 {
   "name": ".",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "HACS-compatible Lovelace card generating WiFi QR codes, no CDN.",
   "private": true,
   "type": "module",

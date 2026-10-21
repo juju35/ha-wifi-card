@@ -2,5 +2,6 @@
   "name": "Wifi QR Card",
   "render_readme": true,
   "content_in_root": false,
-  "filename": "wifi-card.js"
+  "filename": "wifi-card.js",
+  "homeassistant": "2024.8.0"
 }

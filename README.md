@@ -25,7 +25,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 ## Prerequisites
 
-None: the card needs no integration, only the name and password of your network.
+Home Assistant 2024.8 or later. The card needs no integration, only the name and password of your network.
 
 ## Installation
 
