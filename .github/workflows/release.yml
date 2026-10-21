@@ -1,7 +1,7 @@
 name: Release
 
 # Publishes a GitHub release whenever main carries a version that has no tag yet:
-# bump WIFI_QR_CARD_VERSION in the card, add its CHANGELOG.md section, push, and the release follows.
+# bump "version" in package.json, add its CHANGELOG.md section, push, and the release follows.
 on:
   push:
     branches: [main]
@@ -19,10 +19,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Read version
         id: version
         run: |
-          VERSION="$(sed -n "s/^var WIFI_QR_CARD_VERSION = '\(.*\)';$/\1/p" dist/wifi-card.js)"
+          VERSION="$(node -p "require('./package.json').version")"
           test -n "$VERSION"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
@@ -31,9 +36,10 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build notes
+      - name: Check build and notes
         if: steps.version.outputs.exists == 'false'
         run: |
+          npm run check
           .github/scripts/release-notes.sh "${{ steps.version.outputs.version }}" > notes.md
           test -s notes.md
 

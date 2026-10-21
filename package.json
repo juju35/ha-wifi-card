@@ -1,0 +1,16 @@
+{
+  "name": ".",
+  "version": "1.5.0",
+  "description": "HACS-compatible Lovelace card generating WiFi QR codes, no CDN.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check && node --check dist/wifi-card.js",
+    "screenshots": "node scripts/screenshots.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

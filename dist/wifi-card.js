@@ -1,4 +1,4 @@
-var WIFI_QR_CARD_VERSION = '1.4.3';
+var WIFI_QR_CARD_VERSION = '1.5.0';
 var WIFI_BLUE = '#64B5F6';
 
 // ── WiFi badge (original artwork: rounded-cap waves on a blue rounded square) ─
@@ -57,10 +57,18 @@ var WifiQrI18n = {
   },
 };
 
+function wifiQrEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
 function wifiQrT(lang, key) {
   var strings = WifiQrI18n[lang] || WifiQrI18n['en'];
   return strings[key] || WifiQrI18n['en'][key] || key;
 }
+
+var SECURITY_KEYS = { WPA: 'sec_wpa', SAE: 'sec_sae', WEP: 'sec_wep', nopass: 'sec_nopass' };
 
 // ── wifi-qr-card ──────────────────────────────────────────────────────────────
 class WifiQrCard extends HTMLElement {
@@ -144,34 +152,40 @@ class WifiQrCard extends HTMLElement {
       <style>
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 12px; }
-        .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; }
-        .logo { height: 26px; width: 26px; display: block; flex-shrink: 0; }
-        .title { font-size: 16px; font-weight: 500; color: var(--primary-text-color); }
+        .header { display: flex; align-items: center; gap: 12px; align-self: flex-start; width: 100%; }
+        .logo { height: 40px; width: 40px; display: block; flex: none; }
+        .titles { flex: 1; min-width: 0; }
+        .name { font-size: 18px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub { font-size: 13px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
-        .qr-wrap { background: ${WIFI_BLUE}; border-radius: 8px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
+        .header > ha-icon { --mdc-icon-size: 40px; }
+        .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; }
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         .info-block { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-        .info-row { background: var(--secondary-background-color, rgba(128,128,128,0.1)); border-radius: 8px; padding: 10px 14px; }
-        .lbl { font-size: 11px; color: var(--secondary-text-color); margin-bottom: 2px; }
-        .val { font-size: 13px; font-weight: 500; font-family: monospace; word-break: break-all; color: var(--primary-text-color); }
+        .info-row { background: var(--secondary-background-color, rgba(127,127,127,.08)); border-radius: 10px; padding: 8px 12px; }
+        .lbl { font-size: 12px; color: var(--secondary-text-color); margin-bottom: 2px; }
+        .val { font-size: 14px; font-weight: 500; font-family: var(--code-font-family, monospace); word-break: break-all; color: var(--primary-text-color); }
         .pwd-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         button { background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; }
-        .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
+        .hint { font-size: 12px; color: var(--secondary-text-color); text-align: center; }
       </style>
       <ha-card>
         <div class="header">
           ${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}
-          <span class="title">${c.title}</span>
+          <div class="titles">
+            <div class="name">${wifiQrEsc(c.title)}</div>
+            <div class="sub">${wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'))}</div>
+          </div>
         </div>
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
         <div class="info-block">
           <div class="info-row">
             <div class="lbl">${this._t('network')}</div>
-            <div class="val">${c.ssid}</div>
+            <div class="val">${wifiQrEsc(c.ssid)}</div>
           </div>
           <div class="info-row">
             <div class="lbl">${this._t('password')}</div>
@@ -205,6 +219,10 @@ class WifiQrCard extends HTMLElement {
   }
 
   getCardSize() { return 4; }
+
+  getGridOptions() {
+    return { columns: 6, min_columns: 4 };
+  }
 }
 
 // ── wifi-qr-card-editor (visual editor, built on HA's ha-form) ───────────────

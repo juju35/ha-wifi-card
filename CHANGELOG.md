@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0
+
+### Changes
+- Header aligned with the other juju35 cards: 40px logo, title 18px with the network security as subtitle.
+- Rounded corners, spacing and label sizes aligned with the other cards; the network name and password use the theme's code font.
+- Card size in the Sections view (`getGridOptions`).
+- The title and network name are escaped before being displayed.
+
+### Development
+- The card source moves to `src/wifi-card.js`; `npm run build` stamps the version from `package.json` into `dist/wifi-card.js`, and CI checks that `dist/` is up to date.
+- `npm run screenshots` renders the README screenshots (light and dark).
+- Releases are published when `version` in `package.json` has no tag yet.
+
 ## 1.4.3
 
 ### Changes

@@ -19,9 +19,13 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
 - Password hidden by default, revealable with a toggle button
 - Visual editor in the dashboard UI (no YAML needed)
-- Fully compatible with Home Assistant dark mode
+- Light and dark mode, English and French
 - HACS-ready
-- Single file, lightweight (~23 KB)
+- Single file, lightweight (~24 KB)
+
+## Prerequisites
+
+None: the card needs no integration, only the name and password of your network.
 
 ## Installation
 
@@ -85,11 +89,32 @@ qr_size: 200
 | `qr_size` | ❌ | `200` | QR code size in pixels (quiet zone included) |
 | `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
 
+## Screenshots
+
+| Light | Dark (French) |
+|---|---|
+| ![card](screenshots/card.png) | ![card dark](screenshots/card-dark.png) |
+
 ## How it works
 
 The card generates a [WiFi QR code](https://en.wikipedia.org/wiki/QR_code#Joining_a_Wi-Fi_network) using the standard `WIFI:T:<security>;S:<ssid>;P:<password>;;` format. When scanned with a phone camera, the device automatically prompts to join the network — no need to type the password manually.
 
 The QR code engine is a self-contained JavaScript implementation of the QR code specification (ISO/IEC 18004), including Reed-Solomon error correction, embedded directly in the card source. No external libraries or CDN requests are needed.
+
+## Development
+
+```bash
+npm install
+npm run build        # stamps the version of package.json into dist/wifi-card.js
+npm run check        # verifies dist/ is up to date (run in CI)
+npm run screenshots  # renders the card into screenshots/
+```
+
+### Releasing
+
+1. Bump `version` in `package.json` and run `npm run build`
+2. Add a `## <version>` section at the top of [CHANGELOG.md](CHANGELOG.md)
+3. Push to `main`: the **Release** workflow creates the tag and the GitHub release with the changelog section as notes, and attaches `wifi-card.js`
 
 ## Translations
 
