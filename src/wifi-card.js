@@ -151,26 +151,26 @@ class WifiQrCard extends HTMLElement {
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; height: 100%; }
-        ha-card { height: 100%; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 12px; }
-        .header { display: flex; align-items: center; gap: 12px; align-self: flex-start; width: 100%; }
-        .logo { height: 40px; width: 40px; display: block; flex: none; }
+        ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
+        .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; }
+        .logo { height: 36px; width: 36px; display: block; flex: none; }
         .titles { flex: 1; min-width: 0; }
-        .name { font-size: 18px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sub { font-size: 13px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
         .header > ha-icon { --mdc-icon-size: 40px; }
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
-        .qr-wrap svg { max-width: 100%; height: auto; }
+        .qr-wrap svg { max-width: 100%; height: auto; width: 176px; }
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
-        .info-block { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-        .info-row { background: var(--secondary-background-color, rgba(127,127,127,.08)); border-radius: 10px; padding: 8px 12px; }
-        .lbl { font-size: 12px; color: var(--secondary-text-color); margin-bottom: 2px; }
-        .val { font-size: 14px; font-weight: 500; font-family: var(--code-font-family, monospace); word-break: break-all; color: var(--primary-text-color); }
+        .info-block { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+        .info-row { background: var(--secondary-background-color, rgba(127,127,127,.08)); border-radius: 10px; padding: 6px 10px; }
+        .lbl { font-size: 11px; color: var(--secondary-text-color); margin-bottom: 0; }
+        .val { font-size: 13px; font-weight: 500; font-family: var(--code-font-family, monospace); word-break: break-all; color: var(--primary-text-color); }
         .pwd-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
         button { background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; }
-        .hint { font-size: 12px; color: var(--secondary-text-color); text-align: center; }
+        .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
       </style>
       <ha-card>
         <div class="header">
