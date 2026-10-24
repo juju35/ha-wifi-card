@@ -110,3 +110,31 @@ test("security values are normalised and invalid ones rejected", () => {
   assert.equal(ctx.wifiQrSecurity("nopass"), "nopass");
   assert.throws(() => ctx.wifiQrSecurity("WPA4"), /security must be/);
 });
+
+test("eye button has a translated accessible name and aria-pressed; the card QR is hidden from screen readers", () => {
+  const els = {};
+  const el = () => {
+    const attrs = {};
+    return { attrs, setAttribute: (k, v) => (attrs[k] = v), textContent: "" };
+  };
+  const card = new WifiQrCard();
+  card.shadowRoot = {
+    innerHTML: "",
+    getElementById: (id) => (els[id] ||= el()),
+  };
+  card._configRaw = { ssid: "Box", password: "pa;ss", language: "en" };
+  card._applyConfig(true);
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<button id="btn" aria-label="Show password" aria-pressed="false">/);
+  const qrs = html.match(/<svg [^>]*>/g).filter((t) => t.includes('aria-label="QR code"'));
+  assert.equal(qrs.length, 2);
+  assert.match(qrs[0], /aria-hidden="true"/);
+  assert.doesNotMatch(qrs[1], /aria-hidden/);
+  els.btn.onclick();
+  assert.equal(els.btn.attrs["aria-pressed"], "true");
+  assert.equal(els.btn.attrs["aria-label"], "Hide password");
+  assert.equal(els.pwd.textContent, "pa;ss");
+  els.btn.onclick();
+  assert.equal(els.btn.attrs["aria-pressed"], "false");
+  assert.equal(els.btn.attrs["aria-label"], "Show password");
+});

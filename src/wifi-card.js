@@ -2,7 +2,7 @@ var WIFI_QR_CARD_VERSION = '__VERSION__';
 var WIFI_BLUE = '#64B5F6';
 
 // ── WiFi badge (original artwork: rounded-cap waves on a blue rounded square) ─
-// biome-ignore lint: vendored/minified third-party code
+// biome-ignore lint: inline SVG markup kept on one line
 var WIFI_LOGO = '<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" role="img" aria-label="WiFi"><rect width="36" height="36" rx="8" fill="' + WIFI_BLUE + '"/><g fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M13.76 21.76A6 6 0 0 1 22.24 21.76"/><path d="M10.22 18.22A11 11 0 0 1 25.78 18.22"/><path d="M6.69 14.69A16 16 0 0 1 29.31 14.69"/></g><circle cx="18" cy="26.5" r="2.4" fill="#fff"/></svg>';
 
 // ── QR Code engine (pure JS, Reed-Solomon, no CDN) ───────────────────────────
@@ -18,6 +18,8 @@ var WifiQrI18n = {
     hint: 'Scannez le QR code pour vous connecter',
     zoom: 'Agrandir le QR code',
     open_network: 'Réseau ouvert (sans mot de passe)',
+    show_password: 'Afficher le mot de passe',
+    hide_password: 'Masquer le mot de passe',
     ed_title: 'Titre',
     ed_ssid: 'Nom du réseau (SSID)',
     ed_password: 'Mot de passe',
@@ -41,6 +43,8 @@ var WifiQrI18n = {
     hint: 'Scan the QR code to connect automatically',
     zoom: 'Enlarge QR code',
     open_network: 'Open network (no password)',
+    show_password: 'Show password',
+    hide_password: 'Hide password',
     ed_title: 'Title',
     ed_ssid: 'Network name (SSID)',
     ed_password: 'Password',
@@ -206,7 +210,7 @@ class WifiQrCard extends HTMLElement {
             <div class="sub">${wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'))}</div>
           </div>
         </div>
-        <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg}</div>
+        <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
         <div class="info-block">
           <div class="info-row">
@@ -219,7 +223,7 @@ class WifiQrCard extends HTMLElement {
               ? `<div class="val">${this._t('open_network')}</div>`
               : `<div class="pwd-row">
               <div class="val" id="pwd">••••••••••••••••</div>
-              <button id="btn"><ha-icon icon="mdi:eye" id="ico"></ha-icon></button>
+              <button id="btn" aria-label="${this._t('show_password')}" aria-pressed="false"><ha-icon icon="mdi:eye" id="ico"></ha-icon></button>
             </div>`}
           </div>
         </div>
@@ -228,8 +232,11 @@ class WifiQrCard extends HTMLElement {
 
     if (!isOpen) {
       let shown = false;
-      this.shadowRoot.getElementById('btn').onclick = () => {
+      const btn = this.shadowRoot.getElementById('btn');
+      btn.onclick = () => {
         shown = !shown;
+        btn.setAttribute('aria-pressed', String(shown));
+        btn.setAttribute('aria-label', this._t(shown ? 'hide_password' : 'show_password'));
         this.shadowRoot.getElementById('pwd').textContent = shown ? c.password : '••••••••••••••••';
         this.shadowRoot.getElementById('ico').setAttribute('icon', shown ? 'mdi:eye-off' : 'mdi:eye');
       };
