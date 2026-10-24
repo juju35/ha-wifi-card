@@ -105,7 +105,15 @@ class WifiQrCard extends HTMLElement {
 
   setConfig(config) {
     if (config.ssid == null || config.ssid === '') throw new Error('ssid is required');
-    if ((config.password == null || config.password === '') && wifiQrSecurity(config.security) !== 'nopass') throw new Error('password is required');
+    // Validated before the config is kept: an invalid value must not reach set hass later.
+    var security = wifiQrSecurity(config.security);
+    if ((config.password == null || config.password === '') && security !== 'nopass') throw new Error('password is required');
+    // YAML reads an unquoted 01234567 as the number 1234567: the leading zero is lost before
+    // the card sees it, so the most we can do is point at the quotes.
+    if (typeof config.password === 'number' && !this._warnedNumber) {
+      this._warnedNumber = true;
+      console.warn('wifi-qr-card: password is a number; quote it in YAML if it starts with 0 (password: "01234567")');
+    }
     this._configRaw = config;
     if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
     this._applyConfig(true);

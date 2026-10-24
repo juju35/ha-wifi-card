@@ -138,3 +138,39 @@ test("eye button has a translated accessible name and aria-pressed; the card QR 
   assert.equal(els.btn.attrs["aria-pressed"], "false");
   assert.equal(els.btn.attrs["aria-label"], "Show password");
 });
+
+test("an invalid security is refused by setConfig and never thrown from set hass", () => {
+  const card = new WifiQrCard();
+  card.attachShadow = () => {
+    card.shadowRoot = { innerHTML: "", getElementById: () => ({ setAttribute() {} }) };
+    return card.shadowRoot;
+  };
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  assert.throws(() => card.setConfig({ ssid: "Box", password: "secret", security: "WPA4" }), /security must be/);
+  // The card keeps the last valid configuration; a language change must not throw.
+  assert.doesNotThrow(() => {
+    card.hass = { language: "fr" };
+  });
+  assert.match(card.shadowRoot.innerHTML, /<svg /);
+});
+
+test("a password given as a YAML number is flagged once", () => {
+  const warnings = [];
+  const orig = ctx.console.warn;
+  ctx.console.warn = (m) => warnings.push(m);
+  try {
+    const card = new WifiQrCard();
+    card.attachShadow = () => {
+      card.shadowRoot = { innerHTML: "", getElementById: () => ({ setAttribute() {} }) };
+      return card.shadowRoot;
+    };
+    card.setConfig({ ssid: "Box", password: 1234567 });
+    card.setConfig({ ssid: "Box", password: 1234567, title: "x" });
+    card.setConfig({ ssid: "Box", password: "01234567" });
+  } finally {
+    ctx.console.warn = orig;
+  }
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /quote/);
+});
