@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.1
+
+### Fixes
+- An invalid `security` is refused right away with a configuration error, shown in the editor, even when a password is set; the card keeps its last valid configuration and no longer breaks on a later language change.
+- A password written as a YAML number (`password: 12345678`) still works but logs one warning in the browser console asking to quote it, since YAML drops leading zeros.
+
+### Maintenance
+- New tests for `security` and numeric passwords (14 in all); CI installs the dependencies before building, the screenshot script renders each capture in its own page, and the duplicate-code check ignores test folders.
+
 ## 1.7.0
 
 ### Changes
