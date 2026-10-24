@@ -38,7 +38,7 @@ Click the button below to add the repository directly:
 Or manually:
 
 1. Open HACS → **Frontend** → **⋮** → **Custom repositories**
-2. Add `https://github.com/juju35/ha-wifi-card` — Category: **Lovelace**
+2. Add `https://github.com/juju35/ha-wifi-card` — Type: **Dashboard**
 3. Search for **Wifi QR Card** and install it
 4. Clear your browser cache and refresh
 

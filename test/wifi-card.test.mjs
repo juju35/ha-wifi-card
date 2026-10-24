@@ -110,3 +110,67 @@ test("security values are normalised and invalid ones rejected", () => {
   assert.equal(ctx.wifiQrSecurity("nopass"), "nopass");
   assert.throws(() => ctx.wifiQrSecurity("WPA4"), /security must be/);
 });
+
+test("eye button has a translated accessible name and aria-pressed; the card QR is hidden from screen readers", () => {
+  const els = {};
+  const el = () => {
+    const attrs = {};
+    return { attrs, setAttribute: (k, v) => (attrs[k] = v), textContent: "" };
+  };
+  const card = new WifiQrCard();
+  card.shadowRoot = {
+    innerHTML: "",
+    getElementById: (id) => (els[id] ||= el()),
+  };
+  card._configRaw = { ssid: "Box", password: "pa;ss", language: "en" };
+  card._applyConfig(true);
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<button id="btn" aria-label="Show password" aria-pressed="false">/);
+  const qrs = html.match(/<svg [^>]*>/g).filter((t) => t.includes('aria-label="QR code"'));
+  assert.equal(qrs.length, 2);
+  assert.match(qrs[0], /aria-hidden="true"/);
+  assert.doesNotMatch(qrs[1], /aria-hidden/);
+  els.btn.onclick();
+  assert.equal(els.btn.attrs["aria-pressed"], "true");
+  assert.equal(els.btn.attrs["aria-label"], "Hide password");
+  assert.equal(els.pwd.textContent, "pa;ss");
+  els.btn.onclick();
+  assert.equal(els.btn.attrs["aria-pressed"], "false");
+  assert.equal(els.btn.attrs["aria-label"], "Show password");
+});
+
+test("an invalid security is refused by setConfig and never thrown from set hass", () => {
+  const card = new WifiQrCard();
+  card.attachShadow = () => {
+    card.shadowRoot = { innerHTML: "", getElementById: () => ({ setAttribute() {} }) };
+    return card.shadowRoot;
+  };
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  assert.throws(() => card.setConfig({ ssid: "Box", password: "secret", security: "WPA4" }), /security must be/);
+  // The card keeps the last valid configuration; a language change must not throw.
+  assert.doesNotThrow(() => {
+    card.hass = { language: "fr" };
+  });
+  assert.match(card.shadowRoot.innerHTML, /<svg /);
+});
+
+test("a password given as a YAML number is flagged once", () => {
+  const warnings = [];
+  const orig = ctx.console.warn;
+  ctx.console.warn = (m) => warnings.push(m);
+  try {
+    const card = new WifiQrCard();
+    card.attachShadow = () => {
+      card.shadowRoot = { innerHTML: "", getElementById: () => ({ setAttribute() {} }) };
+      return card.shadowRoot;
+    };
+    card.setConfig({ ssid: "Box", password: 1234567 });
+    card.setConfig({ ssid: "Box", password: 1234567, title: "x" });
+    card.setConfig({ ssid: "Box", password: "01234567" });
+  } finally {
+    ctx.console.warn = orig;
+  }
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /quote/);
+});

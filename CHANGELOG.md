@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.7.1
+
+### Fixes
+- An invalid `security` is refused right away with a configuration error, shown in the editor, even when a password is set; the card keeps its last valid configuration and no longer breaks on a later language change.
+- A password written as a YAML number (`password: 12345678`) still works but logs one warning in the browser console asking to quote it, since YAML drops leading zeros.
+
+### Maintenance
+- New tests for `security` and numeric passwords (14 in all); CI installs the dependencies before building, the screenshot script renders each capture in its own page, and the duplicate-code check ignores test folders.
+
+## 1.7.0
+
+### Changes
+- `security` is now checked: a value other than WPA, SAE, WEP or nopass shows a configuration error. Usual spellings keep working (`wpa`, `WPA2`, `wpa3`, `none`, `open`).
+- `qr_size` takes effect again: without it nothing changes (176 px, now also the default shown in the editor and the README).
+- All-digit passwords are accepted (`password: 0` was refused); the README advises quoting them, since YAML drops leading zeros.
+- Accessibility: the show/hide password button has a label and reports its state, and screen readers no longer read the QR code twice.
+- README: explains the escaping of special characters, that the password is stored in clear text in the dashboard configuration, and uses "Type: Dashboard" for HACS.
+
+### Fixes
+- A password or network name containing `;`, `:`, `,`, `"` or `\` now gives a QR code that phones read correctly (`pa;ss` used to join with `pa`).
+- Emoji in the network name or password, and long network name + password pairs (about 110 characters or more), no longer produce an unreadable QR code.
+- A rendering error after a language change shows inside the card instead of breaking it.
+
+### Maintenance
+- CI: actions pinned by commit SHA, read-only token permissions, Dependabot for GitHub Actions, duplicate-code annotations, and QR round-trip tests run on every push.
+
 ## 1.6.1
 
 ### Maintenance
