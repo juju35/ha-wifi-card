@@ -74,7 +74,7 @@ logo: true
 ssid: MyNetwork-Guest
 password: MySecretPassword
 security: WPA
-qr_size: 200
+qr_size: 176
 ```
 
 ### Options reference
@@ -82,11 +82,11 @@ qr_size: 200
 | Option | Required | Default | Description |
 |---|---|---|---|
 | `ssid` | ✅ | — | WiFi network name (SSID) |
-| `password` | ✅* | — | WiFi password (*not needed when `security: nopass`) |
+| `password` | ✅* | — | WiFi password (*not needed when `security: nopass`). Quote it in YAML when it is made of digits (`password: "01234567"`), otherwise YAML reads it as a number and drops leading zeros |
 | `security` | ❌ | `WPA` | Security type: `WPA` (WPA/WPA2), `SAE` (WPA3), `WEP`, or `nopass` (open network) |
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header (`false` shows a plain `mdi:wifi` icon) |
-| `qr_size` | ❌ | `200` | QR code size in pixels (quiet zone included) |
+| `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
 
 ## Screenshots
@@ -98,6 +98,10 @@ qr_size: 200
 ## How it works
 
 The card generates a [WiFi QR code](https://en.wikipedia.org/wiki/QR_code#Joining_a_Wi-Fi_network) using the standard `WIFI:T:<security>;S:<ssid>;P:<password>;;` format. When scanned with a phone camera, the device automatically prompts to join the network — no need to type the password manually.
+
+The characters reserved by this format (`\`, `;`, `,`, `:` and `"`) are escaped with a backslash in the SSID and the password of the QR code, so any network name or password can be used as is. The card itself shows them unescaped.
+
+The password is stored in clear text in the dashboard configuration, which every Home Assistant user can read: use it for a guest network.
 
 The QR code engine is a self-contained JavaScript implementation of the QR code specification (ISO/IEC 18004), including Reed-Solomon error correction, embedded directly in the card source. No external libraries or CDN requests are needed.
 

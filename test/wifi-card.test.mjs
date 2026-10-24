@@ -1,0 +1,112 @@
+// Round-trip tests for the WIFI: string and the embedded QR encoder: build the QR with the card's
+// own code, decode it with jsQR and compare the payload. Run with: npm test
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+import vm from "node:vm";
+import jsQR from "jsqr";
+
+const BS = "\\"; // one backslash, spelled once to keep the expectations readable
+
+// Evaluates src/wifi-card.js with just enough browser stubs to reach its functions and classes.
+function loadCard() {
+  const defined = {};
+  const ctx = {
+    HTMLElement: class {},
+    CustomEvent: class {},
+    customElements: {
+      get: (n) => defined[n],
+      define: (n, c) => {
+        defined[n] = c;
+      },
+    },
+    document: { documentElement: { lang: "en" }, createElement: () => ({}) },
+    console: { info() {} },
+    escape,
+    unescape,
+  };
+  ctx.window = ctx;
+  vm.createContext(ctx);
+  vm.runInContext(readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8"), ctx);
+  return { ctx, WifiQrCard: defined["wifi-qr-card"] };
+}
+
+const { ctx, WifiQrCard } = loadCard();
+
+// Renders the card's SVG to an RGBA bitmap (dark modules black, the rest white) and decodes it.
+function decodeSvg(svg, scale = 8) {
+  const dim = Number(/viewBox="0 0 (\d+) /.exec(svg)[1]);
+  const size = dim * scale;
+  const px = new Uint8ClampedArray(size * size * 4).fill(255);
+  for (const [, x, y] of svg.matchAll(/M(\d+) (\d+)h1v1h-1z/g)) {
+    for (let dy = 0; dy < scale; dy++) {
+      for (let dx = 0; dx < scale; dx++) {
+        const i = ((Number(y) * scale + dy) * size + Number(x) * scale + dx) * 4;
+        px[i] = 0;
+        px[i + 1] = 0;
+        px[i + 2] = 0;
+      }
+    }
+  }
+  const res = jsQR(px, size, size, { inversionAttempts: "dontInvert" });
+  assert.ok(res, "QR code could not be decoded");
+  return new TextDecoder().decode(Uint8Array.from(res.binaryData));
+}
+
+const roundTrip = (text) => decodeSvg(WifiQrCard.prototype._buildQrSvg(text, 176));
+
+test("getLength counts UTF-8 bytes, surrogate pairs included", () => {
+  for (const s of ["abc", "Café", "📶", "Café📶", "é📶", "日本"]) {
+    assert.equal(new ctx.QR8bitByte(s).getLength(), Buffer.byteLength(s, "utf8"), s);
+  }
+});
+
+test("wifiQrField escapes backslash, semicolon, comma, colon and double quote", () => {
+  assert.equal(ctx.wifiQrField("pa;ss"), `pa${BS};ss`);
+  assert.equal(ctx.wifiQrField(`a${BS}b`), `a${BS}${BS}b`);
+  assert.equal(ctx.wifiQrField('"x"'), `${BS}"x${BS}"`);
+  assert.equal(ctx.wifiQrField(":"), `${BS}:`);
+  assert.equal(ctx.wifiQrField("a,b"), `a${BS},b`);
+  assert.equal(ctx.wifiQrField("Café 📶"), "Café 📶");
+});
+
+test("wifiQrString leaves the password out of open networks", () => {
+  assert.equal(ctx.wifiQrString({ security: "nopass", ssid: "a;b", password: "x" }), `WIFI:T:nopass;S:a${BS};b;P:;;`);
+});
+
+const cases = [
+  ["pa;ss", `pa${BS};ss`],
+  [`a${BS}b`, `a${BS}${BS}b`],
+  ['"x"', `${BS}"x${BS}"`],
+  [":", `${BS}:`],
+  ["é📶", "é📶"],
+];
+for (const [password, escaped] of cases) {
+  test(`QR round trip keeps the password ${JSON.stringify(password)}`, () => {
+    const expected = `WIFI:T:WPA;S:Box;P:${escaped};;`;
+    const str = ctx.wifiQrString({ security: "WPA", ssid: "Box", password });
+    assert.equal(str, expected);
+    assert.equal(roundTrip(str), expected);
+  });
+}
+
+test("QR round trip keeps an SSID with an emoji and reserved characters", () => {
+  const str = ctx.wifiQrString({ security: "SAE", ssid: "Café 📶;:", password: "pa;ss" });
+  assert.equal(str, `WIFI:T:SAE;S:Café 📶${BS};${BS}:;P:pa${BS};ss;;`);
+  assert.equal(roundTrip(str), str);
+});
+
+test("QR round trip across versions with multi-byte text", () => {
+  for (const n of [1, 10, 40, 120]) {
+    const s = `WIFI:T:WPA;S:${"📶é".repeat(n)};P:x;;`;
+    assert.equal(roundTrip(s), s);
+  }
+});
+
+test("security values are normalised and invalid ones rejected", () => {
+  assert.equal(ctx.wifiQrSecurity(undefined), "WPA");
+  assert.equal(ctx.wifiQrSecurity("wpa2"), "WPA");
+  assert.equal(ctx.wifiQrSecurity("WPA3"), "SAE");
+  assert.equal(ctx.wifiQrSecurity("nopass"), "nopass");
+  assert.throws(() => ctx.wifiQrSecurity("WPA4"), /security must be/);
+});
