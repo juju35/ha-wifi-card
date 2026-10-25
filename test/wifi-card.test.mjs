@@ -174,3 +174,28 @@ test("a password given as a YAML number is flagged once", () => {
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /quote/);
 });
+
+function renderWith(config) {
+  const card = new WifiQrCard();
+  card.attachShadow = () => {
+    card.shadowRoot = { innerHTML: "", getElementById: () => ({ setAttribute() {} }) };
+    return card.shadowRoot;
+  };
+  card.setConfig({ ssid: "Box", password: "secret", ...config });
+  return card.shadowRoot.innerHTML;
+}
+
+test("a negative, zero or non-numeric qr_size keeps the default 176 px", () => {
+  for (const qr_size of [-50, 0, "abc", "-10"]) {
+    const html = renderWith({ qr_size });
+    assert.match(html, /\.qr-wrap svg \{[^}]*width: 176px;/, String(qr_size));
+    assert.doesNotMatch(html, /width="-|width:\s*-/, String(qr_size));
+    assert.match(html, /<svg [^>]*width="176"/, String(qr_size));
+  }
+});
+
+test("a positive qr_size sets the displayed size", () => {
+  const html = renderWith({ qr_size: 220 });
+  assert.match(html, /\.qr-wrap svg \{[^}]*width: 220px;/);
+  assert.match(html, /<svg [^>]*width="220"/);
+});

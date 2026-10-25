@@ -145,7 +145,7 @@ class WifiQrCard extends HTMLElement {
       password: config.password == null ? '' : String(config.password),
       security: wifiQrSecurity(config.security),
       title: config.title || this._t('default_title'),
-      qr_size: Number(config.qr_size) || null,
+      qr_size: Number(config.qr_size) > 0 ? Number(config.qr_size) : null,
       logo: config.logo !== false,
     };
     this._render(strict);
