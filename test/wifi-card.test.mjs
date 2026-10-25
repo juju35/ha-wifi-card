@@ -199,3 +199,29 @@ test("a positive qr_size sets the displayed size", () => {
   assert.match(html, /\.qr-wrap svg \{[^}]*width: 220px;/);
   assert.match(html, /<svg [^>]*width="220"/);
 });
+
+test("QR version 35 is built with the right alignment patterns", () => {
+  // 1800 bytes: too long for version 34, fits version 35 (level M)
+  const text = `WIFI:S:${"x".repeat(1800 - 7)}`;
+  const svg = WifiQrCard.prototype._buildQrSvg(text, 176);
+  // 17 + 4 * 35 modules plus a quiet zone of 4 on each side
+  assert.equal(/viewBox="0 0 (\d+) /.exec(svg)[1], "165");
+  assert.equal(decodeSvg(svg, 4), text);
+  assert.deepEqual([...ctx.QRUtil.getPatternPosition(35)], [6, 30, 54, 78, 102, 126, 150]);
+});
+
+test("only a too-long payload moves to the next QR version; other errors are raised", () => {
+  const Model = ctx.QRCodeModel;
+  ctx.QRCodeModel = function () {
+    this.addData = () => {};
+    this.make = () => {
+      throw new TypeError("boom");
+    };
+  };
+  try {
+    assert.throws(() => WifiQrCard.prototype._buildQrSvg("WIFI:S:Box;;", 176), /boom/);
+  } finally {
+    ctx.QRCodeModel = Model;
+  }
+  assert.throws(() => WifiQrCard.prototype._buildQrSvg("x".repeat(3000), 176), /too long/);
+});
