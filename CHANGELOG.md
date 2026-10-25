@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.7.2
+
+### Fixes
+- A negative or zero `qr_size` (YAML only) keeps the default 176 px instead of hiding the QR code and filling the console with errors.
+- Very long payloads that fit QR version 35 are encoded in version 35 instead of skipping to version 36; any encoder error other than "too long" is now shown in the card instead of being silently skipped.
+
+### Maintenance
+- The duplication check runs on Node 22 like the other CI jobs; regression tests for both fixes (18 in all). Nothing changes for users.
+
 ## 1.7.1
 
 ### Fixes
