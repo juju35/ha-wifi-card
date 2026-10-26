@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.0 - 2026-10-26
+
+### Fixes
+- i18n: `set hass` now normalises the Home Assistant locale with `split("-")[0]`, so a regional locale (`en-GB`, `fr-BE`, `fr-CH`) resolves to its base code (`en`, `fr`) instead of silently falling back to English. The card now follows the Home Assistant language consistently across all three paths (`set hass`, editor, `document.documentElement.lang`).
+
 ## 1.8.0
 ### Changes
 - Header: the WiFi icon sits in a 40 px round badge tinted with the card blue (24 px icon), like the header icons of the other ha-* cards, instead of a blue rounded square; `logo: false` shows the `mdi:wifi` icon in the same badge.
