@@ -120,7 +120,9 @@ class WifiQrCard extends HTMLElement {
 
   set hass(hass) {
     var prevLang = this._hassLang;
-    this._hassLang = hass?.language ? hass.language : null;
+    // Normalise a regional locale (fr-BE, en-GB…) to its base, like the editor and document lang do,
+    // so WifiQrI18n is matched instead of silently falling back to English.
+    this._hassLang = hass?.language ? hass.language.split('-')[0] : null;
     if (this._configRaw && prevLang !== this._hassLang) this._applyConfig();
   }
 
