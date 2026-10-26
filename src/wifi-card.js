@@ -192,7 +192,7 @@ class WifiQrCard extends HTMLElement {
       <style>
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
-        .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; }
+        .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; margin-bottom: -2px; }
         .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
         .badge .logo { width: 24px; height: 24px; display: block; }

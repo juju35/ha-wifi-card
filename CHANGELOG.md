@@ -4,6 +4,7 @@
 
 ### Changes
 - Header: the WiFi icon sits in a 40 px round badge tinted with the card blue (24 px icon), like the header icons of the other ha-* cards, instead of a blue rounded square; `logo: false` shows the `mdi:wifi` icon in the same badge.
+- Header: 8 px between the header and the QR code.
 
 ## 1.7.2
 
