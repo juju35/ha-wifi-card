@@ -69,6 +69,7 @@ export async function render(shots, { icons = {}, hass = {} } = {}) {
   for (const s of shots) {
     // A new page each time: the card script declares top-level classes that can't be injected twice in one realm.
     const page = await browser.newPage({ deviceScaleFactor: 2, viewport: { width: 1000, height: 2000 } });
+    page.on("pageerror", (err) => console.error(`${s.file}: ${err.message}`));
     await page.setContent(pageHtml(s.theme, s.width));
     await page.addScriptTag({ content: haElements(icons) });
     await page.addScriptTag({ content: cardJs });
@@ -84,7 +85,13 @@ export async function render(shots, { icons = {}, hass = {} } = {}) {
     );
     if (s.after) await s.after(page);
     await page.waitForTimeout(400);
-    await page.locator(s.type).screenshot({ path: `${root}screenshots/${s.file}.png`, animations: "disabled" });
+    // The card with the 16 px page padding around it, on the theme background.
+    const box = await page.locator("#root").boundingBox();
+    await page.screenshot({
+      path: `${root}screenshots/${s.file}.png`,
+      clip: { x: 0, y: 0, width: s.width + 32, height: Math.ceil(box.height) + 32 },
+      animations: "disabled",
+    });
     console.log(`screenshots/${s.file}.png`);
     await page.close();
   }
@@ -95,12 +102,12 @@ const icons = {
   wifi: "M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z",
   eye: "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z",
 };
-const config = { ssid: "Maison-Invités", password: "correct-horse-battery" };
+const config = { ssid: "Home-Guests", password: "correct-horse-battery" };
 
 await render(
   [
-    { file: "card", type: "wifi-qr-card", theme: "light", width: 360, config },
-    { file: "card-dark", type: "wifi-qr-card", theme: "dark", width: 360, config: { ...config, language: "fr", title: "Wifi invité" } },
+    { file: "card", type: "wifi-qr-card", theme: "light", width: 460, config },
+    { file: "card-dark", type: "wifi-qr-card", theme: "dark", width: 460, config: { ...config, title: "Guest WiFi" } },
   ],
   { icons }
 );
