@@ -85,7 +85,7 @@ qr_size: 176
 | `password` | ✅* | — | WiFi password (*not needed when `security: nopass`). Quote it in YAML when it is made of digits (`password: "01234567"`), otherwise YAML reads it as a number and drops leading zeros |
 | `security` | ❌ | `WPA` | Security type: `WPA` (WPA/WPA2), `SAE` (WPA3), `WEP`, or `nopass` (open network) |
 | `title` | ❌ | Auto (i18n) | Card title |
-| `logo` | ❌ | `true` | Show the WiFi logo in the header (`false` shows a plain `mdi:wifi` icon) |
+| `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
 

@@ -1,9 +1,8 @@
 var WIFI_QR_CARD_VERSION = '__VERSION__';
 var WIFI_BLUE = '#64B5F6';
 
-// ── WiFi badge (original artwork: rounded-cap waves on a blue rounded square) ─
-// biome-ignore lint: inline SVG markup kept on one line
-var WIFI_LOGO = '<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" role="img" aria-label="WiFi"><rect width="36" height="36" rx="8" fill="' + WIFI_BLUE + '"/><g fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M13.76 21.76A6 6 0 0 1 22.24 21.76"/><path d="M10.22 18.22A11 11 0 0 1 25.78 18.22"/><path d="M6.69 14.69A16 16 0 0 1 29.31 14.69"/></g><circle cx="18" cy="26.5" r="2.4" fill="#fff"/></svg>';
+// ── WiFi icon (original artwork: rounded-cap waves), shown in the round header badge ─
+var WIFI_LOGO = '<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="4 4 28 28" role="img" aria-label="WiFi"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M13.76 21.76A6 6 0 0 1 22.24 21.76"/><path d="M10.22 18.22A11 11 0 0 1 25.78 18.22"/><path d="M6.69 14.69A16 16 0 0 1 29.31 14.69"/></g><circle cx="18" cy="26.5" r="2.4" fill="currentColor"/></svg>';
 
 // ── QR Code engine (pure JS, Reed-Solomon, no CDN) ───────────────────────────
 // biome-ignore lint: vendored/minified third-party code
@@ -194,12 +193,14 @@ class WifiQrCard extends HTMLElement {
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
         .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; }
-        .logo { height: 36px; width: 36px; display: block; flex: none; }
+        .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+                 --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+        .badge .logo { width: 24px; height: 24px; display: block; }
+        .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         .titles { flex: 1; min-width: 0; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
-        .header > ha-icon { --mdc-icon-size: 40px; }
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; width: ${c.qr_size ? `${c.qr_size}px` : '176px'}; }
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
@@ -215,7 +216,7 @@ class WifiQrCard extends HTMLElement {
       </style>
       <ha-card>
         <div class="header">
-          ${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}
+          <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
           <div class="titles">
             <div class="name">${wifiQrEsc(c.title)}</div>
             <div class="sub">${wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'))}</div>
