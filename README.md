@@ -21,7 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English and French
 - HACS-ready
-- Single file, lightweight (~24 KB)
+- Single file, lightweight (~30 KB)
 
 ## Prerequisites
 
@@ -69,7 +69,7 @@ password: MySecretPassword
 
 ```yaml
 type: custom:wifi-qr-card
-title: Wifi invité
+title: Guest WiFi
 logo: true
 ssid: MyNetwork-Guest
 password: MySecretPassword
@@ -91,7 +91,7 @@ qr_size: 176
 
 ## Screenshots
 
-| Light | Dark (French) |
+| Light | Dark |
 |---|---|
 | ![card](screenshots/card.png) | ![card dark](screenshots/card-dark.png) |
 
