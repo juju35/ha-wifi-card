@@ -19,7 +19,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
 - Password hidden by default, revealable with a toggle button
 - Visual editor in the dashboard UI (no YAML needed)
-- Light and dark mode, English and French
+- Light and dark mode, English, French, German and Spanish
 - HACS-ready
 - Single file, lightweight (~30 KB)
 
@@ -87,7 +87,7 @@ qr_size: 176
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
-| `language` | ❌ | Auto | Force language: `fr` or `en` (auto-detects from HA settings) |
+| `language` | ❌ | Auto | Force language: `en`, `fr`, `de` or `es` (auto-detects from HA settings) |
 
 ## Screenshots
 
@@ -130,6 +130,8 @@ The card auto-detects the language from your Home Assistant settings. Currently 
 |---|---|
 | English | `en` |
 | Français | `fr` |
+| Deutsch | `de` |
+| Español | `es` |
 
 To force a specific language:
 
