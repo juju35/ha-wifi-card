@@ -225,3 +225,18 @@ test("only a too-long payload moves to the next QR version; other errors are rai
   }
   assert.throws(() => WifiQrCard.prototype._buildQrSvg("x".repeat(3000), 176), /too long/);
 });
+
+test("I18N parity: every language has exactly the keys of en, placeholders included", () => {
+  const i18n = ctx.WifiQrI18n;
+  const ref = Object.keys(i18n.en).sort();
+  for (const lang of ["fr", "de", "es"]) {
+    assert.ok(i18n[lang], `missing language ${lang}`);
+    assert.deepEqual(Object.keys(i18n[lang]).sort(), ref, lang);
+    for (const k of ref) {
+      const ph = (s) => (s.match(/\{\w+\}/g) || []).sort();
+      assert.deepEqual(ph(i18n[lang][k]), ph(i18n.en[k]), `${lang}.${k}`);
+    }
+  }
+  assert.equal(ctx.wifiQrT("de", "password"), "Passwort");
+  assert.equal(ctx.wifiQrT("es", "password"), "Contraseña");
+});
