@@ -388,7 +388,14 @@ class WifiQrCardEditor extends HTMLElement {
     Object.keys(WIFI_QR_EDITOR_DEFAULTS).forEach((key) => {
       if (value[key] === WIFI_QR_EDITOR_DEFAULTS[key]) delete value[key];
     });
-    if (value.security === 'nopass') delete value.password;
+    // Switching to an open network drops the password from the config, but keep it
+    // in memory so switching back to WPA/SAE/WEP does not force retyping it.
+    if (value.security === 'nopass') {
+      if (value.password) this._stashedPassword = value.password;
+      delete value.password;
+    } else if (!value.password && this._stashedPassword) {
+      value.password = this._stashedPassword;
+    }
     if (this._config.type) value = Object.assign({ type: this._config.type }, value);
     this._config = value;
     this.dispatchEvent(new CustomEvent('config-changed', { detail: { config: value }, bubbles: true, composed: true }));
