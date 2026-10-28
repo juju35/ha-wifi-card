@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.0 - 2026-10-28
+
+### Changes
+- German and Spanish translations: the card and its visual editor are now available in English, French, German and Spanish, and the editor language selector offers `Deutsch` and `Español`. The language follows Home Assistant (regional locales such as `de-AT` or `es-MX` included) or can be forced with `language: de` / `language: es`.
+
+### Maintenance
+- I18N parity test: `fr`, `de` and `es` must have exactly the keys of `en`.
+
 ## 1.9.1 - 2026-10-28
 
 ### Fixes
