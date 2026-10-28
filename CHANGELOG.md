@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.1 - 2026-10-28
+
+### Fixes
+- Editor: switching `security` to `nopass` keeps the password in memory and restores it when switching back to WPA, SAE or WEP, instead of forcing you to retype it (the saved configuration still stores no password for open networks).
+- Performance: the QR code starts at the smallest version that fits the payload instead of building and discarding up to ~34 undersized models on each render.
+
+### Maintenance
+- README: screenshot caption, English full-options example (`title: Guest WiFi`) and updated card size (~30 KB).
+- CI: the release workflow runs the tests before publishing; unused ruff tooling and the redundant `screenshots/.gitkeep` removed. Nothing changes for users.
+
 ## 1.9.0 - 2026-10-26
 
 ### Fixes
