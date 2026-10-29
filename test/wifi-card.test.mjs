@@ -28,10 +28,10 @@ function loadCard() {
   ctx.window = ctx;
   vm.createContext(ctx);
   vm.runInContext(readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8"), ctx);
-  return { ctx, WifiQrCard: defined["wifi-qr-card"] };
+  return { ctx, WifiQrCard: defined["wifi-qr-card"], WifiQrCardEditor: defined["wifi-qr-card-editor"] };
 }
 
-const { ctx, WifiQrCard } = loadCard();
+const { ctx, WifiQrCard, WifiQrCardEditor } = loadCard();
 
 // Renders the card's SVG to an RGBA bitmap (dark modules black, the rest white) and decodes it.
 function decodeSvg(svg, scale = 8) {
@@ -239,4 +239,43 @@ test("I18N parity: every language has exactly the keys of en, placeholders inclu
   }
   assert.equal(ctx.wifiQrT("de", "password"), "Passwort");
   assert.equal(ctx.wifiQrT("es", "password"), "Contraseña");
+});
+
+// Feeds successive form values to the editor and returns the config it emits each time.
+function editorSteps(start, steps) {
+  const ed = new WifiQrCardEditor();
+  ed._config = start;
+  ed.dispatchEvent = () => {};
+  return steps.map((value) => {
+    ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._config, ...value } } });
+    return ed._config;
+  });
+}
+
+test("editor: the stashed password is restored once on nopass -> WPA, then the field can be cleared", () => {
+  const start = { type: "custom:wifi-qr-card", ssid: "Box", password: "secret", security: "WPA" };
+  const [open, back, cleared, retyped] = editorSteps(start, [
+    { security: "nopass" },
+    { security: "WPA", password: "" },
+    { password: "" },
+    { password: "n" },
+  ]);
+  assert.equal(open.password, undefined);
+  assert.equal(back.password, "secret");
+  assert.equal(cleared.password, undefined);
+  assert.equal(retyped.password, "n");
+});
+
+test("editor: clearing the password without a nopass round trip keeps it empty", () => {
+  const start = { type: "custom:wifi-qr-card", ssid: "Box", password: "secret" };
+  const [cleared] = editorSteps(start, [{ password: "" }]);
+  assert.equal(cleared.password, undefined);
+});
+
+test("a forced language is normalised like the HA locale", () => {
+  const card = new WifiQrCard();
+  for (const [language, expected] of [["de-AT", "de"], ["es-MX", "es"], ["FR", "fr"], ["en", "en"]]) {
+    card._configRaw = { ssid: "Box", language };
+    assert.equal(card._getLang(), expected, language);
+  }
 });
