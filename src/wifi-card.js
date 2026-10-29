@@ -191,7 +191,8 @@ class WifiQrCard extends HTMLElement {
   }
 
   _getLang() {
-    if (this._configRaw?.language) return this._configRaw.language;
+    // Normalise a forced language the same way as the HA locale (de-AT, es-MX, FR → de, es, fr).
+    if (this._configRaw?.language) return String(this._configRaw.language).toLowerCase().split('-')[0];
     if (this._hassLang) return this._hassLang;
     var docLang = document.documentElement.lang;
     if (docLang) return docLang.split('-')[0];
