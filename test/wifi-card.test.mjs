@@ -279,3 +279,73 @@ test("a forced language is normalised like the HA locale", () => {
     assert.equal(card._getLang(), expected, language);
   }
 });
+
+// Card with a stub shadow root whose elements survive re-renders, like ids looked up again.
+function stubCard() {
+  const els = {};
+  const card = new WifiQrCard();
+  card.attachShadow = () => {
+    card.shadowRoot = {
+      innerHTML: "",
+      getElementById: (id) =>
+        (els[id] ||= {
+          attrs: {},
+          style: {},
+          open: false,
+          offsetHeight: 300,
+          setAttribute(k, v) {
+            this.attrs[k] = v;
+          },
+          showModal() {
+            this.open = true;
+          },
+          close() {
+            this.open = false;
+          },
+        }),
+    };
+    return card.shadowRoot;
+  };
+  card.getBoundingClientRect = () => ({ top: 120 });
+  return { card, els };
+}
+
+test("a HA language change keeps the zoom open and the password revealed", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  els.btn.onclick();
+  els.qr.onclick();
+  card.hass = { language: "fr" };
+  assert.match(card.shadowRoot.innerHTML, /Mot de passe/);
+  assert.equal(els.zoom.open, true);
+  assert.equal(els.pwd.textContent, "secret");
+  assert.equal(els.btn.attrs["aria-pressed"], "true");
+  assert.equal(els.btn.attrs["aria-label"], "Masquer le mot de passe");
+});
+
+test("a forced language is not re-rendered on a HA language change", () => {
+  const { card } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret", language: "de" });
+  card.hass = { language: "en" };
+  card.shadowRoot.innerHTML = "untouched";
+  card.hass = { language: "fr" };
+  assert.equal(card.shadowRoot.innerHTML, "untouched");
+});
+
+test("the zoom dialog opens at the top of the card, kept on screen", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /dialog \{[^}]*margin: auto;/);
+  ctx.window.innerHeight = 800;
+  els.qr.onclick();
+  assert.equal(els.zoom.style.marginTop, "120px");
+  els.zoom.close();
+  card.getBoundingClientRect = () => ({ top: 700 });
+  els.qr.onclick();
+  assert.equal(els.zoom.style.marginTop, "492px");
+  els.zoom.close();
+  card.getBoundingClientRect = () => ({ top: -400 });
+  els.qr.onclick();
+  assert.equal(els.zoom.style.marginTop, "8px");
+});
