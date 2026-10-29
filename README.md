@@ -21,7 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German and Spanish
 - HACS-ready
-- Single file, lightweight (~30 KB)
+- Single file, lightweight (~35 KB)
 
 ## Prerequisites
 
