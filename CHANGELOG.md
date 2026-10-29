@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.10.1 - 2026-10-29
+
+### Fixes
+- Editor: after switching `security` to `nopass` and back, the password field can be cleared or retyped again. The remembered password is now restored only once, when leaving `nopass`, instead of refilling the field every time it became empty.
+- `language` forced in YAML is normalised like the Home Assistant locale: `de-AT`, `es-MX` or `FR` now resolve to `de`, `es` or `fr` instead of falling back to English.
+- Card picker: the description reads `WiFi QR code — no CDN`.
+
+### Maintenance
+- `playwright` dev dependency range aligned with the lockfile (`^1.64.1`).
+
 ## 1.10.0 - 2026-10-28
 
 ### Changes
