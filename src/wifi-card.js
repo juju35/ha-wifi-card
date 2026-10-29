@@ -470,7 +470,7 @@ if (!customElements.get('wifi-qr-card')) {
   window.customCards.push({
     type: 'wifi-qr-card',
     name: 'Wifi QR Card',
-    description: 'QR code WiFi — no CDN',
+    description: 'WiFi QR code — no CDN',
     preview: true,
     documentationURL: 'https://github.com/juju35/ha-wifi-card',
   });
