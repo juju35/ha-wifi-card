@@ -1,4 +1,7 @@
 var WIFI_QR_CARD_VERSION = '__VERSION__';
+// Fixed on purpose, not a theme variable: it is the QR code background, which must stay light
+// behind the black modules to scan reliably whatever the theme (dark themes included), and the
+// header badge reuses it as the card's brand colour, like the Wero card's yellow.
 var WIFI_BLUE = '#64B5F6';
 
 // ── WiFi icon (original artwork: rounded-cap waves), shown in the round header badge ─
@@ -375,6 +378,8 @@ class WifiQrCardEditor extends HTMLElement {
     }
   }
 
+  // The editor follows the Home Assistant UI language, like the built-in card editors; the card's
+  // `language` option only sets the language of the card itself (shown in the preview).
   _lang() {
     var lang = this._hass?.language ? this._hass.language.split('-')[0] : 'en';
     return WifiQrI18n[lang] ? lang : 'en';

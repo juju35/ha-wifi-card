@@ -6,9 +6,12 @@
 - Editor: after switching `security` to `nopass` and back, the password field can be cleared or retyped again. The remembered password is now restored only once, when leaving `nopass`, instead of refilling the field every time it became empty.
 - `language` forced in YAML is normalised like the Home Assistant locale: `de-AT`, `es-MX` or `FR` now resolve to `de`, `es` or `fr` instead of falling back to English.
 - Card picker: the description reads `WiFi QR code — no CDN`.
+- The zoomed QR code opens at the top of the card, like the other ha-* popups, instead of centred in the screen (kept fully on screen when the card is scrolled).
+- A Home Assistant language change no longer closes the zoomed QR code or hides a revealed password, and a card with a forced `language` is no longer re-rendered at all.
 
 ### Maintenance
 - `playwright` dev dependency range aligned with the lockfile (`^1.64.1`).
+- Code comments: why the QR blue is fixed (scan contrast on every theme) and why the editor follows the Home Assistant UI language.
 
 ## 1.10.0 - 2026-10-28
 
