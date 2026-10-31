@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Called by Release, so that a version is published only once these checks pass.
+  workflow_call:
 
 permissions:
   contents: read
