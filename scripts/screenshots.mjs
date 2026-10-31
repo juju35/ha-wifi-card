@@ -107,7 +107,7 @@ const config = { ssid: "Home-Guests", password: "correct-horse-battery" };
 await render(
   [
     { file: "card", type: "wifi-qr-card", theme: "light", width: 460, config },
-    { file: "card-dark", type: "wifi-qr-card", theme: "dark", width: 460, config: { ...config, title: "Guest WiFi" } },
+    { file: "card-dark", type: "wifi-qr-card", theme: "dark", width: 460, config },
   ],
   { icons }
 );
