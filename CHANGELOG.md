@@ -3,7 +3,7 @@
 ## 1.10.4 - 2026-11-01
 
 ### Changes
-- Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for the card and its visual editor; the editor language selector offers `Italiano`, `Nederlands`, `Português` and `Polski`. A Brazilian Portuguese Home Assistant (`pt-BR`) gets the European Portuguese texts.
+- Added Italian, Dutch, European Portuguese and Polish translations (`it`, `nl`, `pt`, `pl`) for the card and its visual editor; the editor language selector offers `Italiano`, `Nederlands`, `Português (Portugal)` and `Polski`. A Brazilian Portuguese Home Assistant (`pt-BR`) gets the European Portuguese texts.
 
 ## 1.10.3 - 2026-11-01
 

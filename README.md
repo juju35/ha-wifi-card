@@ -136,7 +136,7 @@ The card auto-detects the language from your Home Assistant settings: the full l
 | Srpski (latinica) | `sr-Latn` |
 | Italiano | `it` |
 | Nederlands | `nl` |
-| Português | `pt` |
+| Português (Portugal) | `pt` |
 | Polski | `pl` |
 
 To force a specific language:
