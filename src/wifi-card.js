@@ -438,15 +438,27 @@ class WifiQrCard extends HTMLElement {
       <style>
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
-        .header { display: flex; align-items: center; gap: 10px; align-self: flex-start; width: 100%; margin-bottom: -2px; }
+        /* Container on the header (an inner element as wide as the card), not on the host: an inline-size
+           container has no intrinsic width and would collapse the card in an auto-width parent. */
+        .header { align-self: flex-start; width: 100%; margin-bottom: -2px; container-type: inline-size; }
+        .hrow { display: flex; align-items: center; gap: 10px; }
         .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
         .badge .logo { width: 24px; height: 24px; display: block; }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         /* Shrinks with the card but always keeps a few characters of the title visible. */
-        .titles { flex: 1 1 auto; min-width: 4ch; }
+        .titles { flex: 1 1 0; min-width: 4ch; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* Phone width at 4 columns (~104 px card): a 32 px badge, as on the mini cards, a 14 px title and 4 px
+           taken from the card padding keep 4 characters of the title visible. */
+        @container (max-width: 100px) {
+          .hrow { gap: 4px; margin-left: -4px; }
+          .name { font-size: 14px; }
+          .badge { width: 32px; height: 32px; }
+          .badge .logo { width: 20px; height: 20px; }
+          .badge ha-icon { --mdc-icon-size: 20px; }
+        }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; width: ${c.qr_size ? `${c.qr_size}px` : '176px'}; }
@@ -468,13 +480,13 @@ class WifiQrCard extends HTMLElement {
         .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
       </style>
       <ha-card>
-        <div class="header">
+        <div class="header"><div class="hrow">
           <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
           <div class="titles">
             <div class="name" title="${title}">${title}</div>
             <div class="sub" title="${sub}">${sub}</div>
           </div>
-        </div>
+        </div></div>
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
         <div class="info-block">
