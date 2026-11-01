@@ -226,32 +226,44 @@ test("only a too-long payload moves to the next QR version; other errors are rai
   assert.throws(() => WifiQrCard.prototype._buildQrSvg("x".repeat(3000), 176), /too long/);
 });
 
-test("I18N parity: every language has exactly the keys of en, placeholders included", () => {
-  const i18n = ctx.WifiQrI18n;
-  const ref = Object.keys(i18n.en).sort();
-  for (const lang of ["fr", "de", "es"]) {
-    assert.ok(i18n[lang], `missing language ${lang}`);
-    assert.deepEqual(Object.keys(i18n[lang]).sort(), ref, lang);
-    for (const k of ref) {
-      const ph = (s) => (s.match(/\{\w+\}/g) || []).sort();
-      assert.deepEqual(ph(i18n[lang][k]), ph(i18n.en[k]), `${lang}.${k}`);
-    }
-  }
-  assert.equal(ctx.wifiQrT("de", "password"), "Passwort");
-  assert.equal(ctx.wifiQrT("es", "password"), "Contraseña");
-});
+const LANGS = ["fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl"];
 
-test("I18N parity: sr and sr-Latn have exactly the keys of en, arrays of the same length", () => {
+test("I18N parity: every language has exactly the keys of en, arrays of the same length, placeholders included", () => {
   const i18n = ctx.WifiQrI18n;
   const shape = (o) =>
     Object.keys(o)
       .sort()
       .map((k) => (Array.isArray(o[k]) ? `${k}[${o[k].length}]` : k));
-  for (const lang of ["sr", "sr-Latn"]) {
+  const ph = (s) => (String(s).match(/\{\w+\}/g) || []).sort();
+  assert.deepEqual(Object.keys(i18n).sort(), ["en", ...LANGS].sort());
+  for (const lang of LANGS) {
     assert.ok(i18n[lang], `missing language ${lang}`);
     assert.deepEqual(shape(i18n[lang]), shape(i18n.en), lang);
-    for (const [k, v] of Object.entries(i18n[lang])) assert.ok(typeof v === "string" && v.trim(), `${lang}.${k}`);
+    for (const [k, v] of Object.entries(i18n[lang])) {
+      assert.ok(typeof v === "string" && v.trim(), `${lang}.${k} is empty`);
+      assert.equal(v, v.trim(), `${lang}.${k} has surrounding spaces`);
+      assert.deepEqual(ph(v), ph(i18n.en[k]), `${lang}.${k} placeholders`);
+    }
   }
+  assert.equal(ctx.wifiQrT("de", "password"), "Passwort");
+  assert.equal(ctx.wifiQrT("es", "password"), "Contraseña");
+  assert.equal(ctx.wifiQrT("it", "ed_language"), "Lingua");
+  assert.equal(ctx.wifiQrT("nl", "password"), "Wachtwoord");
+  assert.equal(ctx.wifiQrT("pt", "password"), "Palavra-passe");
+  assert.equal(ctx.wifiQrT("pl", "password"), "Hasło");
+});
+
+test("editor: the language selector offers every translated language once", () => {
+  const ed = new WifiQrCardEditor();
+  ed._hass = { language: "en" };
+  const field = ed._schema().find((f) => f.name === "language");
+  const options = field.selector.select.options;
+  assert.deepEqual([...options.map((o) => o.value)].sort(), [...Object.keys(ctx.WifiQrI18n)].sort());
+  const labels = Object.fromEntries(options.map((o) => [o.value, o.label]));
+  assert.equal(labels.it, "Italiano");
+  assert.equal(labels.nl, "Nederlands");
+  assert.equal(labels.pt, "Português");
+  assert.equal(labels.pl, "Polski");
 });
 
 test("I18N script: no Latin letter in sr, no Cyrillic letter in sr-Latn (proper nouns and units aside)", () => {
@@ -266,7 +278,13 @@ test("language resolution: full tag if translated, else the part before the dash
     ["de-CH", "de"],
     ["sr-Latn", "sr-Latn"],
     ["sr", "sr"],
-    ["pt-BR", "en"],
+    ["it-IT", "it"],
+    ["nl-BE", "nl"],
+    ["pt", "pt"],
+    // pt-BR falls back to European Portuguese (no pt-BR dictionary): assumed.
+    ["pt-BR", "pt"],
+    ["pl-PL", "pl"],
+    ["ja", "en"],
   ];
   for (const [language, expected] of cases) {
     assert.equal(ctx.wifiQrLang(language), expected, `wifiQrLang ${language}`);
