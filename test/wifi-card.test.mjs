@@ -460,3 +460,71 @@ test("editor: editing another field after a YAML alias saves a valid security", 
   assert.equal(ed._config.password, "secret");
   assert.equal(ed._config.title, "Guests");
 });
+
+// Body of the first CSS rule whose selector is exactly `sel` in the rendered <style>.
+function cssRule(html, sel) {
+  const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const m = new RegExp(`(?:^|[\\s}])${esc}\\s*\\{([^}]*)\\}`).exec(html);
+  assert.ok(m, `no CSS rule for ${sel}`);
+  return m[1];
+}
+const px = (body, prop) => {
+  const m = new RegExp(`(?:^|[;\\s])${prop}:\\s*([^;]+);`).exec(body);
+  return m ? m[1].trim().split(/\s+/).map((v) => Number.parseFloat(v)) : null;
+};
+
+test("open network: the message wraps between words, the SSID and password still break anywhere", () => {
+  const html = renderWith({ security: "nopass", language: "pl" });
+  assert.match(html, /<div class="msg">Sieć otwarta \(bez hasła\)<\/div>/);
+  assert.doesNotMatch(html, /<div class="val">Sieć otwarta/);
+  const msg = cssRule(html, ".msg");
+  assert.match(msg, /word-break: normal;/);
+  assert.match(msg, /overflow-wrap: anywhere;/);
+  assert.match(msg, /font-family: inherit;/);
+  assert.match(cssRule(html, ".val"), /word-break: break-all;/);
+});
+
+test("eye button: target of at least 24x24 px without making the Password row taller", () => {
+  const body = cssRule(renderWith({}), "button");
+  const [pad] = px(body, "padding");
+  const [mv, mh = mv] = px(body, "margin");
+  const icon = 22;
+  assert.ok(icon + 2 * pad >= 24, `target ${icon + 2 * pad} px`);
+  // The vertical negative margin absorbs the padding: the button takes no more height than the icon.
+  assert.ok(icon + 2 * pad + 2 * mv <= icon, "row height grows");
+  assert.ok(mh <= 0 && -mh <= pad, "horizontal margin must not push the icon outside the row padding");
+  assert.match(body, /flex: none;/);
+});
+
+test("masked password stays on one line; the revealed password wraps again", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="val masked" id="pwd">/);
+  const masked = cssRule(html, ".val.masked");
+  assert.match(masked, /white-space: nowrap;/);
+  assert.match(masked, /overflow: hidden;/);
+  assert.match(cssRule(html, ".pwd-row .val"), /min-width: 0;/);
+  els.btn.onclick();
+  assert.equal(els.pwd.className, "val");
+  assert.equal(els.pwd.textContent, "secret");
+  els.btn.onclick();
+  assert.equal(els.pwd.className, "val masked");
+  // A re-render with the password revealed keeps it unmasked.
+  els.btn.onclick();
+  card.hass = { language: "fr" };
+  assert.equal(els.pwd.className, "val");
+});
+
+test("header: the title keeps a few characters and its full text is readable in a tooltip", () => {
+  const html = renderWith({ title: `Wi-Fi <"guests"> & 'co'`, language: "pl" });
+  assert.match(html, /<div class="name" title="Wi-Fi &lt;&quot;guests&quot;&gt; &amp; &#39;co&#39;">Wi-Fi &lt;/);
+  const titles = cssRule(html, ".titles");
+  assert.match(titles, /flex: 1 1 auto;/);
+  assert.match(titles, /min-width: 4ch;/);
+  assert.match(cssRule(html, ".badge"), /flex: none;/);
+  // Default title, translated, gets the tooltip too.
+  assert.match(renderWith({ language: "sr-Latn" }), /<div class="name" title="WiFi za goste">/);
+  // The security subtitle, also truncated on narrow cards (« Brak (sieć otwa… »).
+  assert.match(renderWith({ security: "nopass", language: "pl" }), /<div class="sub" title="Brak \(sieć otwarta\)">/);
+});
