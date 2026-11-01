@@ -431,6 +431,9 @@ class WifiQrCard extends HTMLElement {
       return;
     }
 
+    // Escaped once, shown as text and as a tooltip: both are truncated on narrow cards.
+    const title = wifiQrEsc(c.title);
+    const sub = wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; height: 100%; }
@@ -440,7 +443,8 @@ class WifiQrCard extends HTMLElement {
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
         .badge .logo { width: 24px; height: 24px; display: block; }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
-        .titles { flex: 1; min-width: 0; }
+        /* Shrinks with the card but always keeps a few characters of the title visible. */
+        .titles { flex: 1 1 auto; min-width: 4ch; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
@@ -453,17 +457,22 @@ class WifiQrCard extends HTMLElement {
         .info-row { background: var(--secondary-background-color, rgba(127,127,127,.08)); border-radius: 10px; padding: 6px 10px; }
         .lbl { font-size: 11px; color: var(--secondary-text-color); margin-bottom: 0; }
         .val { font-size: 13px; font-weight: 500; font-family: var(--code-font-family, monospace); word-break: break-all; color: var(--primary-text-color); }
+        /* Open network message: a sentence, wrapped between words (break-all is only for the SSID and password). */
+        .msg { font-size: 13px; font-weight: 500; font-family: inherit; word-break: normal; overflow-wrap: anywhere; color: var(--primary-text-color); }
         .pwd-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        /* Negative margin: the 22 px eye icon overlaps the row padding instead of making the Password row taller than the Network row. */
-        button { background: none; border: none; cursor: pointer; padding: 0; margin: -4px 0; display: flex; align-items: center; }
+        .pwd-row .val { flex: 1 1 auto; min-width: 0; }
+        /* The mask stays on one line so the Password row keeps the Network row height on narrow cards. */
+        .val.masked { white-space: nowrap; overflow: hidden; }
+        /* 30 px target (WCAG 2.5.8); the negative margin absorbs the padding so the Password row is not taller than the Network row. */
+        button { background: none; border: none; cursor: pointer; padding: 4px; margin: -8px -4px; display: flex; align-items: center; flex: none; }
         .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
       </style>
       <ha-card>
         <div class="header">
           <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
           <div class="titles">
-            <div class="name">${wifiQrEsc(c.title)}</div>
-            <div class="sub">${wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'))}</div>
+            <div class="name" title="${title}">${title}</div>
+            <div class="sub" title="${sub}">${sub}</div>
           </div>
         </div>
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
@@ -476,9 +485,9 @@ class WifiQrCard extends HTMLElement {
           <div class="info-row">
             <div class="lbl">${this._t('password')}</div>
             ${isOpen
-              ? `<div class="val">${this._t('open_network')}</div>`
+              ? `<div class="msg">${this._t('open_network')}</div>`
               : `<div class="pwd-row">
-              <div class="val" id="pwd">••••••••••••••••</div>
+              <div class="val masked" id="pwd">••••••••••••••••</div>
               <button id="btn" aria-label="${this._t('show_password')}" aria-pressed="false"><ha-icon icon="mdi:eye" id="ico"></ha-icon></button>
             </div>`}
           </div>
@@ -493,7 +502,9 @@ class WifiQrCard extends HTMLElement {
         const shown = !!this._pwdShown;
         btn.setAttribute('aria-pressed', String(shown));
         btn.setAttribute('aria-label', this._t(shown ? 'hide_password' : 'show_password'));
-        this.shadowRoot.getElementById('pwd').textContent = shown ? c.password : '••••••••••••••••';
+        const pwd = this.shadowRoot.getElementById('pwd');
+        pwd.textContent = shown ? c.password : '••••••••••••••••';
+        pwd.className = shown ? 'val' : 'val masked';
         this.shadowRoot.getElementById('ico').setAttribute('icon', shown ? 'mdi:eye-off' : 'mdi:eye');
       };
       btn.onclick = () => {
