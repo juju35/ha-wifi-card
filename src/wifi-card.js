@@ -113,10 +113,70 @@ var WifiQrI18n = {
     sec_wep: 'WEP',
     sec_nopass: 'Ninguna (red abierta)',
   },
+  sr: {
+    default_title: 'WiFi за госте',
+    network: 'Мрежа',
+    password: 'Лозинка',
+    hint: 'Скенирајте QR код за аутоматско повезивање',
+    zoom: 'Увећај QR код',
+    open_network: 'Отворена мрежа (без лозинке)',
+    show_password: 'Прикажи лозинку',
+    hide_password: 'Сакриј лозинку',
+    ed_title: 'Наслов',
+    ed_ssid: 'Назив мреже (SSID)',
+    ed_password: 'Лозинка',
+    ed_security: 'Безбедност',
+    ed_qr_size: 'Величина QR кода',
+    ed_language: 'Језик',
+    ed_title_helper: 'Остави празно за подразумевани наслов',
+    ed_password_helper: 'Није потребно када је безбедност подешена на „Нема“',
+    ed_qr_size_helper: 'Укључује и празан простор око кода — подразумевано је 176 px',
+    ed_language_helper: 'Остави празно да прати језик Home Assistant-а',
+    ed_logo: 'Прикажи WiFi лого',
+    sec_wpa: 'WPA / WPA2',
+    sec_sae: 'WPA3 (SAE)',
+    sec_wep: 'WEP',
+    sec_nopass: 'Нема (отворена мрежа)',
+  },
+  'sr-Latn': {
+    default_title: 'WiFi za goste',
+    network: 'Mreža',
+    password: 'Lozinka',
+    hint: 'Skenirajte QR kod za automatsko povezivanje',
+    zoom: 'Uvećaj QR kod',
+    open_network: 'Otvorena mreža (bez lozinke)',
+    show_password: 'Prikaži lozinku',
+    hide_password: 'Sakrij lozinku',
+    ed_title: 'Naslov',
+    ed_ssid: 'Naziv mreže (SSID)',
+    ed_password: 'Lozinka',
+    ed_security: 'Bezbednost',
+    ed_qr_size: 'Veličina QR koda',
+    ed_language: 'Jezik',
+    ed_title_helper: 'Ostavi prazno za podrazumevani naslov',
+    ed_password_helper: 'Nije potrebno kada je bezbednost podešena na „Nema“',
+    ed_qr_size_helper: 'Uključuje i prazan prostor oko koda — podrazumevano je 176 px',
+    ed_language_helper: 'Ostavi prazno da prati jezik Home Assistant-a',
+    ed_logo: 'Prikaži WiFi logo',
+    sec_wpa: 'WPA / WPA2',
+    sec_sae: 'WPA3 (SAE)',
+    sec_wep: 'WEP',
+    sec_nopass: 'Nema (otvorena mreža)',
+  },
 };
 
 function wifiQrEsc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Resolves a language tag to a WifiQrI18n key: the full tag when it is translated (sr-Latn),
+// else the part before the dash (fr-FR → fr), else en. Case-insensitive (FR, sr-latn).
+function wifiQrLang(tag) {
+  if (tag == null || tag === '') return 'en';
+  var codes = Object.keys(WifiQrI18n);
+  var find = (t) => codes.find((code) => code.toLowerCase() === t.toLowerCase());
+  var raw = String(tag);
+  return find(raw) || find(raw.split('-')[0]) || 'en';
 }
 
 function wifiQrT(lang, key) {
@@ -197,20 +257,18 @@ class WifiQrCard extends HTMLElement {
 
   set hass(hass) {
     var prevLang = this._configRaw ? this._getLang() : null;
-    // Normalise a regional locale (fr-BE, en-GB…) to its base, like the editor and document lang do,
-    // so WifiQrI18n is matched instead of silently falling back to English.
-    this._hassLang = hass?.language ? hass.language.split('-')[0] : null;
+    // Resolved by wifiQrLang: sr-Latn is kept, a regional locale (fr-BE, en-GB…) falls back to its base.
+    this._hassLang = hass?.language ? wifiQrLang(hass.language) : null;
     // Re-render only when the language actually shown changes (not with a forced `language`).
     if (this._configRaw && prevLang !== this._getLang()) this._applyConfig();
   }
 
   _getLang() {
-    // Normalise a forced language the same way as the HA locale (de-AT, es-MX, FR → de, es, fr).
-    if (this._configRaw?.language) return String(this._configRaw.language).toLowerCase().split('-')[0];
+    // Priority: the card's language option, then the HA language, then the page language. Each is
+    // resolved the same way (de-AT, es-MX, FR, sr-Latn → de, es, fr, sr-Latn).
+    if (this._configRaw?.language) return wifiQrLang(this._configRaw.language);
     if (this._hassLang) return this._hassLang;
-    var docLang = document.documentElement.lang;
-    if (docLang) return docLang.split('-')[0];
-    return 'en';
+    return wifiQrLang(document.documentElement.lang);
   }
 
   _t(key) {
@@ -392,8 +450,7 @@ class WifiQrCardEditor extends HTMLElement {
   // The editor follows the Home Assistant UI language, like the built-in card editors; the card's
   // `language` option only sets the language of the card itself (shown in the preview).
   _lang() {
-    var lang = this._hass?.language ? this._hass.language.split('-')[0] : 'en';
-    return WifiQrI18n[lang] ? lang : 'en';
+    return wifiQrLang(this._hass?.language);
   }
 
   _schema() {
@@ -437,6 +494,8 @@ class WifiQrCardEditor extends HTMLElement {
               { value: 'en', label: 'English' },
               { value: 'de', label: 'Deutsch' },
               { value: 'es', label: 'Español' },
+              { value: 'sr', label: 'Српски' },
+              { value: 'sr-Latn', label: 'Srpski (latinica)' },
             ],
           },
         },

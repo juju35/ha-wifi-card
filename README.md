@@ -87,7 +87,7 @@ qr_size: 176
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
-| `language` | ❌ | Auto | Force language: `en`, `fr`, `de` or `es` (auto-detects from HA settings) |
+| `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr` or `sr-Latn` (auto-detects from HA settings) |
 
 ## Screenshots
 
@@ -124,7 +124,7 @@ npm run screenshots  # renders the card into screenshots/
 
 ## Translations
 
-The card auto-detects the language from your Home Assistant settings. Currently supported:
+The card auto-detects the language from your Home Assistant settings: the full locale when it is translated (`sr-Latn`), otherwise its base language (`fr-FR` → `fr`), otherwise English. Currently supported:
 
 | Language | Code |
 |---|---|
@@ -132,6 +132,8 @@ The card auto-detects the language from your Home Assistant settings. Currently 
 | Français | `fr` |
 | Deutsch | `de` |
 | Español | `es` |
+| Српски | `sr` |
+| Srpski (latinica) | `sr-Latn` |
 
 To force a specific language:
 
