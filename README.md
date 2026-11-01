@@ -19,7 +19,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
 - Password hidden by default, revealable with a toggle button
 - Visual editor in the dashboard UI (no YAML needed)
-- Light and dark mode, English, French, German and Spanish
+- Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese and Polish
 - HACS-ready
 - Single file, lightweight (~35 KB)
 
@@ -87,7 +87,7 @@ qr_size: 176
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
-| `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr` or `sr-Latn` (auto-detects from HA settings) |
+| `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt` or `pl` (auto-detects from HA settings) |
 
 ## Screenshots
 
@@ -124,7 +124,7 @@ npm run screenshots  # renders the card into screenshots/
 
 ## Translations
 
-The card auto-detects the language from your Home Assistant settings: the full locale when it is translated (`sr-Latn`), otherwise its base language (`fr-FR` → `fr`), otherwise English. Currently supported:
+The card auto-detects the language from your Home Assistant settings: the full locale when it is translated (`sr-Latn`), otherwise its base language (`fr-FR` → `fr`, `pt-BR` → `pt`, European Portuguese), otherwise English. Currently supported:
 
 | Language | Code |
 |---|---|
@@ -134,6 +134,10 @@ The card auto-detects the language from your Home Assistant settings: the full l
 | Español | `es` |
 | Српски | `sr` |
 | Srpski (latinica) | `sr-Latn` |
+| Italiano | `it` |
+| Nederlands | `nl` |
+| Português (Portugal) | `pt` |
+| Polski | `pl` |
 
 To force a specific language:
 
