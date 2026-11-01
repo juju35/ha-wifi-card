@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.10.2 - 2026-10-29
+
+### Fixes
+- Visual editor: a `security` written in YAML with an alias the card accepts (`wpa2`, `wpa3`, `none`, `open`, lower case…) now shows the matching option in the « Security » field instead of an empty select. The configuration is only rewritten (to `WPA`, `SAE`, `WEP` or `nopass`) once you change something in the editor.
+- The « Password » row is now the same height as the « Network » row: the eye button no longer makes it taller.
+
+### Maintenance
+- Biome 2.6.3 everywhere: the pre-commit hook, `biome.json` and the Lint workflow, which now reads the version from `.pre-commit-config.yaml` (and checks `biome.json` matches) instead of hard-coding it.
+- Dependabot no longer bumps `playwright`, kept on the version shared by the ha-* repos.
+- Screenshots updated.
+
 ## 1.10.1 - 2026-10-29
 
 ### Fixes
