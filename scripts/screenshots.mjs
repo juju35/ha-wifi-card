@@ -1,7 +1,7 @@
 // Renders the card with mock data and saves the README screenshots.
 // Usage: npm run build && npm run screenshots
 import { chromium } from "playwright";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -63,6 +63,35 @@ const pageHtml = (theme, width) => `<!doctype html><html><head><meta charset="ut
          font-family: Roboto, "Segoe UI", Helvetica, Arial, sans-serif; width: ${width}px; }
 </style></head><body><div id="root"></div></body></html>`;
 
+// Decodes both PNGs in the browser and compares their RGBA pixels (not their bytes).
+export async function samePixels(browser, a, b) {
+  const page = await browser.newPage();
+  try {
+    return await page.evaluate(
+      async ([a, b]) => {
+        const decode = async (b64) => {
+          const img = new Image();
+          img.src = `data:image/png;base64,${b64}`;
+          await img.decode();
+          const c = document.createElement("canvas");
+          c.width = img.naturalWidth;
+          c.height = img.naturalHeight;
+          const ctx = c.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          return ctx.getImageData(0, 0, c.width, c.height);
+        };
+        const [x, y] = await Promise.all([decode(a), decode(b)]);
+        if (x.width !== y.width || x.height !== y.height) return false;
+        for (let i = 0; i < x.data.length; i++) if (x.data[i] !== y.data[i]) return false;
+        return true;
+      },
+      [Buffer.from(a).toString("base64"), Buffer.from(b).toString("base64")]
+    );
+  } finally {
+    await page.close();
+  }
+}
+
 // Renders each shot { file, type, theme, width, config, hass?, after? } into screenshots/<file>.png.
 export async function render(shots, { icons = {}, hass = {} } = {}) {
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
@@ -87,13 +116,19 @@ export async function render(shots, { icons = {}, hass = {} } = {}) {
     await page.waitForTimeout(400);
     // The card with the 16 px page padding around it, on the theme background.
     const box = await page.locator("#root").boundingBox();
-    await page.screenshot({
-      path: `${root}screenshots/${s.file}.png`,
+    const png = await page.screenshot({
       clip: { x: 0, y: 0, width: s.width + 32, height: Math.ceil(box.height) + 32 },
       animations: "disabled",
     });
-    console.log(`screenshots/${s.file}.png`);
     await page.close();
+    const path = `${root}screenshots/${s.file}.png`;
+    // Rewritten only when the decoded pixels differ: a re-encoded but identical PNG is not a change.
+    if (existsSync(path) && (await samePixels(browser, readFileSync(path), png))) {
+      console.log(`screenshots/${s.file}.png unchanged`);
+      continue;
+    }
+    writeFileSync(path, png);
+    console.log(`screenshots/${s.file}.png`);
   }
   await browser.close();
 }
