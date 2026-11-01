@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.3 - 2026-11-01
+
+### Changes
+- Serbian translations, Cyrillic (`sr`) and Latin (`sr-Latn`), for the card and its visual editor; the editor language selector offers `Српски` and `Srpski (latinica)`. Serbian translations by @cpmarexel2f (#22).
+
+### Fixes
+- Language resolution is the same for the card's `language` option, the Home Assistant language, the page language and the editor: the full locale when it is translated (`sr-Latn`), otherwise the part before the dash (`fr-FR` → `fr`, `de-CH` → `de`), otherwise English. A Home Assistant set to `sr-Latn` now gets the Latin script instead of Cyrillic.
+
 ## 1.10.2 - 2026-10-29
 
 ### Fixes

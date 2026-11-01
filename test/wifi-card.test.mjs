@@ -241,6 +241,55 @@ test("I18N parity: every language has exactly the keys of en, placeholders inclu
   assert.equal(ctx.wifiQrT("es", "password"), "Contraseña");
 });
 
+test("I18N parity: sr and sr-Latn have exactly the keys of en, arrays of the same length", () => {
+  const i18n = ctx.WifiQrI18n;
+  const shape = (o) =>
+    Object.keys(o)
+      .sort()
+      .map((k) => (Array.isArray(o[k]) ? `${k}[${o[k].length}]` : k));
+  for (const lang of ["sr", "sr-Latn"]) {
+    assert.ok(i18n[lang], `missing language ${lang}`);
+    assert.deepEqual(shape(i18n[lang]), shape(i18n.en), lang);
+    for (const [k, v] of Object.entries(i18n[lang])) assert.ok(typeof v === "string" && v.trim(), `${lang}.${k}`);
+  }
+});
+
+test("I18N script: no Latin letter in sr, no Cyrillic letter in sr-Latn (proper nouns and units aside)", () => {
+  const strip = (s) => s.replace(/Home Assistant|WiFi|QR|SSID|WPA\d?|SAE|WEP|px/g, "");
+  for (const [k, v] of Object.entries(ctx.WifiQrI18n.sr)) assert.doesNotMatch(strip(v), /\p{Script=Latin}/u, `sr.${k}`);
+  for (const [k, v] of Object.entries(ctx.WifiQrI18n["sr-Latn"])) assert.doesNotMatch(v, /\p{Script=Cyrillic}/u, `sr-Latn.${k}`);
+});
+
+test("language resolution: full tag if translated, else the part before the dash, else en", () => {
+  const cases = [
+    ["fr-FR", "fr"],
+    ["de-CH", "de"],
+    ["sr-Latn", "sr-Latn"],
+    ["sr", "sr"],
+    ["pt-BR", "en"],
+  ];
+  for (const [language, expected] of cases) {
+    assert.equal(ctx.wifiQrLang(language), expected, `wifiQrLang ${language}`);
+    // HA locale, for the card and the editor
+    const card = new WifiQrCard();
+    card.hass = { language };
+    card._configRaw = { ssid: "Box" };
+    assert.equal(card._getLang(), expected, `card hass ${language}`);
+    const ed = new WifiQrCardEditor();
+    ed._hass = { language };
+    assert.equal(ed._lang(), expected, `editor ${language}`);
+    // Forced language
+    card._configRaw = { ssid: "Box", language };
+    assert.equal(card._getLang(), expected, `card language ${language}`);
+  }
+  // Priority kept: the card's language option wins over the HA language.
+  const card = new WifiQrCard();
+  card.hass = { language: "fr-FR" };
+  card._configRaw = { ssid: "Box", language: "sr-Latn" };
+  assert.equal(card._getLang(), "sr-Latn");
+  assert.equal(ctx.wifiQrT(card._getLang(), "password"), "Lozinka");
+});
+
 // Feeds successive form values to the editor and returns the config it emits each time.
 function editorSteps(start, steps) {
   const ed = new WifiQrCardEditor();
