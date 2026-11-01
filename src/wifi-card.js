@@ -135,6 +135,16 @@ function wifiQrSecurity(value) {
   return sec;
 }
 
+// For the editor: the select option matching what the card does, or the value as written
+// when the card would reject it (so the error stays visible instead of being masked).
+function wifiQrEditorSecurity(value) {
+  try {
+    return wifiQrSecurity(value);
+  } catch (_err) {
+    return value;
+  }
+}
+
 // Escapes the characters reserved by the WIFI: format (backslash, ; , : and ").
 function wifiQrField(s) {
   return String(s).replace(/([\\;,:"])/g, '\\$1');
@@ -286,7 +296,8 @@ class WifiQrCard extends HTMLElement {
         .lbl { font-size: 11px; color: var(--secondary-text-color); margin-bottom: 0; }
         .val { font-size: 13px; font-weight: 500; font-family: var(--code-font-family, monospace); word-break: break-all; color: var(--primary-text-color); }
         .pwd-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        button { background: none; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; }
+        /* Negative margin: the 22 px eye icon overlaps the row padding instead of making the Password row taller than the Network row. */
+        button { background: none; border: none; cursor: pointer; padding: 0; margin: -4px 0; display: flex; align-items: center; }
         .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
       </style>
       <ha-card>
@@ -450,7 +461,11 @@ class WifiQrCardEditor extends HTMLElement {
       return txt === key ? undefined : txt;
     };
     // Show the defaults as set, so the fields match what the card does.
-    this._form.data = Object.assign({}, WIFI_QR_EDITOR_DEFAULTS, this._config);
+    // YAML aliases (wpa2, wpa3, none, open…) are shown as the matching option; the config itself
+    // is only rewritten once the user changes something.
+    var data = Object.assign({}, WIFI_QR_EDITOR_DEFAULTS, this._config);
+    data.security = wifiQrEditorSecurity(data.security);
+    this._form.data = data;
   }
 
   _valueChanged(ev) {
