@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.10.5 - 2026-11-01
+
+### Fixes
+- Open network: the « Open network (no password) » message now wraps between words instead of being cut in the middle of a word on narrow cards (« Open network (n / o password) »), in every language.
+- The eye button that shows the password has a 30 × 30 px touch target instead of 22 × 22 px, without making the « Password » row taller.
+- The hidden password (`••••••••••••••••`) stays on one line, so on narrow cards (default 6-column width of a Sections view on a phone) the « Password » row keeps the height of the « Network » row. The revealed password still wraps.
+- When the title or the security subtitle is truncated on a narrow card, hovering it shows the full text; the title always keeps a few characters visible.
+
 ## 1.10.4 - 2026-11-01
 
 ### Changes
