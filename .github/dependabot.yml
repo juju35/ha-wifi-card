@@ -15,6 +15,9 @@ updates:
       dev-dependencies:
         dependency-type: development
         patterns: ["*"]
+    # Playwright stays on the version shared by the ha-* repos (bumped by hand).
+    ignore:
+      - dependency-name: playwright
   - package-ecosystem: pre-commit
     directory: /
     schedule:
