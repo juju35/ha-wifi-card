@@ -349,3 +349,47 @@ test("the zoom dialog opens at the top of the card, kept on screen", () => {
   els.qr.onclick();
   assert.equal(els.zoom.style.marginTop, "8px");
 });
+
+// Renders the editor with a stub ha-form and returns the data it shows.
+function editorData(config) {
+  const ed = new WifiQrCardEditor();
+  ed._form = {};
+  ed._hass = { language: "en" };
+  ed._config = { ...config };
+  ed._render();
+  return { ed, data: ed._form.data };
+}
+
+test("editor: a YAML security alias is shown as the matching select option", () => {
+  for (const [alias, expected] of [
+    ["wpa2", "WPA"],
+    ["wpa", "WPA"],
+    ["WPA/WPA2", "WPA"],
+    ["wpa3", "SAE"],
+    ["sae", "SAE"],
+    ["wep", "WEP"],
+    ["none", "nopass"],
+    ["open", "nopass"],
+    ["NOPASS", "nopass"],
+  ]) {
+    const { ed, data } = editorData({ type: "custom:wifi-qr-card", ssid: "Box", security: alias });
+    assert.equal(data.security, expected, alias);
+    // Only shown normalised: the config is left as written until the user changes something.
+    assert.equal(ed._config.security, alias, alias);
+  }
+});
+
+test("editor: no security shows WPA, an unknown value is shown as written", () => {
+  assert.equal(editorData({ ssid: "Box" }).data.security, "WPA");
+  assert.equal(editorData({ ssid: "Box", security: "" }).data.security, "WPA");
+  assert.equal(editorData({ ssid: "Box", security: "foo" }).data.security, "foo");
+});
+
+test("editor: editing another field after a YAML alias saves a valid security", () => {
+  const { ed } = editorData({ type: "custom:wifi-qr-card", ssid: "Box", password: "secret", security: "wpa3" });
+  ed.dispatchEvent = () => {};
+  ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._form.data, title: "Guests" } } });
+  assert.equal(ed._config.security, "SAE");
+  assert.equal(ed._config.password, "secret");
+  assert.equal(ed._config.title, "Guests");
+});
