@@ -460,3 +460,105 @@ test("editor: editing another field after a YAML alias saves a valid security", 
   assert.equal(ed._config.password, "secret");
   assert.equal(ed._config.title, "Guests");
 });
+
+// Body of the first CSS rule whose selector is exactly `sel` in the rendered <style>.
+function cssRule(html, sel) {
+  const esc = sel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const m = new RegExp(`(?:^|[\\s}])${esc}\\s*\\{([^}]*)\\}`).exec(html);
+  assert.ok(m, `no CSS rule for ${sel}`);
+  return m[1];
+}
+const px = (body, prop) => {
+  const m = new RegExp(`(?:^|[;\\s])${prop}:\\s*([^;]+);`).exec(body);
+  return m ? m[1].trim().split(/\s+/).map((v) => Number.parseFloat(v)) : null;
+};
+
+test("open network: the message wraps between words, the SSID and password still break anywhere", () => {
+  const html = renderWith({ security: "nopass", language: "pl" });
+  assert.match(html, /<div class="msg">Sieć otwarta \(bez hasła\)<\/div>/);
+  assert.doesNotMatch(html, /<div class="val">Sieć otwarta/);
+  const msg = cssRule(html, ".msg");
+  assert.match(msg, /word-break: normal;/);
+  assert.match(msg, /overflow-wrap: anywhere;/);
+  assert.match(msg, /font-family: inherit;/);
+  assert.match(cssRule(html, ".val"), /word-break: break-all;/);
+});
+
+test("eye button: target of at least 24x24 px without making the Password row taller", () => {
+  const body = cssRule(renderWith({}), "button");
+  const [pad] = px(body, "padding");
+  const [mv, mh = mv] = px(body, "margin");
+  const icon = 22;
+  assert.ok(icon + 2 * pad >= 24, `target ${icon + 2 * pad} px`);
+  // The vertical negative margin absorbs the padding: the button takes no more height than the icon.
+  assert.ok(icon + 2 * pad + 2 * mv <= icon, "row height grows");
+  assert.ok(mh <= 0 && -mh <= pad, "horizontal margin must not push the icon outside the row padding");
+  assert.match(body, /flex: none;/);
+});
+
+test("masked password stays on one line; the revealed password wraps again", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="val masked" id="pwd">/);
+  const masked = cssRule(html, ".val.masked");
+  assert.match(masked, /white-space: nowrap;/);
+  assert.match(masked, /overflow: hidden;/);
+  assert.match(cssRule(html, ".pwd-row .val"), /min-width: 0;/);
+  els.btn.onclick();
+  assert.equal(els.pwd.className, "val");
+  assert.equal(els.pwd.textContent, "secret");
+  els.btn.onclick();
+  assert.equal(els.pwd.className, "val masked");
+  // A re-render with the password revealed keeps it unmasked.
+  els.btn.onclick();
+  card.hass = { language: "fr" };
+  assert.equal(els.pwd.className, "val");
+});
+
+test("header: the title keeps a few characters and its full text is readable in a tooltip", () => {
+  const html = renderWith({ title: `Wi-Fi <"guests"> & 'co'`, language: "pl" });
+  assert.match(html, /<div class="name" title="Wi-Fi &lt;&quot;guests&quot;&gt; &amp; &#39;co&#39;">Wi-Fi &lt;/);
+  const titles = cssRule(html, ".titles");
+  // Basis 0: the title block takes only the room left by the badge, never more.
+  assert.match(titles, /flex: 1 1 0;/);
+  assert.match(titles, /min-width: 4ch;/);
+  assert.match(cssRule(html, ".badge"), /flex: none;/);
+  // Default title, translated, gets the tooltip too.
+  assert.match(renderWith({ language: "sr-Latn" }), /<div class="name" title="WiFi za goste">/);
+  // The security subtitle, also truncated on narrow cards (« Brak (sieć otwa… »).
+  assert.match(renderWith({ security: "nopass", language: "pl" }), /<div class="sub" title="Brak \(sieć otwarta\)">/);
+});
+
+test("header at phone width (4 columns, ~104 px card): a smaller badge leaves 4 title characters, nothing overflows", () => {
+  const html = renderWith({ language: "pl" });
+  // The container is the header (as wide as the card), never the host nor ha-card: an inline-size
+  // container has no intrinsic width and would collapse the card in an auto-width parent.
+  assert.match(cssRule(html, ".header"), /container-type: inline-size;/);
+  assert.match(cssRule(html, ".header"), /width: 100%;/);
+  assert.doesNotMatch(cssRule(html, ":host"), /container/);
+  assert.doesNotMatch(cssRule(html, "ha-card"), /container/);
+  const m = /@container \(max-width: (\d+)px\) \{([\s\S]*?)\n\s*\}/.exec(html);
+  assert.ok(m, "no @container rule for narrow headers");
+  const header = 104 - 2 * 12 - 2; // card width minus ha-card padding and border
+  assert.ok(Number(m[1]) >= header, `@container ${m[1]}px does not reach the ${header} px header`);
+  const [badge] = px(cssRule(m[2], ".badge"), "width");
+  const hrow = cssRule(m[2], ".hrow");
+  const [gap] = px(hrow, "gap");
+  const [ml = 0] = px(hrow, "margin-left") || [];
+  assert.ok(ml <= 0 && -ml < 12, "the row may only borrow part of the 12 px card padding");
+  const [font] = px(cssRule(m[2], ".name"), "font-size");
+  const fourChars = font * 3; // "Gues…" measures 42 px in a 14 px Roboto/Arial title, 48 px at 16 px
+  const room = header - ml - badge - gap;
+  assert.ok(fourChars < room, `badge ${badge} + gap ${gap} leaves ${room} px for "Gues…"`);
+  // Declared after the rules it overrides, otherwise the base rules win on source order.
+  for (const sel of [".hrow {", ".badge {", ".name {"]) assert.ok(html.indexOf(sel) < m.index, `${sel} is declared after @container`);
+  // At normal widths the badge keeps the 40 px of the other ha-* cards.
+  assert.deepEqual(px(cssRule(html, ".badge"), "width"), [40]);
+});
+
+test("focus is never moved with scrolling: every focus() call passes preventScroll", () => {
+  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const calls = src.match(/\.focus\([^)]*\)/g) || [];
+  for (const c of calls) assert.match(c, /preventScroll: true/, c);
+});

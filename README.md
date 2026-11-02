@@ -21,7 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese and Polish
 - HACS-ready
-- Single file, lightweight (~35 KB)
+- Single file, lightweight (~42 KB)
 
 ## Prerequisites
 
@@ -111,7 +111,7 @@ The QR code engine is a self-contained JavaScript implementation of the QR code 
 npm install
 npm run build        # stamps the version of package.json into dist/wifi-card.js
 npm run check        # builds and checks the card (run in CI)
-npm run screenshots  # renders the card into screenshots/
+npm run screenshots  # renders the card into screenshots/ (a PNG is rewritten only if its pixels change)
 ```
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
