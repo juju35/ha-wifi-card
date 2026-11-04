@@ -264,7 +264,7 @@ var WifiQrI18n = {
     sec_nopass: 'Brak (sieć otwarta)',
   },
   ro: {
-    default_title: 'Wi-Fi pentru oaspeți',
+    default_title: 'Wi-Fi oaspeți',
     network: 'Rețea',
     password: 'Parolă',
     hint: 'Scanați codul QR pentru a vă conecta automat',
@@ -286,7 +286,7 @@ var WifiQrI18n = {
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
-    sec_nopass: 'Niciuna (rețea deschisă)',
+    sec_nopass: 'Fără (rețea deschisă)',
   },
   da: {
     default_title: 'Gæste-wifi',
@@ -361,7 +361,7 @@ var WifiQrI18n = {
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
-    sec_nopass: 'Няма (отворена мрежа)',
+    sec_nopass: 'Без (отворена мрежа)',
   },
   ru: {
     default_title: 'Гостевой Wi-Fi',
@@ -411,7 +411,7 @@ var WifiQrI18n = {
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
-    sec_nopass: 'Немає (відкрита мережа)',
+    sec_nopass: 'Відкрита мережа',
   },
   hu: {
     default_title: 'Vendég Wi-Fi',
@@ -539,7 +539,7 @@ var WifiQrI18n = {
     sec_nopass: 'Nav (atvērts tīkls)',
   },
   el: {
-    default_title: 'Wi-Fi επισκεπτών',
+    default_title: 'WiFi επισκεπτών',
     network: 'Δίκτυο',
     password: 'Κωδικός πρόσβασης',
     hint: 'Σαρώστε τον κωδικό QR για αυτόματη σύνδεση',
