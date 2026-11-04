@@ -226,7 +226,29 @@ test("only a too-long payload moves to the next QR version; other errors are rai
   assert.throws(() => WifiQrCard.prototype._buildQrSvg("x".repeat(3000), 176), /too long/);
 });
 
-const LANGS = ["fr", "de", "es", "sr", "sr-Latn", "it", "nl", "pt", "pl"];
+const LANGS = [
+  "fr",
+  "de",
+  "es",
+  "sr",
+  "sr-Latn",
+  "it",
+  "nl",
+  "pt",
+  "pl",
+  "ro",
+  "da",
+  "sv",
+  "bg",
+  "ru",
+  "uk",
+  "hu",
+  "sk",
+  "cs",
+  "sl",
+  "lv",
+  "el",
+];
 
 test("I18N parity: every language has exactly the keys of en, arrays of the same length, placeholders included", () => {
   const i18n = ctx.WifiQrI18n;
@@ -251,6 +273,18 @@ test("I18N parity: every language has exactly the keys of en, arrays of the same
   assert.equal(ctx.wifiQrT("nl", "password"), "Wachtwoord");
   assert.equal(ctx.wifiQrT("pt", "password"), "Palavra-passe");
   assert.equal(ctx.wifiQrT("pl", "password"), "Hasło");
+  assert.equal(ctx.wifiQrT("ro", "password"), "Parolă");
+  assert.equal(ctx.wifiQrT("da", "password"), "Adgangskode");
+  assert.equal(ctx.wifiQrT("sv", "password"), "Lösenord");
+  assert.equal(ctx.wifiQrT("bg", "password"), "Парола");
+  assert.equal(ctx.wifiQrT("ru", "password"), "Пароль");
+  assert.equal(ctx.wifiQrT("uk", "network"), "Мережа");
+  assert.equal(ctx.wifiQrT("hu", "password"), "Jelszó");
+  assert.equal(ctx.wifiQrT("sk", "network"), "Sieť");
+  assert.equal(ctx.wifiQrT("cs", "network"), "Síť");
+  assert.equal(ctx.wifiQrT("sl", "password"), "Geslo");
+  assert.equal(ctx.wifiQrT("lv", "password"), "Parole");
+  assert.equal(ctx.wifiQrT("el", "network"), "Δίκτυο");
 });
 
 test("editor: the language selector offers every translated language once", () => {
@@ -264,6 +298,18 @@ test("editor: the language selector offers every translated language once", () =
   assert.equal(labels.nl, "Nederlands");
   assert.equal(labels.pt, "Português (Portugal)");
   assert.equal(labels.pl, "Polski");
+  assert.equal(labels.ro, "Română");
+  assert.equal(labels.da, "Dansk");
+  assert.equal(labels.sv, "Svenska");
+  assert.equal(labels.bg, "Български");
+  assert.equal(labels.ru, "Русский");
+  assert.equal(labels.uk, "Українська");
+  assert.equal(labels.hu, "Magyar");
+  assert.equal(labels.sk, "Slovenčina");
+  assert.equal(labels.cs, "Čeština");
+  assert.equal(labels.sl, "Slovenščina");
+  assert.equal(labels.lv, "Latviešu");
+  assert.equal(labels.el, "Ελληνικά");
 });
 
 test("I18N script: no Latin letter in sr, no Cyrillic letter in sr-Latn (proper nouns and units aside)", () => {
@@ -284,6 +330,18 @@ test("language resolution: full tag if translated, else the part before the dash
     // pt-BR falls back to European Portuguese (no pt-BR dictionary): assumed.
     ["pt-BR", "pt"],
     ["pl-PL", "pl"],
+    ["ro-RO", "ro"],
+    ["da-DK", "da"],
+    ["sv-SE", "sv"],
+    ["bg-BG", "bg"],
+    ["ru-RU", "ru"],
+    ["uk-UA", "uk"],
+    ["hu-HU", "hu"],
+    ["sk-SK", "sk"],
+    ["cs-CZ", "cs"],
+    ["sl-SI", "sl"],
+    ["lv-LV", "lv"],
+    ["el-GR", "el"],
     ["ja", "en"],
   ];
   for (const [language, expected] of cases) {

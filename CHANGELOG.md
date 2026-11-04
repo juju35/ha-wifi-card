@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.10.6 - 2026-11-04
+
+### Changes
+- Added Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek translations (`ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv`, `el`) for the card and its visual editor; the editor language selector offers `Română`, `Dansk`, `Svenska`, `Български`, `Русский`, `Українська`, `Magyar`, `Slovenčina`, `Čeština`, `Slovenščina`, `Latviešu` and `Ελληνικά`.
+
 ## 1.10.5 - 2026-11-01
 
 ### Fixes
