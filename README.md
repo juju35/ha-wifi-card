@@ -14,7 +14,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-wifi-card&category=plugin)
 
-![wifi-qr-card](https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png)
+<img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="wifi-qr-card" width="400">
 
 ## Features
 
@@ -95,7 +95,7 @@ qr_size: 176
 
 | Light | Dark |
 |---|---|
-| ![card](https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png) | ![card dark](https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png) |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png" alt="card dark" width="400"> |
 
 ## How it works
 
