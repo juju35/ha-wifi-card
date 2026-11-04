@@ -5,7 +5,7 @@
 [![Validate](https://github.com/juju35/ha-wifi-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-wifi-card/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-wifi-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-wifi-card/actions/workflows/lint.yml)
 [![Release](https://img.shields.io/github/v/release/juju35/ha-wifi-card)](https://github.com/juju35/ha-wifi-card/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/juju35/ha-wifi-card/blob/main/LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/julienstep9)
 
 Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy guest network access.
@@ -95,7 +95,7 @@ qr_size: 176
 
 | Light | Dark |
 |---|---|
-| ![card](screenshots/card.png) | ![card dark](screenshots/card-dark.png) |
+| ![card](https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png) | ![card dark](https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png) |
 
 ## How it works
 
@@ -121,7 +121,7 @@ npm run screenshots  # renders the card into screenshots/ (a PNG is rewritten on
 ### Releasing
 
 1. Bump `version` in `package.json`
-2. Add a `## <version>` section at the top of [CHANGELOG.md](CHANGELOG.md)
+2. Add a `## <version>` section at the top of [CHANGELOG.md](https://github.com/juju35/ha-wifi-card/blob/main/CHANGELOG.md)
 3. Push to `main`: the **Release** workflow builds the card, creates the tag and the GitHub release with the changelog section as notes, and attaches `wifi-card.js`
 
 ## Translations
@@ -166,7 +166,7 @@ Contributions for additional languages are welcome!
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/juju35/ha-wifi-card/blob/main/LICENSE)
 
 ## Support
 
