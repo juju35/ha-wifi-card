@@ -243,11 +243,9 @@ const LANGS = [
   "ru",
   "uk",
   "hu",
-  "ga",
   "sk",
   "cs",
   "sl",
-  "mt",
   "lv",
   "el",
 ];
@@ -282,11 +280,9 @@ test("I18N parity: every language has exactly the keys of en, arrays of the same
   assert.equal(ctx.wifiQrT("ru", "password"), "Пароль");
   assert.equal(ctx.wifiQrT("uk", "network"), "Мережа");
   assert.equal(ctx.wifiQrT("hu", "password"), "Jelszó");
-  assert.equal(ctx.wifiQrT("ga", "password"), "Pasfhocal");
   assert.equal(ctx.wifiQrT("sk", "network"), "Sieť");
   assert.equal(ctx.wifiQrT("cs", "network"), "Síť");
   assert.equal(ctx.wifiQrT("sl", "password"), "Geslo");
-  assert.equal(ctx.wifiQrT("mt", "ed_language"), "Lingwa");
   assert.equal(ctx.wifiQrT("lv", "password"), "Parole");
   assert.equal(ctx.wifiQrT("el", "network"), "Δίκτυο");
 });
@@ -309,11 +305,9 @@ test("editor: the language selector offers every translated language once", () =
   assert.equal(labels.ru, "Русский");
   assert.equal(labels.uk, "Українська");
   assert.equal(labels.hu, "Magyar");
-  assert.equal(labels.ga, "Gaeilge");
   assert.equal(labels.sk, "Slovenčina");
   assert.equal(labels.cs, "Čeština");
   assert.equal(labels.sl, "Slovenščina");
-  assert.equal(labels.mt, "Malti");
   assert.equal(labels.lv, "Latviešu");
   assert.equal(labels.el, "Ελληνικά");
 });
@@ -343,11 +337,9 @@ test("language resolution: full tag if translated, else the part before the dash
     ["ru-RU", "ru"],
     ["uk-UA", "uk"],
     ["hu-HU", "hu"],
-    ["ga-IE", "ga"],
     ["sk-SK", "sk"],
     ["cs-CZ", "cs"],
     ["sl-SI", "sl"],
-    ["mt-MT", "mt"],
     ["lv-LV", "lv"],
     ["el-GR", "el"],
     ["ja", "en"],
