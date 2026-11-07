@@ -319,7 +319,7 @@ test("editor: the language selector offers every translated language once", () =
 });
 
 test("I18N script: no Latin letter in sr, no Cyrillic letter in sr-Latn (proper nouns and units aside)", () => {
-  const strip = (s) => s.replace(/Home Assistant|WiFi|QR|SSID|WPA\d?|SAE|WEP|px/g, "");
+  const strip = (s) => s.replace(/Home Assistant|WiFi|QR|SSID|WPA\d?|SAE|WEP|px|\{\w+\}/g, "");
   for (const [k, v] of Object.entries(ctx.WifiQrI18n.sr)) assert.doesNotMatch(strip(v), /\p{Script=Latin}/u, `sr.${k}`);
   for (const [k, v] of Object.entries(ctx.WifiQrI18n["sr-Latn"])) assert.doesNotMatch(v, /\p{Script=Cyrillic}/u, `sr-Latn.${k}`);
 });
@@ -821,4 +821,117 @@ test("editor: the zoom toggle is only in the mini card editor, its default left 
   full._config = { ssid: "Box", password: "secret" };
   full._render();
   assert.equal("zoom" in full._form.data, false);
+});
+
+// ── Hidden network ────────────────────────────────────────────────────────────
+
+test("hidden: true adds H:true; to the payload, escaping kept, decoded as is", () => {
+  const str = ctx.wifiQrString({ security: "WPA", ssid: "Box;1", password: "pa:ss", hidden: true });
+  assert.equal(str, `WIFI:T:WPA;S:Box${BS};1;P:pa${BS}:ss;H:true;;`);
+  assert.equal(roundTrip(str), str);
+  assert.equal(ctx.wifiQrString({ security: "nopass", ssid: "Box", password: "x", hidden: true }), "WIFI:T:nopass;S:Box;P:;H:true;;");
+  // Not hidden: the payload is unchanged.
+  assert.equal(ctx.wifiQrString({ security: "WPA", ssid: "Box", password: "x", hidden: false }), "WIFI:T:WPA;S:Box;P:x;;");
+});
+
+test("hidden: only the boolean true marks the card's QR code hidden", () => {
+  const qr = (html) => decodeSvg(/<div class="qr-wrap"[^>]*>(<svg[\s\S]*?<\/svg>)/.exec(html)[1]);
+  assert.equal(qr(renderWith({ hidden: true })), "WIFI:T:WPA;S:Box;P:secret;H:true;;");
+  assert.equal(qr(renderWith({ hidden: "yes" })), "WIFI:T:WPA;S:Box;P:secret;;");
+  assert.equal(qr(renderWith({})), "WIFI:T:WPA;S:Box;P:secret;;");
+});
+
+// ── SSID / password from entities ─────────────────────────────────────────────
+
+const qrOf = (html) => decodeSvg(/<div class="(?:qr-wrap|thumb)"[^>]*>(<svg[\s\S]*?<\/svg>)/.exec(html)[1]);
+const hassWith = (states) => ({ language: "en", states: Object.fromEntries(Object.entries(states).map(([id, state]) => [id, { state }])) });
+
+test("entities: ssid_entity / password_entity make the static values optional, one of each is still required", () => {
+  const { card } = stubCard();
+  assert.doesNotThrow(() => card.setConfig({ ssid_entity: "input_text.ssid", password_entity: "sensor.pwd" }));
+  assert.doesNotThrow(() => card.setConfig({ ssid_entity: "input_text.ssid", security: "nopass" }));
+  assert.throws(() => card.setConfig({ password: "x" }), /ssid or ssid_entity is required/);
+  assert.throws(() => card.setConfig({ ssid: "Box" }), /password or password_entity is required/);
+});
+
+test("entities: their states override the static values, and the QR code and texts follow them live", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Static", password: "static-pass", ssid_entity: "input_text.ssid", password_entity: "sensor.pwd", language: "en" });
+  card.hass = hassWith({ "input_text.ssid": "Guest;5G", "sensor.pwd": "from:router" });
+  let html = card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="val">Guest;5G<\/div>/);
+  assert.equal(qrOf(html), `WIFI:T:WPA;S:Guest${BS};5G;P:from${BS}:router;;`);
+  els.btn.onclick();
+  assert.equal(els.pwd.textContent, "from:router");
+  // The router rotates the password: the card follows, the password stays revealed.
+  card.hass = hassWith({ "input_text.ssid": "Guest;5G", "sensor.pwd": "new-pass" });
+  html = card.shadowRoot.innerHTML;
+  assert.equal(qrOf(html), `WIFI:T:WPA;S:Guest${BS};5G;P:new-pass;;`);
+  assert.equal(els.pwd.textContent, "new-pass");
+  // The password never reaches the HTML, only textContent.
+  assert.doesNotMatch(html, /new-pass/);
+  // Unavailable or unknown: back to the static values.
+  card.hass = hassWith({ "input_text.ssid": "unavailable", "sensor.pwd": "unknown" });
+  assert.equal(qrOf(card.shadowRoot.innerHTML), "WIFI:T:WPA;S:Static;P:static-pass;;");
+});
+
+test("entities: a hass update that changes neither the states nor the language does not re-render", () => {
+  const { card } = stubCard();
+  card.setConfig({ ssid_entity: "input_text.ssid", password: "secret", language: "en" });
+  card.hass = hassWith({ "input_text.ssid": "Box", "sensor.other": "1" });
+  card.shadowRoot.innerHTML = "untouched";
+  card.hass = hassWith({ "input_text.ssid": "Box", "sensor.other": "2" });
+  assert.equal(card.shadowRoot.innerHTML, "untouched");
+  card.hass = hassWith({ "input_text.ssid": "Box2", "sensor.other": "2" });
+  assert.equal(qrOf(card.shadowRoot.innerHTML), "WIFI:T:WPA;S:Box2;P:secret;;");
+});
+
+test("entities: without a value nor a static fallback, the card names the entity instead of a QR code", () => {
+  const { card } = stubCard();
+  card.setConfig({ ssid_entity: "input_text.ssid", password_entity: "input_text.pwd", hidden: true, language: "fr" });
+  assert.match(card.shadowRoot.innerHTML, /Aucune valeur pour input_text\.ssid/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<svg/);
+  card.hass = hassWith({ "input_text.ssid": "Box", "input_text.pwd": "" });
+  assert.match(card.shadowRoot.innerHTML, /Aucune valeur pour input_text\.pwd/);
+  card.hass = hassWith({ "input_text.ssid": "Box", "input_text.pwd": "secret" });
+  assert.equal(qrOf(card.shadowRoot.innerHTML), "WIFI:T:WPA;S:Box;P:secret;H:true;;");
+});
+
+test("entities: the mini card shows the entity's SSID and encodes it in its thumbnail", () => {
+  const { card } = stubMini({ ssid_entity: "sensor.guest_ssid", hidden: true });
+  card.hass = hassWith({ "sensor.guest_ssid": "Router-Guests" });
+  const html = card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="sub" title="Router-Guests">Router-Guests<\/div>/);
+  assert.equal(qrOf(html), "WIFI:T:WPA;S:Router-Guests;P:secret-pass;H:true;;");
+});
+
+test("editor: entity pickers and the hidden toggle, the SSID no longer required with an entity, defaults left out", () => {
+  for (const Editor of [WifiQrCardEditor, WifiQrMiniCardEditor]) {
+    const ed = new Editor();
+    ed._form = {};
+    ed._hass = { language: "en" };
+    ed._config = { type: "custom:wifi-qr-card", ssid: "Box", password: "secret" };
+    ed._render();
+    const schema = ed._form.schema;
+    const field = (n) => schema.find((f) => f.name === n);
+    assert.equal(field("ssid").required, true);
+    for (const n of ["ssid_entity", "password_entity"]) {
+      assert.deepEqual([...field(n).selector.entity.filter[0].domain], ["input_text", "text", "sensor"]);
+      assert.equal(ed._form.computeHelper({ name: n }), ctx.WifiQrI18n.en.ed_entity_helper);
+    }
+    assert.ok(field("hidden").selector.boolean);
+    assert.equal(ed._form.computeLabel({ name: "ssid_entity" }), "Network name entity");
+    assert.equal(ed._form.computeLabel({ name: "password_entity" }), "Password entity");
+    assert.equal(ed._form.computeLabel({ name: "hidden" }), "Hidden network (SSID not broadcast)");
+    assert.equal(ed._form.data.hidden, false);
+    ed.dispatchEvent = () => {};
+    ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._form.data } } });
+    assert.equal("hidden" in ed._config, false);
+    ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._form.data, hidden: true, ssid: "", ssid_entity: "input_text.ssid" } } });
+    assert.equal(ed._config.hidden, true);
+    assert.equal(ed._config.ssid_entity, "input_text.ssid");
+    assert.equal("ssid" in ed._config, false);
+    ed._render();
+    assert.equal(ed._form.schema.find((f) => f.name === "ssid").required, false);
+  }
 });

@@ -24,7 +24,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek
 - Ready for the Marketplace
-- Single file, lightweight (~68 KB)
+- Single file, lightweight (~77 KB)
 
 ## Prerequisites
 
@@ -58,7 +58,7 @@ Or manually:
 
 ### Visual editor
 
-Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, SSID, password, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
+Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, SSID, password (or the entities giving them), hidden network, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
 
 ### Minimal
 
@@ -80,6 +80,17 @@ security: WPA
 qr_size: 176
 ```
 
+### SSID and password from entities
+
+`ssid_entity` and `password_entity` read the network name and the password from an entity's state, for example an `input_text` helper or the guest WiFi sensor of a router integration. The QR code and the texts update live when the state changes (a rotated guest password, say). While an entity is unknown or unavailable the card uses `ssid` / `password` if they are set; with no value at all it names the entity instead of showing a QR code.
+
+```yaml
+type: custom:wifi-qr-card
+ssid_entity: input_text.guest_wifi_ssid
+password_entity: sensor.router_guest_wifi_password
+hidden: true
+```
+
 ### Mini card
 
 `wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
@@ -96,8 +107,11 @@ zoom: true
 
 | Option | Required | Default | Description |
 |---|---|---|---|
-| `ssid` | ✅ | — | WiFi network name (SSID) |
-| `password` | ✅* | — | WiFi password (*not needed when `security: nopass`). Quote it in YAML when it is made of digits (`password: "01234567"`), otherwise YAML reads it as a number and drops leading zeros |
+| `ssid` | ✅* | — | WiFi network name (SSID) (*not needed with `ssid_entity`) |
+| `password` | ✅* | — | WiFi password (*not needed when `security: nopass` or with `password_entity`). Quote it in YAML when it is made of digits (`password: "01234567"`), otherwise YAML reads it as a number and drops leading zeros |
+| `ssid_entity` | ❌ | — | Entity whose state is the network name (`input_text`, `text`, a router integration's `sensor`…). Overrides `ssid`, which stays the fallback while the entity is unknown or unavailable |
+| `password_entity` | ❌ | — | Entity whose state is the password. Overrides `password`, which stays the fallback while the entity is unknown or unavailable |
+| `hidden` | ❌ | `false` | The network does not broadcast its SSID: adds `H:true;` to the QR code so phones join it anyway |
 | `security` | ❌ | `WPA` | Security type: `WPA` (WPA/WPA2), `SAE` (WPA3), `WEP`, or `nopass` (open network) |
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
@@ -117,11 +131,11 @@ The mini card on a desktop column, then on 6 columns of a phone, where the QR co
 
 ## How it works
 
-The card generates a [WiFi QR code](https://en.wikipedia.org/wiki/QR_code#Joining_a_Wi-Fi_network) using the standard `WIFI:T:<security>;S:<ssid>;P:<password>;;` format. When scanned with a phone camera, the device automatically prompts to join the network — no need to type the password manually.
+The card generates a [WiFi QR code](https://en.wikipedia.org/wiki/QR_code#Joining_a_Wi-Fi_network) using the standard `WIFI:T:<security>;S:<ssid>;P:<password>;;` format (`WIFI:T:<security>;S:<ssid>;P:<password>;H:true;;` for a hidden network). When scanned with a phone camera, the device automatically prompts to join the network — no need to type the password manually.
 
 The characters reserved by this format (`\`, `;`, `,`, `:` and `"`) are escaped with a backslash in the SSID and the password of the QR code, so any network name or password can be used as is. The card itself shows them unescaped.
 
-The password is stored in clear text in the dashboard configuration, which every Home Assistant user can read: use it for a guest network.
+The password is stored in clear text in the dashboard configuration, which every Home Assistant user can read: use it for a guest network. With `password_entity` it is not in the dashboard, but the entity's state is readable by every Home Assistant user too.
 
 The QR code engine is a self-contained JavaScript implementation of the QR code specification (ISO/IEC 18004), including Reed-Solomon error correction, embedded directly in the card source. No external libraries or CDN requests are needed.
 
