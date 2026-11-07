@@ -1,6 +1,6 @@
 # ha-wifi-card
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![Marketplace](https://img.shields.io/badge/Marketplace-Custom-41BDF5.svg)](https://www.home-assistant.io/integrations/marketplace/)
 [![HACS Validation](https://github.com/juju35/ha-wifi-card/actions/workflows/hacs.yml/badge.svg)](https://github.com/juju35/ha-wifi-card/actions/workflows/hacs.yml)
 [![Validate](https://github.com/juju35/ha-wifi-card/actions/workflows/validate.yml/badge.svg)](https://github.com/juju35/ha-wifi-card/actions/workflows/validate.yml)
 [![Lint](https://github.com/juju35/ha-wifi-card/actions/workflows/lint.yml/badge.svg)](https://github.com/juju35/ha-wifi-card/actions/workflows/lint.yml)
@@ -12,7 +12,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 **Zero external dependencies** — the QR code is generated in pure JavaScript with an embedded Reed-Solomon encoder. No CDN, no network requests.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-wifi-card&category=plugin)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-wifi-card&category=plugin)
 
 <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="wifi-qr-card" width="400">
 
@@ -22,7 +22,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 - Password hidden by default, revealable with a toggle button
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek
-- HACS-ready
+- Ready for the Marketplace
 - Single file, lightweight (~54 KB)
 
 ## Prerequisites
@@ -31,17 +31,17 @@ Home Assistant 2024.8 or later. The card needs no integration, only the name and
 
 ## Installation
 
-### Via HACS (recommended)
+### Via the Marketplace (recommended)
 
 Click the button below to add the repository directly:
 
-[![Add to HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=juju35&repository=ha-wifi-card&category=plugin)
+[![Add to the Marketplace](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=juju35&repository=ha-wifi-card&category=plugin)
 
 Or manually:
 
-1. Open HACS → **Frontend** → **⋮** → **Custom repositories**
+1. Open **Settings → Marketplace → Add from link** (top right; this needs a GitHub account connected)
 2. Add `https://github.com/juju35/ha-wifi-card` — Type: **Dashboard**
-3. Search for **Wifi QR Card** and install it
+3. Open **Wifi QR Card** and click **Install**
 4. Clear your browser cache and refresh
 
 ### Manual
@@ -116,7 +116,7 @@ npm run check        # builds and checks the card (run in CI)
 npm run screenshots  # renders the card into screenshots/ (a PNG is rewritten only if its pixels change)
 ```
 
-`dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where HACS downloads it from.
+`dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 
 ### Releasing
 
