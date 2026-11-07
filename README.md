@@ -20,7 +20,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
 - Password hidden by default, revealable with a toggle button
-- Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail, and a detail button that switches to the full card (big scannable QR code) and back
+- Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail that opens the QR code full screen, and a detail button that switches to the full card and back
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek
 - Ready for the Marketplace
@@ -82,7 +82,7 @@ qr_size: 176
 
 ### Mini card
 
-`wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail or the detail button (top right) to switch to the full card, with its big scannable QR code; the button or a click anywhere outside the card brings the compact view back.
+`wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
 
 ```yaml
 type: custom:wifi-qr-mini-card

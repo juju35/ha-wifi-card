@@ -673,9 +673,10 @@ test("mini card: one compact row, QR thumbnail and detail button, never the pass
   assert.match(html, /<ha-card class="mini">/);
   assert.match(html, /<div class="name" title="Guests">Guests<\/div>/);
   assert.match(html, /<div class="sub" title="Home-Guests">Home-Guests<\/div>/);
-  assert.doesNotMatch(html, /secret-pass|id="pwd"|Password|<dialog/);
-  // The thumbnail: the big QR code's colours, a rounded 64 px tile, a button to the full card.
-  assert.match(html, /<div class="thumb" id="qr" role="button" tabindex="0" title="Show the full card" aria-label="Show the full card"><svg aria-hidden="true" [^>]*width="64"/);
+  assert.doesNotMatch(html.replace(/<dialog[\s\S]*<\/dialog>/, ""), /secret-pass|id="pwd"|Password/);
+  // The thumbnail: the big QR code's colours, a rounded 64 px tile, a button to the full screen QR (its dialog).
+  assert.match(html, /<div class="thumb" id="qr" role="button" tabindex="0" title="Enlarge QR code" aria-label="Enlarge QR code"><svg aria-hidden="true" [^>]*width="64"/);
+  assert.match(html, /<dialog id="zoom" aria-label="Enlarge QR code"><svg /);
   assert.match(cssRule(html, ".thumb"), /width: 64px; height: 64px; background: #64B5F6; border-radius: 8px;/);
   assert.match(html, /<button class="zoom" id="zbtn" title="Show the full card" aria-label="Show the full card"><ha-icon icon="mdi:arrow-expand">/);
   assert.match(cssRule(html, ".zoom"), /all: unset;[^}]*width: 24px; height: 24px;[^}]*border-radius: 50%;[^}]*color: var\(--secondary-text-color\);/);
@@ -708,7 +709,7 @@ test("mini card: only its compact ha-card is a size container, the host keeps a 
   assert.doesNotMatch(full, /:host\(\[mini\]\)|class="zoom"/);
 });
 
-test("mini card: the detail button and the thumbnail switch to the full card and back", () => {
+test("mini card: the detail button switches to the full card and back; the thumbnail opens the full screen QR", () => {
   const { card, els } = stubMini();
   assert.deepEqual({ ...card.getGridOptions() }, { columns: 6, min_columns: 6 });
   assert.equal(card.getCardSize(), 2);
@@ -722,10 +723,15 @@ test("mini card: the detail button and the thumbnail switch to the full card and
   html = card.shadowRoot.innerHTML;
   assert.match(html, /class="mini"/);
   assert.equal(card.getCardSize(), 2);
-  // A tap on the thumbnail opens the full card (its big QR code), not the zoom dialog.
+  // A tap on the thumbnail opens the QR code full screen directly; the card stays compact.
   els.qr.onclick();
-  assert.match(card.shadowRoot.innerHTML, /id="pwd"/);
-  assert.equal(els.zoom.open, false);
+  assert.equal(els.zoom.open, true);
+  assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+  els.zoom.close();
+  let prevented = false;
+  els.qr.onkeydown({ key: "Enter", preventDefault: () => (prevented = true) });
+  assert.equal(els.zoom.open, true);
+  assert.ok(prevented);
 });
 
 test("mini card: the detail button keeps the keyboard focus, a mouse click does not move it", () => {
@@ -739,9 +745,9 @@ test("mini card: the detail button keeps the keyboard focus, a mouse click does 
 test("mini card: zoom: false removes the detail button", () => {
   const { card, els } = stubMini({ zoom: false });
   assert.doesNotMatch(card.shadowRoot.innerHTML, /class="zoom"/);
+  // The thumbnail still opens the full screen QR.
   els.qr.onclick();
-  assert.match(card.shadowRoot.innerHTML, /id="pwd"/);
-  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="zoom"/);
+  assert.equal(els.zoom.open, true);
 });
 
 test("mini card: a click outside the card brings the compact view back, not one inside it or in a dialog", () => {

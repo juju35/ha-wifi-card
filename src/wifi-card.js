@@ -938,6 +938,11 @@ class WifiQrCard extends HTMLElement {
       if (this._pwdShown) show();
     }
 
+    this._bindQr(wasZoomed);
+  }
+
+  // The QR code (the big one, or the mini card's thumbnail) opens it full screen in its dialog.
+  _bindQr(reopen) {
     const qr = this.shadowRoot.getElementById('qr');
     const dlg = this.shadowRoot.getElementById('zoom');
     const open = () => {
@@ -953,7 +958,7 @@ class WifiQrCard extends HTMLElement {
     qr.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
     // Escape is handled natively by <dialog>; a click anywhere (QR or backdrop) closes it
     dlg.onclick = () => dlg.close();
-    if (wasZoomed) open();
+    if (reopen) open();
   }
 
   getCardSize() { return 4; }
@@ -1072,7 +1077,8 @@ class WifiQrMiniCard extends WifiQrCard {
     }
     const title = wifiQrEsc(c.title);
     const ssid = wifiQrEsc(c.ssid);
-    const zoomIn = wifiQrEsc(this._t('zoom_in'));
+    const zoom = wifiQrEsc(this._t('zoom'));
+    const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
     this.shadowRoot.innerHTML = `
       <style>
         :host { height: 100%; }
@@ -1092,6 +1098,10 @@ class WifiQrMiniCard extends WifiQrCard {
         .thumb { flex: none; width: 64px; height: 64px; background: ${WIFI_BLUE}; border-radius: 8px; overflow: hidden; line-height: 0; cursor: zoom-in; }
         .thumb svg { width: 100%; height: 100%; display: block; }
         .thumb:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 2px; }
+        /* The full screen QR, as on the full card. */
+        dialog { border: none; padding: 0; margin: 8px auto auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
+        dialog::backdrop { background: rgba(0,0,0,0.85); }
+        dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
            and a 14 px title keep a few characters of the title. */
         @container (max-width: 200px) {
@@ -1107,18 +1117,13 @@ class WifiQrMiniCard extends WifiQrCard {
             <div class="name" title="${title}">${title}</div>
             <div class="sub" title="${ssid}">${ssid}</div>
           </div>
-          <div class="thumb" id="qr" role="button" tabindex="0" title="${zoomIn}" aria-label="${zoomIn}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
+          <div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
           ${this._zoomButton()}
         </div>
+        <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
       </ha-card>`;
-    const thumb = this.shadowRoot.getElementById('qr');
-    thumb.onclick = () => this._setZoom(true);
-    thumb.onkeydown = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        this._setZoom(true, true);
-      }
-    };
+    // The thumbnail opens the QR code full screen directly, like the big one of the full card.
+    this._bindQr(wasOpen);
     this._bindZoom();
   }
 }
