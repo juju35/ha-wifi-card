@@ -42,6 +42,11 @@ var WifiQrI18n = {
     zoom_out: 'Revenir à la vue compacte',
     mini_name: 'Mini-carte QR Wifi',
     mini_desc: 'Réseau Wifi compact : nom et petit QR code, avec un bouton pour afficher la carte complète.',
+    ed_ssid_entity: 'Entité du nom du réseau',
+    ed_password_entity: 'Entité du mot de passe',
+    ed_entity_helper: 'Facultatif : son état remplace la valeur ci-dessus et met à jour le QR code en direct',
+    ed_hidden: 'Réseau masqué (SSID non diffusé)',
+    entity_unavailable: 'Aucune valeur pour {entity}',
   },
   en: {
     default_title: 'Guest WiFi',
@@ -72,6 +77,11 @@ var WifiQrI18n = {
     zoom_out: 'Back to the compact view',
     mini_name: 'Wifi QR Mini Card',
     mini_desc: 'Compact WiFi network: name and a small QR code, with a button to show the full card.',
+    ed_ssid_entity: 'Network name entity',
+    ed_password_entity: 'Password entity',
+    ed_entity_helper: 'Optional: its state replaces the value above and updates the QR code live',
+    ed_hidden: 'Hidden network (SSID not broadcast)',
+    entity_unavailable: 'No value from {entity}',
   },
   de: {
     default_title: 'Gäste-WLAN',
@@ -102,6 +112,11 @@ var WifiQrI18n = {
     zoom_out: 'Zurück zur kompakten Ansicht',
     mini_name: 'WLAN-QR-Minikarte',
     mini_desc: 'Kompaktes WLAN: Name und kleiner QR-Code, mit einer Schaltfläche für die vollständige Karte.',
+    ed_ssid_entity: 'Entität für den Netzwerknamen',
+    ed_password_entity: 'Entität für das Passwort',
+    ed_entity_helper: 'Optional: Ihr Zustand ersetzt den Wert oben und aktualisiert den QR-Code live',
+    ed_hidden: 'Verstecktes Netzwerk (SSID wird nicht gesendet)',
+    entity_unavailable: 'Kein Wert von {entity}',
   },
   es: {
     default_title: 'Wi-Fi de invitados',
@@ -132,6 +147,11 @@ var WifiQrI18n = {
     zoom_out: 'Volver a la vista compacta',
     mini_name: 'Minitarjeta QR Wi-Fi',
     mini_desc: 'Red Wi-Fi compacta: nombre y un pequeño código QR, con un botón para mostrar la tarjeta completa.',
+    ed_ssid_entity: 'Entidad del nombre de la red',
+    ed_password_entity: 'Entidad de la contraseña',
+    ed_entity_helper: 'Opcional: su estado sustituye el valor de arriba y actualiza el código QR en directo',
+    ed_hidden: 'Red oculta (SSID no difundido)',
+    entity_unavailable: 'Sin valor de {entity}',
   },
   sr: {
     default_title: 'WiFi за госте',
@@ -162,6 +182,11 @@ var WifiQrI18n = {
     zoom_out: 'Назад на компактни приказ',
     mini_name: 'Мини картица за WiFi QR',
     mini_desc: 'Компактна WiFi мрежа: назив и мали QR код, са дугметом за целу картицу.',
+    ed_ssid_entity: 'Ентитет назива мреже',
+    ed_password_entity: 'Ентитет лозинке',
+    ed_entity_helper: 'Опционо: његово стање замењује вредност изнад и ажурира QR код уживо',
+    ed_hidden: 'Скривена мрежа (SSID се не емитује)',
+    entity_unavailable: 'Нема вредности из {entity}',
   },
   'sr-Latn': {
     default_title: 'WiFi za goste',
@@ -192,6 +217,11 @@ var WifiQrI18n = {
     zoom_out: 'Nazad na kompaktni prikaz',
     mini_name: 'Mini kartica za WiFi QR',
     mini_desc: 'Kompaktna WiFi mreža: naziv i mali QR kod, sa dugmetom za celu karticu.',
+    ed_ssid_entity: 'Entitet naziva mreže',
+    ed_password_entity: 'Entitet lozinke',
+    ed_entity_helper: 'Opciono: njegovo stanje zamenjuje vrednost iznad i ažurira QR kod uživo',
+    ed_hidden: 'Skrivena mreža (SSID se ne emituje)',
+    entity_unavailable: 'Nema vrednosti iz {entity}',
   },
   it: {
     default_title: 'Wi-Fi ospiti',
@@ -222,6 +252,11 @@ var WifiQrI18n = {
     zoom_out: 'Torna alla vista compatta',
     mini_name: 'Mini scheda QR Wi-Fi',
     mini_desc: 'Rete Wi-Fi compatta: nome e piccolo codice QR, con un pulsante per la scheda completa.',
+    ed_ssid_entity: 'Entità del nome della rete',
+    ed_password_entity: 'Entità della password',
+    ed_entity_helper: 'Facoltativa: il suo stato sostituisce il valore qui sopra e aggiorna il codice QR in tempo reale',
+    ed_hidden: 'Rete nascosta (SSID non trasmesso)',
+    entity_unavailable: 'Nessun valore da {entity}',
   },
   nl: {
     default_title: 'Gastenwifi',
@@ -252,6 +287,11 @@ var WifiQrI18n = {
     zoom_out: 'Terug naar de compacte weergave',
     mini_name: 'Wifi-QR-minikaart',
     mini_desc: 'Compact wifinetwerk: naam en kleine QR-code, met een knop voor de volledige kaart.',
+    ed_ssid_entity: 'Entiteit voor de netwerknaam',
+    ed_password_entity: 'Entiteit voor het wachtwoord',
+    ed_entity_helper: 'Optioneel: de status vervangt de waarde hierboven en werkt de QR-code live bij',
+    ed_hidden: 'Verborgen netwerk (SSID niet uitgezonden)',
+    entity_unavailable: 'Geen waarde van {entity}',
   },
   pt: {
     default_title: 'Wi-Fi visitas',
@@ -282,6 +322,11 @@ var WifiQrI18n = {
     zoom_out: 'Voltar à vista compacta',
     mini_name: 'Mini cartão QR Wi-Fi',
     mini_desc: 'Rede Wi-Fi compacta: nome e um pequeno código QR, com um botão para o cartão completo.',
+    ed_ssid_entity: 'Entidade do nome da rede',
+    ed_password_entity: 'Entidade da palavra-passe',
+    ed_entity_helper: 'Opcional: o seu estado substitui o valor acima e atualiza o código QR em tempo real',
+    ed_hidden: 'Rede oculta (SSID não difundido)',
+    entity_unavailable: 'Sem valor de {entity}',
   },
   pl: {
     default_title: 'Wi-Fi dla gości',
@@ -312,6 +357,11 @@ var WifiQrI18n = {
     zoom_out: 'Wróć do widoku kompaktowego',
     mini_name: 'Mini karta QR Wi-Fi',
     mini_desc: 'Kompaktowa sieć Wi-Fi: nazwa i mały kod QR, z przyciskiem pełnej karty.',
+    ed_ssid_entity: 'Encja nazwy sieci',
+    ed_password_entity: 'Encja hasła',
+    ed_entity_helper: 'Opcjonalnie: jej stan zastępuje wartość powyżej i aktualizuje kod QR na żywo',
+    ed_hidden: 'Sieć ukryta (SSID nierozgłaszany)',
+    entity_unavailable: 'Brak wartości z {entity}',
   },
   ro: {
     default_title: 'Wi-Fi oaspeți',
@@ -342,6 +392,11 @@ var WifiQrI18n = {
     zoom_out: 'Înapoi la vizualizarea compactă',
     mini_name: 'Mini card QR Wi-Fi',
     mini_desc: 'Rețea Wi-Fi compactă: nume și un cod QR mic, cu un buton pentru cardul complet.',
+    ed_ssid_entity: 'Entitatea numelui rețelei',
+    ed_password_entity: 'Entitatea parolei',
+    ed_entity_helper: 'Opțional: starea ei înlocuiește valoarea de mai sus și actualizează codul QR în timp real',
+    ed_hidden: 'Rețea ascunsă (SSID nedifuzat)',
+    entity_unavailable: 'Nicio valoare de la {entity}',
   },
   da: {
     default_title: 'Gæste-wifi',
@@ -372,6 +427,11 @@ var WifiQrI18n = {
     zoom_out: 'Tilbage til kompakt visning',
     mini_name: 'Wifi-QR-minikort',
     mini_desc: 'Kompakt wifi-netværk: navn og en lille QR-kode, med en knap til hele kortet.',
+    ed_ssid_entity: 'Entitet for netværksnavn',
+    ed_password_entity: 'Entitet for adgangskode',
+    ed_entity_helper: 'Valgfri: dens tilstand erstatter værdien ovenfor og opdaterer QR-koden live',
+    ed_hidden: 'Skjult netværk (SSID udsendes ikke)',
+    entity_unavailable: 'Ingen værdi fra {entity}',
   },
   sv: {
     default_title: 'Gäst-wifi',
@@ -402,6 +462,11 @@ var WifiQrI18n = {
     zoom_out: 'Tillbaka till kompakt vy',
     mini_name: 'Minikort för wifi-QR',
     mini_desc: 'Kompakt wifi-nätverk: namn och en liten QR-kod, med en knapp för hela kortet.',
+    ed_ssid_entity: 'Entitet för nätverksnamn',
+    ed_password_entity: 'Entitet för lösenord',
+    ed_entity_helper: 'Valfri: dess tillstånd ersätter värdet ovan och uppdaterar QR-koden direkt',
+    ed_hidden: 'Dolt nätverk (SSID sänds inte)',
+    entity_unavailable: 'Inget värde från {entity}',
   },
   bg: {
     default_title: 'Wi-Fi за гости',
@@ -432,6 +497,11 @@ var WifiQrI18n = {
     zoom_out: 'Обратно към компактния изглед',
     mini_name: 'Мини карта с Wi-Fi QR',
     mini_desc: 'Компактна Wi-Fi мрежа: име и малък QR код, с бутон за цялата карта.',
+    ed_ssid_entity: 'Обект за името на мрежата',
+    ed_password_entity: 'Обект за паролата',
+    ed_entity_helper: 'По избор: състоянието му замества стойността по-горе и обновява QR кода на живо',
+    ed_hidden: 'Скрита мрежа (SSID не се излъчва)',
+    entity_unavailable: 'Няма стойност от {entity}',
   },
   ru: {
     default_title: 'Гостевой Wi-Fi',
@@ -462,6 +532,11 @@ var WifiQrI18n = {
     zoom_out: 'Вернуться к компактному виду',
     mini_name: 'Мини-карточка Wi-Fi QR',
     mini_desc: 'Компактная сеть Wi-Fi: имя и небольшой QR-код, с кнопкой полной карточки.',
+    ed_ssid_entity: 'Объект с именем сети',
+    ed_password_entity: 'Объект с паролем',
+    ed_entity_helper: 'Необязательно: его состояние заменяет значение выше и обновляет QR-код в реальном времени',
+    ed_hidden: 'Скрытая сеть (SSID не транслируется)',
+    entity_unavailable: 'Нет значения от {entity}',
   },
   uk: {
     default_title: 'Гостьовий Wi-Fi',
@@ -492,6 +567,11 @@ var WifiQrI18n = {
     zoom_out: 'Повернутися до компактного вигляду',
     mini_name: 'Міні-картка Wi-Fi QR',
     mini_desc: 'Компактна мережа Wi-Fi: назва й невеликий QR-код, з кнопкою повної картки.',
+    ed_ssid_entity: 'Сутність із назвою мережі',
+    ed_password_entity: 'Сутність із паролем',
+    ed_entity_helper: 'Необов’язково: її стан замінює значення вище й оновлює QR-код наживо',
+    ed_hidden: 'Прихована мережа (SSID не транслюється)',
+    entity_unavailable: 'Немає значення від {entity}',
   },
   hu: {
     default_title: 'Vendég Wi-Fi',
@@ -522,6 +602,11 @@ var WifiQrI18n = {
     zoom_out: 'Vissza a kompakt nézethez',
     mini_name: 'Wi-Fi QR mini kártya',
     mini_desc: 'Kompakt Wi-Fi-hálózat: név és kis QR-kód, a teljes kártya gombjával.',
+    ed_ssid_entity: 'Hálózatnév entitás',
+    ed_password_entity: 'Jelszó entitás',
+    ed_entity_helper: 'Opcionális: az állapota felülírja a fenti értéket, és élőben frissíti a QR-kódot',
+    ed_hidden: 'Rejtett hálózat (az SSID nincs sugározva)',
+    entity_unavailable: 'Nincs érték innen: {entity}',
   },
   sk: {
     default_title: 'Wi-Fi pre hostí',
@@ -552,6 +637,11 @@ var WifiQrI18n = {
     zoom_out: 'Späť na kompaktné zobrazenie',
     mini_name: 'Mini karta Wi-Fi QR',
     mini_desc: 'Kompaktná sieť Wi-Fi: názov a malý QR kód, s tlačidlom celej karty.',
+    ed_ssid_entity: 'Entita názvu siete',
+    ed_password_entity: 'Entita hesla',
+    ed_entity_helper: 'Voliteľné: jej stav nahradí hodnotu vyššie a priebežne aktualizuje QR kód',
+    ed_hidden: 'Skrytá sieť (SSID sa nevysiela)',
+    entity_unavailable: 'Žiadna hodnota z {entity}',
   },
   cs: {
     default_title: 'Wi-Fi pro hosty',
@@ -582,6 +672,11 @@ var WifiQrI18n = {
     zoom_out: 'Zpět na kompaktní zobrazení',
     mini_name: 'Mini karta Wi-Fi QR',
     mini_desc: 'Kompaktní síť Wi-Fi: název a malý QR kód, s tlačítkem celé karty.',
+    ed_ssid_entity: 'Entita názvu sítě',
+    ed_password_entity: 'Entita hesla',
+    ed_entity_helper: 'Volitelné: její stav nahradí hodnotu výše a průběžně aktualizuje QR kód',
+    ed_hidden: 'Skrytá síť (SSID se nevysílá)',
+    entity_unavailable: 'Žádná hodnota z {entity}',
   },
   sl: {
     default_title: 'Wi-Fi za goste',
@@ -612,6 +707,11 @@ var WifiQrI18n = {
     zoom_out: 'Nazaj na kompaktni pogled',
     mini_name: 'Mini kartica Wi-Fi QR',
     mini_desc: 'Kompaktno omrežje Wi-Fi: ime in majhna koda QR, z gumbom za celotno kartico.',
+    ed_ssid_entity: 'Entiteta imena omrežja',
+    ed_password_entity: 'Entiteta gesla',
+    ed_entity_helper: 'Neobvezno: njeno stanje nadomesti zgornjo vrednost in sproti posodobi kodo QR',
+    ed_hidden: 'Skrito omrežje (SSID se ne oddaja)',
+    entity_unavailable: 'Ni vrednosti iz {entity}',
   },
   lv: {
     default_title: 'Viesu Wi-Fi',
@@ -642,6 +742,11 @@ var WifiQrI18n = {
     zoom_out: 'Atpakaļ uz kompakto skatu',
     mini_name: 'Wi-Fi QR mini karte',
     mini_desc: 'Kompakts Wi-Fi tīkls: nosaukums un mazs QR kods, ar pogu pilnajai kartei.',
+    ed_ssid_entity: 'Tīkla nosaukuma entītija',
+    ed_password_entity: 'Paroles entītija',
+    ed_entity_helper: 'Neobligāti: tās stāvoklis aizstāj vērtību augstāk un tiešsaistē atjaunina QR kodu',
+    ed_hidden: 'Slēpts tīkls (SSID netiek pārraidīts)',
+    entity_unavailable: 'Nav vērtības no {entity}',
   },
   el: {
     default_title: 'WiFi επισκεπτών',
@@ -672,6 +777,11 @@ var WifiQrI18n = {
     zoom_out: 'Επιστροφή στη συμπαγή προβολή',
     mini_name: 'Μίνι κάρτα QR Wi-Fi',
     mini_desc: 'Συμπαγές δίκτυο Wi-Fi: όνομα και μικρός κωδικός QR, με κουμπί για την πλήρη κάρτα.',
+    ed_ssid_entity: 'Οντότητα ονόματος δικτύου',
+    ed_password_entity: 'Οντότητα κωδικού πρόσβασης',
+    ed_entity_helper: 'Προαιρετικό: η κατάστασή της αντικαθιστά την παραπάνω τιμή και ενημερώνει τον κωδικό QR ζωντανά',
+    ed_hidden: 'Κρυφό δίκτυο (το SSID δεν εκπέμπεται)',
+    entity_unavailable: 'Καμία τιμή από {entity}',
   },
 };
 
@@ -722,7 +832,14 @@ function wifiQrField(s) {
 
 function wifiQrString(c) {
   var isOpen = c.security === 'nopass';
-  return `WIFI:T:${c.security};S:${wifiQrField(c.ssid)};P:${isOpen ? '' : wifiQrField(c.password)};;`;
+  // H:true tells the phone the network does not broadcast its SSID, so it joins it anyway.
+  return `WIFI:T:${c.security};S:${wifiQrField(c.ssid)};P:${isOpen ? '' : wifiQrField(c.password)};${c.hidden ? 'H:true;' : ''};`;
+}
+
+// The state of an entity giving the SSID or the password, or null while it has none (unknown, unavailable, empty).
+function wifiQrEntityValue(hass, id) {
+  var state = hass?.states?.[id]?.state;
+  return state == null || state === '' || state === 'unknown' || state === 'unavailable' ? null : String(state);
 }
 
 // Smallest QR version (level M, single 8-bit segment) whose data area fits `bytes`
@@ -750,10 +867,12 @@ class WifiQrCard extends HTMLElement {
   }
 
   setConfig(config) {
-    if (config.ssid == null || config.ssid === '') throw new Error('ssid is required');
+    if ((config.ssid == null || config.ssid === '') && !config.ssid_entity) throw new Error('ssid or ssid_entity is required');
     // Validated before the config is kept: an invalid value must not reach set hass later.
     var security = wifiQrSecurity(config.security);
-    if ((config.password == null || config.password === '') && security !== 'nopass') throw new Error('password is required');
+    if ((config.password == null || config.password === '') && security !== 'nopass' && !config.password_entity) {
+      throw new Error('password or password_entity is required');
+    }
     // YAML reads an unquoted 01234567 as the number 1234567: the leading zero is lost before
     // the card sees it, so the most we can do is point at the quotes.
     if (typeof config.password === 'number' && !this._warnedNumber) {
@@ -767,10 +886,20 @@ class WifiQrCard extends HTMLElement {
 
   set hass(hass) {
     var prevLang = this._configRaw ? this._getLang() : null;
+    var prevStates = this._entityStates();
+    this._hass = hass;
     // Resolved by wifiQrLang: sr-Latn is kept, a regional locale (fr-BE, en-GB…) falls back to its base.
     this._hassLang = hass?.language ? wifiQrLang(hass.language) : null;
-    // Re-render only when the language actually shown changes (not with a forced `language`).
-    if (this._configRaw && prevLang !== this._getLang()) this._applyConfig();
+    // Re-render only when the language actually shown changes (not with a forced `language`), or the
+    // state of the `ssid_entity` / `password_entity`.
+    if (this._configRaw && (prevLang !== this._getLang() || prevStates !== this._entityStates())) this._applyConfig();
+  }
+
+  // The states of the configured entities, as one comparable string.
+  _entityStates() {
+    var raw = this._configRaw;
+    if (!raw || !(raw.ssid_entity || raw.password_entity)) return '';
+    return JSON.stringify([raw.ssid_entity, raw.password_entity].map((id) => (id ? wifiQrEntityValue(this._hass, id) : null)));
   }
 
   _getLang() {
@@ -788,14 +917,24 @@ class WifiQrCard extends HTMLElement {
   // strict: let errors reach setConfig (the editor shows them); otherwise show them in the card.
   _applyConfig(strict) {
     var config = this._configRaw;
+    // An entity with a value overrides the static ssid / password; without one, the static value is used.
+    var value = (id, fallback) => (id && wifiQrEntityValue(this._hass, id)) || (fallback == null ? '' : String(fallback));
     this._config = {
-      ssid: String(config.ssid),
-      password: config.password == null ? '' : String(config.password),
+      ssid: value(config.ssid_entity, config.ssid),
+      password: value(config.password_entity, config.password),
       security: wifiQrSecurity(config.security),
+      hidden: config.hidden === true,
       title: config.title || this._t('default_title'),
       qr_size: Number(config.qr_size) > 0 ? Number(config.qr_size) : null,
       logo: config.logo !== false,
     };
+    // Neither the entity nor a static value: no QR code (it would not connect), the entity is named instead.
+    var c = this._config;
+    var missing = !c.ssid ? config.ssid_entity : !c.password && c.security !== 'nopass' ? config.password_entity : null;
+    if (missing) {
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--secondary-text-color)">${wifiQrEsc(this._t('entity_unavailable').replace('{entity}', missing))}</div></ha-card>`;
+      return;
+    }
     this._render(strict);
   }
 
@@ -1124,7 +1263,9 @@ class WifiQrMiniCard extends WifiQrCard {
 }
 
 // ── wifi-qr-card-editor (visual editor, built on HA's ha-form) ───────────────
-var WIFI_QR_EDITOR_DEFAULTS = { security: 'WPA', qr_size: 176, logo: true };
+var WIFI_QR_EDITOR_DEFAULTS = { security: 'WPA', qr_size: 176, logo: true, hidden: false };
+// Entities whose state can give the SSID or the password: helpers and router integrations.
+var WIFI_QR_ENTITY_SELECTOR = { entity: { filter: [{ domain: ['input_text', 'text', 'sensor'] }] } };
 
 class WifiQrCardEditor extends HTMLElement {
   // The mini card's editor adds its `zoom` toggle.
@@ -1163,8 +1304,12 @@ class WifiQrCardEditor extends HTMLElement {
       { name: 'title', selector: { text: {} } },
       { name: 'logo', selector: { boolean: {} } },
       ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
-      { name: 'ssid', required: true, selector: { text: {} } },
+      // The SSID is only required without an entity giving it.
+      { name: 'ssid', required: !this._config?.ssid_entity, selector: { text: {} } },
+      { name: 'ssid_entity', selector: WIFI_QR_ENTITY_SELECTOR },
       { name: 'password', selector: { text: { type: 'password' } } },
+      { name: 'password_entity', selector: WIFI_QR_ENTITY_SELECTOR },
+      { name: 'hidden', selector: { boolean: {} } },
       {
         type: 'grid',
         name: '',
@@ -1236,7 +1381,8 @@ class WifiQrCardEditor extends HTMLElement {
     this._form.schema = this._schema();
     this._form.computeLabel = (s) => wifiQrT(lang, `ed_${s.name}`);
     this._form.computeHelper = (s) => {
-      var key = `ed_${s.name}_helper`;
+      // Both entity fields share one helper.
+      var key = /_entity$/.test(s.name) ? 'ed_entity_helper' : `ed_${s.name}_helper`;
       var txt = wifiQrT(lang, key);
       return txt === key ? undefined : txt;
     };

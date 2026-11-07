@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.12.0 - 2026-11-07
+
+### What's new
+- New `ssid_entity` and `password_entity` options: the network name and the password are read from an entity's state (an `input_text`, a `text` or a router integration's `sensor`), override `ssid` and `password`, and the QR code and texts update live when the state changes.
+- When such an entity is unknown or unavailable, the card falls back to `ssid` / `password`, or names the entity instead of showing a QR code that would not connect.
+- New `hidden: true` option for networks that do not broadcast their SSID: the QR code tells the phone to join it anyway (`H:true;`).
+- Visual editor: entity pickers for the network name and the password, and a « Hidden network » toggle, in all 22 languages of the card.
+
 ## 1.11.2 - 2026-11-07
 
 ### Changes
