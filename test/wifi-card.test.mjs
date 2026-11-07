@@ -464,21 +464,13 @@ test("a forced language is not re-rendered on a HA language change", () => {
   assert.equal(card.shadowRoot.innerHTML, "untouched");
 });
 
-test("the zoom dialog opens at the top of the card, kept on screen", () => {
+test("the zoom dialog opens centred on the screen, like the Wero card's", () => {
   const { card, els } = stubCard();
   card.setConfig({ ssid: "Box", password: "secret" });
-  assert.doesNotMatch(card.shadowRoot.innerHTML, /dialog \{[^}]*margin: auto;/);
-  ctx.window.innerHeight = 800;
+  assert.match(card.shadowRoot.innerHTML, /dialog \{[^}]*margin: auto;/);
   els.qr.onclick();
-  assert.equal(els.zoom.style.marginTop, "120px");
-  els.zoom.close();
-  card.getBoundingClientRect = () => ({ top: 700 });
-  els.qr.onclick();
-  assert.equal(els.zoom.style.marginTop, "492px");
-  els.zoom.close();
-  card.getBoundingClientRect = () => ({ top: -400 });
-  els.qr.onclick();
-  assert.equal(els.zoom.style.marginTop, "8px");
+  assert.equal(els.zoom.open, true);
+  assert.equal(els.zoom.style.marginTop, undefined);
 });
 
 // Renders the editor with a stub ha-form and returns the data it shows.

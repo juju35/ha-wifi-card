@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.2 - 2026-11-07
+
+### Changes
+- The full screen QR code opens centred on the screen again, like the Wero card's.
+
 ## 1.11.1 - 2026-11-07
 
 ### Changes
