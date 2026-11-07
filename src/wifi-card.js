@@ -872,7 +872,7 @@ class WifiQrCard extends HTMLElement {
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; width: ${c.qr_size ? `${c.qr_size}px` : '176px'}; }
-        dialog { border: none; padding: 0; margin: 8px auto auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
+        dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         .info-block { width: 100%; display: flex; flex-direction: column; gap: 6px; }
@@ -946,13 +946,8 @@ class WifiQrCard extends HTMLElement {
     const qr = this.shadowRoot.getElementById('qr');
     const dlg = this.shadowRoot.getElementById('zoom');
     const open = () => {
-      if (dlg.open) return;
-      dlg.showModal();
-      // Like the other ha-* popups: aligned on the top of the card instead of centred in the
-      // viewport, and kept fully on screen when the card is scrolled out of view.
-      const top = this.getBoundingClientRect().top;
-      const max = window.innerHeight - dlg.offsetHeight - 8;
-      dlg.style.marginTop = `${Math.max(8, Math.min(top, max))}px`;
+      // Centred on the screen, like the Wero card's full screen QR code.
+      if (!dlg.open) dlg.showModal();
     };
     qr.onclick = open;
     qr.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } };
@@ -1099,7 +1094,7 @@ class WifiQrMiniCard extends WifiQrCard {
         .thumb svg { width: 100%; height: 100%; display: block; }
         .thumb:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 2px; }
         /* The full screen QR, as on the full card. */
-        dialog { border: none; padding: 0; margin: 8px auto auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
+        dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
