@@ -1080,10 +1080,11 @@ class WifiQrMiniCard extends WifiQrCard {
         ha-card.mini { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; justify-content: center;
                        container-type: inline-size; }
         .row { display: flex; align-items: center; gap: 10px; min-width: 0; }
-        .badge { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; flex: none;
+        /* The full card's 40 px header badge, not reduced in the compact view. */
+        .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
-        .badge .logo { width: 20px; height: 20px; display: block; }
-        .badge ha-icon { color: inherit; --mdc-icon-size: 20px; }
+        .badge .logo { width: 24px; height: 24px; display: block; }
+        .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         .titles { flex: 1 1 0; min-width: 4ch; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

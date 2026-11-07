@@ -680,7 +680,9 @@ test("mini card: one compact row, QR thumbnail and detail button, never the pass
   assert.match(html, /<button class="zoom" id="zbtn" title="Show the full card" aria-label="Show the full card"><ha-icon icon="mdi:arrow-expand">/);
   assert.match(cssRule(html, ".zoom"), /all: unset;[^}]*width: 24px; height: 24px;[^}]*border-radius: 50%;[^}]*color: var\(--secondary-text-color\);/);
   assert.doesNotMatch(cssRule(html, ".zoom"), /background/);
-  assert.deepEqual(px(cssRule(html, ".badge"), "width"), [32]);
+  // The full card's 40 px badge and 24 px glyph, not reduced in the compact view.
+  assert.deepEqual(px(cssRule(html, ".badge"), "width"), [40]);
+  assert.deepEqual(px(cssRule(html, ".badge .logo"), "width"), [24]);
   // The QR thumbnail still encodes the network.
   const svg = /<div class="thumb"[^>]*>(<svg[\s\S]*?<\/svg>)/.exec(html)[1];
   assert.equal(decodeSvg(svg), "WIFI:T:WPA;S:Home-Guests;P:secret-pass;;");
