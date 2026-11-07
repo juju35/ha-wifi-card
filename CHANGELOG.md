@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.0 - 2026-11-07
+
+### What's new
+- Mini card `wifi-qr-mini-card`: the network on one compact row (header icon, title, network name and a small QR code thumbnail), the password never shown. The detail button (top right) or a tap on the thumbnail switches to the full card with its big scannable QR code; the button or a click anywhere outside the card brings the compact view back. `zoom: false` removes the button. On a very narrow card (6 columns of a phone) the thumbnail shrinks to 48 px so the title keeps a few characters.
+- Visual editor for the mini card, with a « Detail button » toggle; the mini card is listed in the card picker in your language, in all 22 languages of the card.
+
 ## 1.10.7 - 2026-11-04
 
 ### Documentation

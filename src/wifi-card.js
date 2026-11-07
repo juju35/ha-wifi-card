@@ -33,10 +33,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zone blanche incluse — 176 px par défaut',
     ed_language_helper: 'Laisser vide pour suivre la langue de Home Assistant',
     ed_logo: 'Afficher le logo WiFi',
+    ed_zoom: 'Bouton détail',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Aucune (réseau ouvert)',
+    zoom_in: 'Afficher la carte complète',
+    zoom_out: 'Revenir à la vue compacte',
+    mini_name: 'Mini-carte QR Wifi',
+    mini_desc: 'Réseau Wifi compact : nom et petit QR code, avec un bouton pour afficher la carte complète.',
   },
   en: {
     default_title: 'Guest WiFi',
@@ -58,10 +63,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Quiet zone included — defaults to 176 px',
     ed_language_helper: 'Leave empty to follow the Home Assistant language',
     ed_logo: 'Show the WiFi logo',
+    ed_zoom: 'Detail button',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'None (open network)',
+    zoom_in: 'Show the full card',
+    zoom_out: 'Back to the compact view',
+    mini_name: 'Wifi QR Mini Card',
+    mini_desc: 'Compact WiFi network: name and a small QR code, with a button to show the full card.',
   },
   de: {
     default_title: 'Gäste-WLAN',
@@ -83,10 +93,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ruhezone inklusive – standardmäßig 176 px',
     ed_language_helper: 'Leer lassen, um der Sprache von Home Assistant zu folgen',
     ed_logo: 'WLAN-Logo anzeigen',
+    ed_zoom: 'Detail-Schaltfläche',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Keine (offenes Netzwerk)',
+    zoom_in: 'Vollständige Karte anzeigen',
+    zoom_out: 'Zurück zur kompakten Ansicht',
+    mini_name: 'WLAN-QR-Minikarte',
+    mini_desc: 'Kompaktes WLAN: Name und kleiner QR-Code, mit einer Schaltfläche für die vollständige Karte.',
   },
   es: {
     default_title: 'Wi-Fi de invitados',
@@ -108,10 +123,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona de silencio incluida: 176 px por defecto',
     ed_language_helper: 'Déjalo vacío para seguir el idioma de Home Assistant',
     ed_logo: 'Mostrar el logotipo Wi-Fi',
+    ed_zoom: 'Botón de detalle',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ninguna (red abierta)',
+    zoom_in: 'Mostrar la tarjeta completa',
+    zoom_out: 'Volver a la vista compacta',
+    mini_name: 'Minitarjeta QR Wi-Fi',
+    mini_desc: 'Red Wi-Fi compacta: nombre y un pequeño código QR, con un botón para mostrar la tarjeta completa.',
   },
   sr: {
     default_title: 'WiFi за госте',
@@ -133,10 +153,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Укључује и празан простор око кода — подразумевано је 176 px',
     ed_language_helper: 'Остави празно да прати језик Home Assistant-а',
     ed_logo: 'Прикажи WiFi лого',
+    ed_zoom: 'Дугме за детаље',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нема (отворена мрежа)',
+    zoom_in: 'Прикажи целу картицу',
+    zoom_out: 'Назад на компактни приказ',
+    mini_name: 'Мини картица за WiFi QR',
+    mini_desc: 'Компактна WiFi мрежа: назив и мали QR код, са дугметом за целу картицу.',
   },
   'sr-Latn': {
     default_title: 'WiFi za goste',
@@ -158,10 +183,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Uključuje i prazan prostor oko koda — podrazumevano je 176 px',
     ed_language_helper: 'Ostavi prazno da prati jezik Home Assistant-a',
     ed_logo: 'Prikaži WiFi logo',
+    ed_zoom: 'Dugme za detalje',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nema (otvorena mreža)',
+    zoom_in: 'Prikaži celu karticu',
+    zoom_out: 'Nazad na kompaktni prikaz',
+    mini_name: 'Mini kartica za WiFi QR',
+    mini_desc: 'Kompaktna WiFi mreža: naziv i mali QR kod, sa dugmetom za celu karticu.',
   },
   it: {
     default_title: 'Wi-Fi ospiti',
@@ -183,10 +213,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona di rispetto inclusa: 176 px per impostazione predefinita',
     ed_language_helper: 'Lascia vuoto per usare la lingua di Home Assistant',
     ed_logo: 'Mostra il logo Wi-Fi',
+    ed_zoom: 'Pulsante dettagli',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nessuna (rete aperta)',
+    zoom_in: 'Mostra la scheda completa',
+    zoom_out: 'Torna alla vista compatta',
+    mini_name: 'Mini scheda QR Wi-Fi',
+    mini_desc: 'Rete Wi-Fi compatta: nome e piccolo codice QR, con un pulsante per la scheda completa.',
   },
   nl: {
     default_title: 'Gastenwifi',
@@ -208,10 +243,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inclusief witrand — standaard 176 px',
     ed_language_helper: 'Leeg laten om de taal van Home Assistant te volgen',
     ed_logo: 'Wifilogo tonen',
+    ed_zoom: 'Detailknop',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Geen (open netwerk)',
+    zoom_in: 'Volledige kaart tonen',
+    zoom_out: 'Terug naar de compacte weergave',
+    mini_name: 'Wifi-QR-minikaart',
+    mini_desc: 'Compact wifinetwerk: naam en kleine QR-code, met een knop voor de volledige kaart.',
   },
   pt: {
     default_title: 'Wi-Fi visitas',
@@ -233,10 +273,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Margem de silêncio incluída — 176 px por predefinição',
     ed_language_helper: 'Deixe vazio para seguir o idioma do Home Assistant',
     ed_logo: 'Mostrar o logótipo Wi-Fi',
+    ed_zoom: 'Botão de detalhe',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nenhuma (rede aberta)',
+    zoom_in: 'Mostrar o cartão completo',
+    zoom_out: 'Voltar à vista compacta',
+    mini_name: 'Mini cartão QR Wi-Fi',
+    mini_desc: 'Rede Wi-Fi compacta: nome e um pequeno código QR, com um botão para o cartão completo.',
   },
   pl: {
     default_title: 'Wi-Fi dla gości',
@@ -258,10 +303,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ze strefą ciszy — domyślnie 176 px',
     ed_language_helper: 'Pozostaw puste, aby używać języka Home Assistant',
     ed_logo: 'Pokaż logo Wi-Fi',
+    ed_zoom: 'Przycisk szczegółów',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brak (sieć otwarta)',
+    zoom_in: 'Pokaż pełną kartę',
+    zoom_out: 'Wróć do widoku kompaktowego',
+    mini_name: 'Mini karta QR Wi-Fi',
+    mini_desc: 'Kompaktowa sieć Wi-Fi: nazwa i mały kod QR, z przyciskiem pełnej karty.',
   },
   ro: {
     default_title: 'Wi-Fi oaspeți',
@@ -283,10 +333,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona liniștită inclusă — implicit 176 px',
     ed_language_helper: 'Lăsați gol pentru a folosi limba din Home Assistant',
     ed_logo: 'Afișează sigla Wi-Fi',
+    ed_zoom: 'Buton de detalii',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Fără (rețea deschisă)',
+    zoom_in: 'Afișează cardul complet',
+    zoom_out: 'Înapoi la vizualizarea compactă',
+    mini_name: 'Mini card QR Wi-Fi',
+    mini_desc: 'Rețea Wi-Fi compactă: nume și un cod QR mic, cu un buton pentru cardul complet.',
   },
   da: {
     default_title: 'Gæste-wifi',
@@ -308,10 +363,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inklusive frizone – 176 px som standard',
     ed_language_helper: 'Lad feltet stå tomt for at følge sproget i Home Assistant',
     ed_logo: 'Vis wifi-logoet',
+    ed_zoom: 'Detaljeknap',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (åbent netværk)',
+    zoom_in: 'Vis hele kortet',
+    zoom_out: 'Tilbage til kompakt visning',
+    mini_name: 'Wifi-QR-minikort',
+    mini_desc: 'Kompakt wifi-netværk: navn og en lille QR-kode, med en knap til hele kortet.',
   },
   sv: {
     default_title: 'Gäst-wifi',
@@ -333,10 +393,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inklusive frizon – 176 px som standard',
     ed_language_helper: 'Lämna tomt för att följa språket i Home Assistant',
     ed_logo: 'Visa wifi-logotypen',
+    ed_zoom: 'Detaljknapp',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (öppet nätverk)',
+    zoom_in: 'Visa hela kortet',
+    zoom_out: 'Tillbaka till kompakt vy',
+    mini_name: 'Minikort för wifi-QR',
+    mini_desc: 'Kompakt wifi-nätverk: namn och en liten QR-kod, med en knapp för hela kortet.',
   },
   bg: {
     default_title: 'Wi-Fi за гости',
@@ -358,10 +423,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'С включена тиха зона — по подразбиране 176 px',
     ed_language_helper: 'Оставете празно, за да се използва езикът на Home Assistant',
     ed_logo: 'Показване на логото на Wi-Fi',
+    ed_zoom: 'Бутон за подробности',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Без (отворена мрежа)',
+    zoom_in: 'Покажи цялата карта',
+    zoom_out: 'Обратно към компактния изглед',
+    mini_name: 'Мини карта с Wi-Fi QR',
+    mini_desc: 'Компактна Wi-Fi мрежа: име и малък QR код, с бутон за цялата карта.',
   },
   ru: {
     default_title: 'Гостевой Wi-Fi',
@@ -383,10 +453,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'С учётом свободной зоны — по умолчанию 176 px',
     ed_language_helper: 'Оставьте пустым, чтобы использовать язык Home Assistant',
     ed_logo: 'Показывать логотип Wi-Fi',
+    ed_zoom: 'Кнопка подробностей',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нет (открытая сеть)',
+    zoom_in: 'Показать полную карточку',
+    zoom_out: 'Вернуться к компактному виду',
+    mini_name: 'Мини-карточка Wi-Fi QR',
+    mini_desc: 'Компактная сеть Wi-Fi: имя и небольшой QR-код, с кнопкой полной карточки.',
   },
   uk: {
     default_title: 'Гостьовий Wi-Fi',
@@ -408,10 +483,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'З урахуванням вільної зони — типово 176 px',
     ed_language_helper: 'Залиште порожнім, щоб використовувати мову Home Assistant',
     ed_logo: 'Показувати логотип Wi-Fi',
+    ed_zoom: 'Кнопка деталей',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Відкрита мережа',
+    zoom_in: 'Показати повну картку',
+    zoom_out: 'Повернутися до компактного вигляду',
+    mini_name: 'Міні-картка Wi-Fi QR',
+    mini_desc: 'Компактна мережа Wi-Fi: назва й невеликий QR-код, з кнопкою повної картки.',
   },
   hu: {
     default_title: 'Vendég Wi-Fi',
@@ -433,10 +513,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Csendes zónával együtt – alapértelmezés: 176 px',
     ed_language_helper: 'Hagyd üresen, hogy a Home Assistant nyelvét kövesse',
     ed_logo: 'Wi-Fi-logó megjelenítése',
+    ed_zoom: 'Részletek gomb',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nincs (nyílt hálózat)',
+    zoom_in: 'Teljes kártya megjelenítése',
+    zoom_out: 'Vissza a kompakt nézethez',
+    mini_name: 'Wi-Fi QR mini kártya',
+    mini_desc: 'Kompakt Wi-Fi-hálózat: név és kis QR-kód, a teljes kártya gombjával.',
   },
   sk: {
     default_title: 'Wi-Fi pre hostí',
@@ -458,10 +543,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Vrátane tichej zóny — predvolene 176 px',
     ed_language_helper: 'Nechajte prázdne, ak chcete používať jazyk Home Assistant',
     ed_logo: 'Zobraziť logo Wi-Fi',
+    ed_zoom: 'Tlačidlo podrobností',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žiadne (otvorená sieť)',
+    zoom_in: 'Zobraziť celú kartu',
+    zoom_out: 'Späť na kompaktné zobrazenie',
+    mini_name: 'Mini karta Wi-Fi QR',
+    mini_desc: 'Kompaktná sieť Wi-Fi: názov a malý QR kód, s tlačidlom celej karty.',
   },
   cs: {
     default_title: 'Wi-Fi pro hosty',
@@ -483,10 +573,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Včetně klidové zóny — výchozí 176 px',
     ed_language_helper: 'Ponechte prázdné, chcete-li používat jazyk Home Assistant',
     ed_logo: 'Zobrazit logo Wi-Fi',
+    ed_zoom: 'Tlačítko podrobností',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žádné (otevřená síť)',
+    zoom_in: 'Zobrazit celou kartu',
+    zoom_out: 'Zpět na kompaktní zobrazení',
+    mini_name: 'Mini karta Wi-Fi QR',
+    mini_desc: 'Kompaktní síť Wi-Fi: název a malý QR kód, s tlačítkem celé karty.',
   },
   sl: {
     default_title: 'Wi-Fi za goste',
@@ -508,10 +603,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Vključno s tiho cono — privzeto 176 px',
     ed_language_helper: 'Pustite prazno, da se uporabi jezik Home Assistant',
     ed_logo: 'Pokaži logotip Wi-Fi',
+    ed_zoom: 'Gumb za podrobnosti',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brez (odprto omrežje)',
+    zoom_in: 'Prikaži celotno kartico',
+    zoom_out: 'Nazaj na kompaktni pogled',
+    mini_name: 'Mini kartica Wi-Fi QR',
+    mini_desc: 'Kompaktno omrežje Wi-Fi: ime in majhna koda QR, z gumbom za celotno kartico.',
   },
   lv: {
     default_title: 'Viesu Wi-Fi',
@@ -533,10 +633,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ieskaitot klusuma zonu — pēc noklusējuma 176 px',
     ed_language_helper: 'Atstājiet tukšu, lai izmantotu Home Assistant valodu',
     ed_logo: 'Rādīt Wi-Fi logotipu',
+    ed_zoom: 'Detaļu poga',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nav (atvērts tīkls)',
+    zoom_in: 'Rādīt pilno karti',
+    zoom_out: 'Atpakaļ uz kompakto skatu',
+    mini_name: 'Wi-Fi QR mini karte',
+    mini_desc: 'Kompakts Wi-Fi tīkls: nosaukums un mazs QR kods, ar pogu pilnajai kartei.',
   },
   el: {
     default_title: 'WiFi επισκεπτών',
@@ -558,10 +663,15 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Με τη ζώνη ησυχίας — προεπιλογή 176 px',
     ed_language_helper: 'Αφήστε κενό για να ακολουθεί τη γλώσσα του Home Assistant',
     ed_logo: 'Εμφάνιση λογότυπου Wi-Fi',
+    ed_zoom: 'Κουμπί λεπτομερειών',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Καμία (ανοιχτό δίκτυο)',
+    zoom_in: 'Εμφάνιση πλήρους κάρτας',
+    zoom_out: 'Επιστροφή στη συμπαγή προβολή',
+    mini_name: 'Μίνι κάρτα QR Wi-Fi',
+    mini_desc: 'Συμπαγές δίκτυο Wi-Fi: όνομα και μικρός κωδικός QR, με κουμπί για την πλήρη κάρτα.',
   },
 };
 
@@ -778,6 +888,7 @@ class WifiQrCard extends HTMLElement {
         /* 30 px target (WCAG 2.5.8); the negative margin absorbs the padding so the Password row is not taller than the Network row. */
         button { background: none; border: none; cursor: pointer; padding: 4px; margin: -8px -4px; display: flex; align-items: center; flex: none; }
         .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
+        ${this._miniStyle()}
       </style>
       <ha-card>
         <div class="header"><div class="hrow">
@@ -786,6 +897,7 @@ class WifiQrCard extends HTMLElement {
             <div class="name" title="${title}">${title}</div>
             <div class="sub" title="${sub}">${sub}</div>
           </div>
+          ${this._zoomButton()}
         </div></div>
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
@@ -849,12 +961,181 @@ class WifiQrCard extends HTMLElement {
   getGridOptions() {
     return { columns: 6, min_columns: 4 };
   }
+
+  // Hooks for the mini card: its styles and its detail button at the right of the header.
+  _miniStyle() { return ''; }
+
+  _zoomButton() { return ''; }
+}
+
+// ── wifi-qr-mini-card ─────────────────────────────────────────────────────────
+// Styles of the mini card in both its views (compact and full card). Only the compact view's ha-card is a size
+// container: a size container takes no width from its content, so in a parent sized by its content (inline-block,
+// an `auto` grid column) it would shrink to its padding. The empty, zero-height grid before it gives the host up to
+// 240 px there, and no minimum.
+var WIFI_MINI_STYLE = `
+        :host([mini]) { display: block; min-width: 0; }
+        :host([mini])::before { content: ""; display: grid; grid-template-columns: minmax(0, 240px); height: 0; }
+        .zoom { all: unset; flex: none; cursor: pointer; width: 24px; height: 24px; margin: -4px -4px -4px 0; border-radius: 50%; align-self: flex-start;
+                display: grid; place-items: center; color: var(--secondary-text-color); }
+        .zoom ha-icon { color: inherit; --mdc-icon-size: 16px; }
+        .zoom:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
+        .zoom:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 1px; }`;
+
+// A click in a dialog opened from the page (a more-info, say) is not a click outside the card.
+function wifiQrInDialog(ev) {
+  return ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n.localName));
+}
+
+// The mini card extends the full card: one row with the header badge, the title and the network name, and a QR code
+// thumbnail; the password is never shown. Its detail button (top right, `zoom: false` removes it) and the thumbnail
+// switch it to the full card, same configuration; the button or a click anywhere outside the card brings it back.
+class WifiQrMiniCard extends WifiQrCard {
+  static getConfigElement() {
+    return document.createElement('wifi-qr-mini-card-editor');
+  }
+
+  constructor() {
+    super();
+    this._zoomed = false;
+    this._onOutside = (ev) => {
+      if (this._zoomed && !ev.composedPath().includes(this) && !wifiQrInDialog(ev)) this._setZoom(false);
+    };
+  }
+
+  connectedCallback() {
+    document.addEventListener('click', this._onOutside, true);
+  }
+
+  disconnectedCallback() {
+    document.removeEventListener('click', this._onOutside, true);
+  }
+
+  setConfig(config) {
+    // The host attribute behind the mini card's styles; never set in the constructor (not allowed there).
+    this.setAttribute?.('mini', '');
+    super.setConfig(config);
+  }
+
+  getCardSize() {
+    return this._zoomed ? super.getCardSize() : 2;
+  }
+
+  getGridOptions() {
+    return this._zoomed ? super.getGridOptions() : { columns: 6, min_columns: 6 };
+  }
+
+  _miniStyle() {
+    return WIFI_MINI_STYLE;
+  }
+
+  _zoomButton() {
+    if (this._configRaw?.zoom === false) return '';
+    const label = wifiQrEsc(this._t(this._zoomed ? 'zoom_out' : 'zoom_in'));
+    return `<button class="zoom" id="zbtn" title="${label}" aria-label="${label}"><ha-icon icon="mdi:${this._zoomed ? 'arrow-collapse' : 'arrow-expand'}"></ha-icon></button>`;
+  }
+
+  // keyboard: activated with Enter / Space, the focus goes to the button of the new view, without scrolling.
+  _setZoom(zoomed, keyboard) {
+    this._zoomed = zoomed;
+    this._render();
+    if (keyboard) {
+      const target = this.shadowRoot.getElementById(this._configRaw?.zoom === false ? 'qr' : 'zbtn');
+      target?.focus?.({ preventScroll: true });
+    }
+  }
+
+  _bindZoom() {
+    const btn = this.shadowRoot.getElementById('zbtn');
+    if (!btn) return;
+    btn.onclick = (ev) => {
+      ev?.stopPropagation?.();
+      // A keyboard activation of a button is a click without a click count.
+      this._setZoom(!this._zoomed, ev?.detail === 0);
+    };
+  }
+
+  _render(strict) {
+    if (this._zoomed) {
+      super._render(strict);
+      this._bindZoom();
+      return;
+    }
+    const c = this._config;
+    let svg;
+    try {
+      svg = this._buildQrSvg(wifiQrString(c), 64);
+    } catch (err) {
+      if (strict) throw err;
+      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--error-color)">${wifiQrEsc(err.message)}</div></ha-card>`;
+      return;
+    }
+    const title = wifiQrEsc(c.title);
+    const ssid = wifiQrEsc(c.ssid);
+    const zoomIn = wifiQrEsc(this._t('zoom_in'));
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host { height: 100%; }
+        ${WIFI_MINI_STYLE}
+        ha-card.mini { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; justify-content: center;
+                       container-type: inline-size; }
+        .row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        /* The full card's 40 px header badge, not reduced in the compact view. */
+        .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+                 --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+        .badge .logo { width: 24px; height: 24px; display: block; }
+        .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
+        .titles { flex: 1 1 0; min-width: 4ch; }
+        .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* The big QR code's colours and rounded tile, at thumbnail size. */
+        .thumb { flex: none; width: 64px; height: 64px; background: ${WIFI_BLUE}; border-radius: 8px; overflow: hidden; line-height: 0; cursor: zoom-in; }
+        .thumb svg { width: 100%; height: 100%; display: block; }
+        .thumb:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 2px; }
+        /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
+           and a 14 px title keep a few characters of the title. */
+        @container (max-width: 200px) {
+          .row { gap: 4px; margin: 0 -4px; }
+          .name { font-size: 14px; }
+          .thumb { width: 48px; height: 48px; border-radius: 6px; }
+        }
+      </style>
+      <ha-card class="mini">
+        <div class="row">
+          <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
+          <div class="titles">
+            <div class="name" title="${title}">${title}</div>
+            <div class="sub" title="${ssid}">${ssid}</div>
+          </div>
+          <div class="thumb" id="qr" role="button" tabindex="0" title="${zoomIn}" aria-label="${zoomIn}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
+          ${this._zoomButton()}
+        </div>
+      </ha-card>`;
+    const thumb = this.shadowRoot.getElementById('qr');
+    thumb.onclick = () => this._setZoom(true);
+    thumb.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this._setZoom(true, true);
+      }
+    };
+    this._bindZoom();
+  }
 }
 
 // ── wifi-qr-card-editor (visual editor, built on HA's ha-form) ───────────────
 var WIFI_QR_EDITOR_DEFAULTS = { security: 'WPA', qr_size: 176, logo: true };
 
 class WifiQrCardEditor extends HTMLElement {
+  // The mini card's editor adds its `zoom` toggle.
+  static get mini() {
+    return false;
+  }
+
+  _defaults() {
+    return Object.assign({}, WIFI_QR_EDITOR_DEFAULTS, this.constructor.mini ? { zoom: true } : {});
+  }
+
   setConfig(config) {
     this._config = Object.assign({}, config);
     this._render();
@@ -881,6 +1162,7 @@ class WifiQrCardEditor extends HTMLElement {
     return [
       { name: 'title', selector: { text: {} } },
       { name: 'logo', selector: { boolean: {} } },
+      ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
       { name: 'ssid', required: true, selector: { text: {} } },
       { name: 'password', selector: { text: { type: 'password' } } },
       {
@@ -961,7 +1243,7 @@ class WifiQrCardEditor extends HTMLElement {
     // Show the defaults as set, so the fields match what the card does.
     // YAML aliases (wpa2, wpa3, none, open…) are shown as the matching option; the config itself
     // is only rewritten once the user changes something.
-    var data = Object.assign({}, WIFI_QR_EDITOR_DEFAULTS, this._config);
+    var data = Object.assign(this._defaults(), this._config);
     data.security = wifiQrEditorSecurity(data.security);
     this._form.data = data;
   }
@@ -973,8 +1255,9 @@ class WifiQrCardEditor extends HTMLElement {
     Object.keys(value).forEach((key) => {
       if (value[key] === '' || value[key] === null || value[key] === undefined) delete value[key];
     });
-    Object.keys(WIFI_QR_EDITOR_DEFAULTS).forEach((key) => {
-      if (value[key] === WIFI_QR_EDITOR_DEFAULTS[key]) delete value[key];
+    var defaults = this._defaults();
+    Object.keys(defaults).forEach((key) => {
+      if (value[key] === defaults[key]) delete value[key];
     });
     // Switching to an open network drops the password from the config, but keep it
     // in memory so switching back to WPA/SAE/WEP does not force retyping it.
@@ -995,8 +1278,17 @@ class WifiQrCardEditor extends HTMLElement {
   }
 }
 
+class WifiQrMiniCardEditor extends WifiQrCardEditor {
+  static get mini() {
+    return true;
+  }
+}
+
 if (!customElements.get('wifi-qr-card-editor')) {
   customElements.define('wifi-qr-card-editor', WifiQrCardEditor);
+}
+if (!customElements.get('wifi-qr-mini-card-editor')) {
+  customElements.define('wifi-qr-mini-card-editor', WifiQrMiniCardEditor);
 }
 
 if (!customElements.get('wifi-qr-card')) {
@@ -1010,4 +1302,17 @@ if (!customElements.get('wifi-qr-card')) {
     documentationURL: 'https://github.com/juju35/ha-wifi-card',
   });
   console.info(`%c WIFI-QR-CARD %c v${WIFI_QR_CARD_VERSION} `, 'color:#fff;background:#1976D2;font-weight:700', 'color:#1976D2;background:#fff');
+}
+if (!customElements.get('wifi-qr-mini-card')) {
+  customElements.define('wifi-qr-mini-card', WifiQrMiniCard);
+  // The card picker lists it in the page language (the HA frontend sets it), like the card's own texts.
+  var wifiQrPickerLang = wifiQrLang(document.documentElement.lang || globalThis.navigator?.language);
+  window.customCards = window.customCards || [];
+  window.customCards.push({
+    type: 'wifi-qr-mini-card',
+    name: wifiQrT(wifiQrPickerLang, 'mini_name'),
+    description: wifiQrT(wifiQrPickerLang, 'mini_desc'),
+    preview: true,
+    documentationURL: 'https://github.com/juju35/ha-wifi-card',
+  });
 }

@@ -20,10 +20,11 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
 - Password hidden by default, revealable with a toggle button
+- Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail, and a detail button that switches to the full card (big scannable QR code) and back
 - Visual editor in the dashboard UI (no YAML needed)
 - Light and dark mode, English, French, German, Spanish, Serbian (Cyrillic and Latin), Italian, Dutch, European Portuguese, Polish, Romanian, Danish, Swedish, Bulgarian, Russian, Ukrainian, Hungarian, Slovak, Czech, Slovenian, Latvian and Greek
 - Ready for the Marketplace
-- Single file, lightweight (~54 KB)
+- Single file, lightweight (~68 KB)
 
 ## Prerequisites
 
@@ -57,7 +58,7 @@ Or manually:
 
 ### Visual editor
 
-Add the card from the dashboard (**Add card → Wifi QR Card**) and fill in the fields: title, logo, SSID, password, security, QR code size and language. The preview updates live, and empty optional fields are left out of the generated YAML.
+Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, SSID, password, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
 
 ### Minimal
 
@@ -79,6 +80,18 @@ security: WPA
 qr_size: 176
 ```
 
+### Mini card
+
+`wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail or the detail button (top right) to switch to the full card, with its big scannable QR code; the button or a click anywhere outside the card brings the compact view back.
+
+```yaml
+type: custom:wifi-qr-mini-card
+title: Guest WiFi
+ssid: MyNetwork-Guest
+password: MySecretPassword
+zoom: true
+```
+
 ### Options reference
 
 | Option | Required | Default | Description |
@@ -89,6 +102,7 @@ qr_size: 176
 | `title` | ❌ | Auto (i18n) | Card title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
+| `zoom` | ❌ | `true` | Mini card only: show the detail button that switches to the full card and back |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings) |
 
 ## Screenshots
@@ -96,6 +110,10 @@ qr_size: 176
 | Light | Dark |
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png" alt="card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card.png" alt="mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-dark.png" alt="mini card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow.png" alt="mini card, narrow" width="200"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow-dark.png" alt="mini card, narrow, dark" width="200"> |
+
+The mini card on a desktop column, then on 6 columns of a phone, where the QR code thumbnail gets smaller.
 
 ## How it works
 
