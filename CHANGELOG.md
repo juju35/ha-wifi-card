@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.12.1 - 2026-11-07
+
+### Security
+- A revealed password is masked again after 30 seconds, when the card leaves the page and when the mini card folds back to its compact view.
+
+### Changes
+- The QR code is only rebuilt when the network or its size changes, not on every re-render.
+- The QR code's accessible name is translated in all 22 languages of the card.
+
 ## 1.12.0 - 2026-11-07
 
 ### What's new
