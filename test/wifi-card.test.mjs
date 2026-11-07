@@ -28,10 +28,16 @@ function loadCard() {
   ctx.window = ctx;
   vm.createContext(ctx);
   vm.runInContext(readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8"), ctx);
-  return { ctx, WifiQrCard: defined["wifi-qr-card"], WifiQrCardEditor: defined["wifi-qr-card-editor"] };
+  return {
+    ctx,
+    WifiQrCard: defined["wifi-qr-card"],
+    WifiQrCardEditor: defined["wifi-qr-card-editor"],
+    WifiQrMiniCard: defined["wifi-qr-mini-card"],
+    WifiQrMiniCardEditor: defined["wifi-qr-mini-card-editor"],
+  };
 }
 
-const { ctx, WifiQrCard, WifiQrCardEditor } = loadCard();
+const { ctx, WifiQrCard, WifiQrCardEditor, WifiQrMiniCard, WifiQrMiniCardEditor } = loadCard();
 
 // Renders the card's SVG to an RGBA bitmap (dark modules black, the rest white) and decodes it.
 function decodeSvg(svg, scale = 8) {
@@ -619,4 +625,200 @@ test("focus is never moved with scrolling: every focus() call passes preventScro
   const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
   const calls = src.match(/\.focus\([^)]*\)/g) || [];
   for (const c of calls) assert.match(c, /preventScroll: true/, c);
+});
+
+// ── Mini card ─────────────────────────────────────────────────────────────────
+
+// Mini card with a stub shadow root whose elements survive re-renders (looked up again by id).
+function stubMini(config) {
+  const els = {};
+  const attrs = {};
+  const card = new WifiQrMiniCard();
+  card.setAttribute = (k, v) => (attrs[k] = v);
+  card.attachShadow = () => {
+    card.shadowRoot = {
+      innerHTML: "",
+      getElementById: (id) =>
+        (els[id] ||= {
+          attrs: {},
+          style: {},
+          open: false,
+          offsetHeight: 300,
+          setAttribute(k, v) {
+            this.attrs[k] = v;
+          },
+          showModal() {
+            this.open = true;
+          },
+          close() {
+            this.open = false;
+          },
+          focus(opts) {
+            this.focused = opts;
+          },
+        }),
+    };
+    return card.shadowRoot;
+  };
+  card.getBoundingClientRect = () => ({ top: 0 });
+  card.setConfig({ ssid: "Home-Guests", password: "secret-pass", language: "en", ...config });
+  return { card, els, attrs };
+}
+const click = (el, detail = 1) => el.onclick({ detail, stopPropagation() {} });
+
+test("mini card: one compact row, QR thumbnail and detail button, never the password", () => {
+  const { card, attrs } = stubMini({ title: "Guests" });
+  const html = card.shadowRoot.innerHTML;
+  assert.equal(attrs.mini, "");
+  assert.match(html, /<ha-card class="mini">/);
+  assert.match(html, /<div class="name" title="Guests">Guests<\/div>/);
+  assert.match(html, /<div class="sub" title="Home-Guests">Home-Guests<\/div>/);
+  assert.doesNotMatch(html, /secret-pass|id="pwd"|Password|<dialog/);
+  // The thumbnail: the big QR code's colours, a rounded 64 px tile, a button to the full card.
+  assert.match(html, /<div class="thumb" id="qr" role="button" tabindex="0" title="Show the full card" aria-label="Show the full card"><svg aria-hidden="true" [^>]*width="64"/);
+  assert.match(cssRule(html, ".thumb"), /width: 64px; height: 64px; background: #64B5F6; border-radius: 8px;/);
+  assert.match(html, /<button class="zoom" id="zbtn" title="Show the full card" aria-label="Show the full card"><ha-icon icon="mdi:arrow-expand">/);
+  assert.match(cssRule(html, ".zoom"), /all: unset;[^}]*width: 24px; height: 24px;[^}]*border-radius: 50%;[^}]*color: var\(--secondary-text-color\);/);
+  assert.doesNotMatch(cssRule(html, ".zoom"), /background/);
+  assert.deepEqual(px(cssRule(html, ".badge"), "width"), [32]);
+  // The QR thumbnail still encodes the network.
+  const svg = /<div class="thumb"[^>]*>(<svg[\s\S]*?<\/svg>)/.exec(html)[1];
+  assert.equal(decodeSvg(svg), "WIFI:T:WPA;S:Home-Guests;P:secret-pass;;");
+});
+
+test("mini card: only its compact ha-card is a size container, the host keeps a width in shrink-to-fit parents", () => {
+  const { card, els } = stubMini();
+  let html = card.shadowRoot.innerHTML;
+  assert.match(cssRule(html, "ha-card.mini"), /container-type: inline-size;/);
+  assert.match(cssRule(html, ":host([mini])"), /display: block; min-width: 0;/);
+  assert.match(cssRule(html, ":host([mini])::before"), /grid-template-columns: minmax\(0, 240px\); height: 0;/);
+  const m = /@container \(max-width: 200px\) \{([\s\S]*?)\n\s*\}/.exec(html);
+  assert.ok(m, "no narrow rule");
+  assert.deepEqual(px(cssRule(m[1], ".thumb"), "width"), [48]);
+  assert.match(cssRule(html, ".name"), /text-overflow: ellipsis;/);
+  // Zoomed: the full card, whose ha-card is never a size container.
+  click(els.zbtn);
+  html = card.shadowRoot.innerHTML;
+  assert.doesNotMatch(cssRule(html, "ha-card"), /container/);
+  assert.doesNotMatch(html, /class="mini"/);
+  // The full card alone has neither the mini styles nor a detail button.
+  const full = renderWith({});
+  assert.doesNotMatch(full, /:host\(\[mini\]\)|class="zoom"/);
+});
+
+test("mini card: the detail button and the thumbnail switch to the full card and back", () => {
+  const { card, els } = stubMini();
+  assert.deepEqual({ ...card.getGridOptions() }, { columns: 6, min_columns: 6 });
+  assert.equal(card.getCardSize(), 2);
+  click(els.zbtn);
+  let html = card.shadowRoot.innerHTML;
+  assert.match(html, /id="pwd"/);
+  assert.match(html, /<button class="zoom" id="zbtn" title="Back to the compact view" aria-label="Back to the compact view"><ha-icon icon="mdi:arrow-collapse">/);
+  assert.deepEqual({ ...card.getGridOptions() }, { ...WifiQrCard.prototype.getGridOptions() });
+  assert.equal(card.getCardSize(), WifiQrCard.prototype.getCardSize());
+  click(els.zbtn);
+  html = card.shadowRoot.innerHTML;
+  assert.match(html, /class="mini"/);
+  assert.equal(card.getCardSize(), 2);
+  // A tap on the thumbnail opens the full card (its big QR code), not the zoom dialog.
+  els.qr.onclick();
+  assert.match(card.shadowRoot.innerHTML, /id="pwd"/);
+  assert.equal(els.zoom.open, false);
+});
+
+test("mini card: the detail button keeps the keyboard focus, a mouse click does not move it", () => {
+  const { els } = stubMini();
+  click(els.zbtn, 1);
+  assert.equal(els.zbtn.focused, undefined);
+  click(els.zbtn, 0);
+  assert.deepEqual({ ...els.zbtn.focused }, { preventScroll: true });
+});
+
+test("mini card: zoom: false removes the detail button", () => {
+  const { card, els } = stubMini({ zoom: false });
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="zoom"/);
+  els.qr.onclick();
+  assert.match(card.shadowRoot.innerHTML, /id="pwd"/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="zoom"/);
+});
+
+test("mini card: a click outside the card brings the compact view back, not one inside it or in a dialog", () => {
+  const listeners = [];
+  const doc = ctx.document;
+  doc.addEventListener = (type, fn, capture) => listeners.push({ type, fn, capture });
+  doc.removeEventListener = (type, fn, capture) => {
+    const i = listeners.findIndex((l) => l.type === type && l.fn === fn && l.capture === capture);
+    if (i >= 0) listeners.splice(i, 1);
+  };
+  try {
+    const { card, els } = stubMini();
+    card.connectedCallback();
+    assert.equal(listeners.length, 1);
+    assert.equal(listeners[0].type, "click");
+    assert.equal(listeners[0].capture, true);
+    const fire = (...path) => listeners[0].fn({ composedPath: () => path });
+    click(els.zbtn);
+    fire({ localName: "button" }, card, { localName: "body" });
+    assert.equal(card._zoomed, true, "a click inside the card");
+    fire({ localName: "div" }, { localName: "ha-more-info-dialog" }, { localName: "body" });
+    assert.equal(card._zoomed, true, "a click in a dialog");
+    fire({ localName: "div" }, { localName: "body" });
+    assert.equal(card._zoomed, false);
+    assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+    card.disconnectedCallback();
+    assert.equal(listeners.length, 0);
+  } finally {
+    delete doc.addEventListener;
+    delete doc.removeEventListener;
+  }
+});
+
+test("mini card: the mini attribute is set by setConfig, never by the constructor", () => {
+  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const cls = src.slice(src.indexOf("class WifiQrMiniCard extends"), src.indexOf("// ── wifi-qr-card-editor"));
+  const ctor = /constructor\(\) \{([\s\S]*?)\n {2}\}/.exec(cls)[1];
+  assert.doesNotMatch(ctor, /setAttribute/);
+  assert.match(/setConfig\(config\) \{([\s\S]*?)\n {2}\}/.exec(cls)[1], /setAttribute\?\.\('mini', ''\)/);
+});
+
+test("mini card: registered in the card picker with a translated name", () => {
+  const entry = ctx.customCards.find((c) => c.type === "wifi-qr-mini-card");
+  assert.ok(entry, "not registered");
+  assert.equal(entry.name, "Wifi QR Mini Card");
+  assert.equal(entry.description, ctx.WifiQrI18n.en.mini_desc);
+  assert.equal(entry.preview, true);
+  assert.equal(WifiQrMiniCard.getConfigElement.toString().includes("wifi-qr-mini-card-editor"), true);
+  for (const lang of Object.keys(ctx.WifiQrI18n)) {
+    if (lang === "en") continue;
+    for (const k of ["zoom_in", "zoom_out", "ed_zoom", "mini_name", "mini_desc"])
+      assert.notEqual(ctx.WifiQrI18n[lang][k], ctx.WifiQrI18n.en[k], `${lang}.${k} is not translated`);
+  }
+});
+
+test("editor: the zoom toggle is only in the mini card editor, its default left out of the YAML", () => {
+  const names = (ed) => {
+    ed._hass = { language: "en" };
+    return ed._schema().map((f) => f.name);
+  };
+  assert.ok(!names(new WifiQrCardEditor()).includes("zoom"));
+  assert.ok(names(new WifiQrMiniCardEditor()).includes("zoom"));
+  const ed = new WifiQrMiniCardEditor();
+  ed._form = {};
+  ed._hass = { language: "en" };
+  ed._config = { type: "custom:wifi-qr-mini-card", ssid: "Box", password: "secret" };
+  ed._render();
+  assert.equal(ed._form.data.zoom, true);
+  assert.equal(ed._form.computeLabel({ name: "zoom" }), "Detail button");
+  ed.dispatchEvent = () => {};
+  ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._form.data } } });
+  assert.equal("zoom" in ed._config, false);
+  ed._valueChanged({ stopPropagation() {}, detail: { value: { ...ed._form.data, zoom: false } } });
+  assert.equal(ed._config.zoom, false);
+  // The full card's editor neither shows nor writes it.
+  const full = new WifiQrCardEditor();
+  full._form = {};
+  full._hass = { language: "en" };
+  full._config = { ssid: "Box", password: "secret" };
+  full._render();
+  assert.equal("zoom" in full._form.data, false);
 });

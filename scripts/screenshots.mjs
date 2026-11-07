@@ -136,6 +136,8 @@ export async function render(shots, { icons = {}, hass = {} } = {}) {
 const icons = {
   wifi: "M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z",
   eye: "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z",
+  "arrow-expand": "M10,21V19H6.41L10.91,14.5L9.5,13.09L5,17.59V14H3V21H10M14.5,10.91L19,6.41V10H21V3H14V5H17.59L13.09,9.5L14.5,10.91Z",
+  "arrow-collapse": "M19.5,3.09L15,7.59V4H13V11H20V9H16.41L20.91,4.5L19.5,3.09M4,13V15H7.59L3.09,19.5L4.5,20.91L9,16.41V20H11V13H4Z",
 };
 const config = { ssid: "Home-Guests", password: "correct-horse-battery" };
 
@@ -143,6 +145,11 @@ await render(
   [
     { file: "card", type: "wifi-qr-card", theme: "light", width: 460, config },
     { file: "card-dark", type: "wifi-qr-card", theme: "dark", width: 460, config },
+    // The mini card: compact view at a desktop column width, then at 6 columns of a phone (very narrow).
+    { file: "mini-card", type: "wifi-qr-mini-card", theme: "light", width: 380, config },
+    { file: "mini-card-dark", type: "wifi-qr-mini-card", theme: "dark", width: 380, config },
+    { file: "mini-card-narrow", type: "wifi-qr-mini-card", theme: "light", width: 180, config },
+    { file: "mini-card-narrow-dark", type: "wifi-qr-mini-card", theme: "dark", width: 180, config },
   ],
   { icons }
 );
