@@ -3,6 +3,8 @@ var WIFI_QR_CARD_VERSION = '__VERSION__';
 // behind the black modules to scan reliably whatever the theme (dark themes included), and the
 // header badge reuses it as the card's brand colour, like the Wero card's yellow.
 var WIFI_BLUE = '#64B5F6';
+// A revealed password is masked again after 30 s.
+var WIFI_PWD_REVEAL_MS = 30000;
 
 // ── WiFi icon (original artwork: rounded-cap waves), shown in the round header badge ─
 var WIFI_LOGO = '<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="4 4 28 28" role="img" aria-label="WiFi"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M13.76 21.76A6 6 0 0 1 22.24 21.76"/><path d="M10.22 18.22A11 11 0 0 1 25.78 18.22"/><path d="M6.69 14.69A16 16 0 0 1 29.31 14.69"/></g><circle cx="18" cy="26.5" r="2.4" fill="currentColor"/></svg>';
@@ -19,6 +21,7 @@ var WifiQrI18n = {
     password: 'Mot de passe',
     hint: 'Scannez le QR code pour vous connecter',
     zoom: 'Agrandir le QR code',
+    qr_code: 'QR code Wifi',
     open_network: 'Réseau ouvert (sans mot de passe)',
     show_password: 'Afficher le mot de passe',
     hide_password: 'Masquer le mot de passe',
@@ -54,6 +57,7 @@ var WifiQrI18n = {
     password: 'Password',
     hint: 'Scan the QR code to connect automatically',
     zoom: 'Enlarge QR code',
+    qr_code: 'WiFi QR code',
     open_network: 'Open network (no password)',
     show_password: 'Show password',
     hide_password: 'Hide password',
@@ -89,6 +93,7 @@ var WifiQrI18n = {
     password: 'Passwort',
     hint: 'Scanne den QR-Code, um dich automatisch zu verbinden',
     zoom: 'QR-Code vergrößern',
+    qr_code: 'WLAN-QR-Code',
     open_network: 'Offenes Netzwerk (ohne Passwort)',
     show_password: 'Passwort anzeigen',
     hide_password: 'Passwort verbergen',
@@ -124,6 +129,7 @@ var WifiQrI18n = {
     password: 'Contraseña',
     hint: 'Escanea el código QR para conectarte automáticamente',
     zoom: 'Ampliar el código QR',
+    qr_code: 'Código QR wifi',
     open_network: 'Red abierta (sin contraseña)',
     show_password: 'Mostrar contraseña',
     hide_password: 'Ocultar contraseña',
@@ -159,6 +165,7 @@ var WifiQrI18n = {
     password: 'Лозинка',
     hint: 'Скенирајте QR код за аутоматско повезивање',
     zoom: 'Увећај QR код',
+    qr_code: 'WiFi QR код',
     open_network: 'Отворена мрежа (без лозинке)',
     show_password: 'Прикажи лозинку',
     hide_password: 'Сакриј лозинку',
@@ -194,6 +201,7 @@ var WifiQrI18n = {
     password: 'Lozinka',
     hint: 'Skenirajte QR kod za automatsko povezivanje',
     zoom: 'Uvećaj QR kod',
+    qr_code: 'Wi-Fi QR kod',
     open_network: 'Otvorena mreža (bez lozinke)',
     show_password: 'Prikaži lozinku',
     hide_password: 'Sakrij lozinku',
@@ -229,6 +237,7 @@ var WifiQrI18n = {
     password: 'Password',
     hint: 'Scansiona il codice QR per connetterti automaticamente',
     zoom: 'Ingrandisci il codice QR',
+    qr_code: 'Codice QR Wi-Fi',
     open_network: 'Rete aperta (senza password)',
     show_password: 'Mostra password',
     hide_password: 'Nascondi password',
@@ -264,6 +273,7 @@ var WifiQrI18n = {
     password: 'Wachtwoord',
     hint: 'Scan de QR-code om automatisch verbinding te maken',
     zoom: 'QR-code vergroten',
+    qr_code: 'wifi-QR-code',
     open_network: 'Open netwerk (zonder wachtwoord)',
     show_password: 'Wachtwoord tonen',
     hide_password: 'Wachtwoord verbergen',
@@ -299,6 +309,7 @@ var WifiQrI18n = {
     password: 'Palavra-passe',
     hint: 'Leia o código QR para se ligar automaticamente',
     zoom: 'Ampliar o código QR',
+    qr_code: 'Código QR Wi-Fi',
     open_network: 'Rede aberta (sem palavra-passe)',
     show_password: 'Mostrar palavra-passe',
     hide_password: 'Ocultar palavra-passe',
@@ -334,6 +345,7 @@ var WifiQrI18n = {
     password: 'Hasło',
     hint: 'Zeskanuj kod QR, aby połączyć się automatycznie',
     zoom: 'Powiększ kod QR',
+    qr_code: 'Kod QR Wi-Fi',
     open_network: 'Sieć otwarta (bez hasła)',
     show_password: 'Pokaż hasło',
     hide_password: 'Ukryj hasło',
@@ -369,6 +381,7 @@ var WifiQrI18n = {
     password: 'Parolă',
     hint: 'Scanați codul QR pentru a vă conecta automat',
     zoom: 'Mărește codul QR',
+    qr_code: 'Cod QR Wi-Fi',
     open_network: 'Rețea deschisă (fără parolă)',
     show_password: 'Afișează parola',
     hide_password: 'Ascunde parola',
@@ -404,6 +417,7 @@ var WifiQrI18n = {
     password: 'Adgangskode',
     hint: 'Scan QR-koden for at oprette forbindelse automatisk',
     zoom: 'Forstør QR-koden',
+    qr_code: 'Wi-Fi-QR-kode',
     open_network: 'Åbent netværk (ingen adgangskode)',
     show_password: 'Vis adgangskode',
     hide_password: 'Skjul adgangskode',
@@ -439,6 +453,7 @@ var WifiQrI18n = {
     password: 'Lösenord',
     hint: 'Skanna QR-koden för att ansluta automatiskt',
     zoom: 'Förstora QR-koden',
+    qr_code: 'Wi-Fi-QR-kod',
     open_network: 'Öppet nätverk (inget lösenord)',
     show_password: 'Visa lösenord',
     hide_password: 'Dölj lösenord',
@@ -474,6 +489,7 @@ var WifiQrI18n = {
     password: 'Парола',
     hint: 'Сканирайте QR кода, за да се свържете автоматично',
     zoom: 'Увеличаване на QR кода',
+    qr_code: 'QR код за WiFi',
     open_network: 'Отворена мрежа (без парола)',
     show_password: 'Показване на паролата',
     hide_password: 'Скриване на паролата',
@@ -509,6 +525,7 @@ var WifiQrI18n = {
     password: 'Пароль',
     hint: 'Отсканируйте QR-код для автоматического подключения',
     zoom: 'Увеличить QR-код',
+    qr_code: 'QR-код Wi-Fi',
     open_network: 'Открытая сеть (без пароля)',
     show_password: 'Показать пароль',
     hide_password: 'Скрыть пароль',
@@ -544,6 +561,7 @@ var WifiQrI18n = {
     password: 'Пароль',
     hint: 'Відскануйте QR-код для автоматичного підключення',
     zoom: 'Збільшити QR-код',
+    qr_code: 'QR-код Wi-Fi',
     open_network: 'Відкрита мережа (без пароля)',
     show_password: 'Показати пароль',
     hide_password: 'Приховати пароль',
@@ -579,6 +597,7 @@ var WifiQrI18n = {
     password: 'Jelszó',
     hint: 'Olvasd be a QR-kódot az automatikus csatlakozáshoz',
     zoom: 'QR-kód nagyítása',
+    qr_code: 'Wi-Fi QR-kód',
     open_network: 'Nyílt hálózat (jelszó nélkül)',
     show_password: 'Jelszó megjelenítése',
     hide_password: 'Jelszó elrejtése',
@@ -614,6 +633,7 @@ var WifiQrI18n = {
     password: 'Heslo',
     hint: 'Naskenujte QR kód na automatické pripojenie',
     zoom: 'Zväčšiť QR kód',
+    qr_code: 'QR kód Wi-Fi',
     open_network: 'Otvorená sieť (bez hesla)',
     show_password: 'Zobraziť heslo',
     hide_password: 'Skryť heslo',
@@ -649,6 +669,7 @@ var WifiQrI18n = {
     password: 'Heslo',
     hint: 'Naskenujte QR kód pro automatické připojení',
     zoom: 'Zvětšit QR kód',
+    qr_code: 'QR kód Wi-Fi',
     open_network: 'Otevřená síť (bez hesla)',
     show_password: 'Zobrazit heslo',
     hide_password: 'Skrýt heslo',
@@ -684,6 +705,7 @@ var WifiQrI18n = {
     password: 'Geslo',
     hint: 'Skenirajte kodo QR za samodejno povezavo',
     zoom: 'Povečaj kodo QR',
+    qr_code: 'Koda QR za Wi-Fi',
     open_network: 'Odprto omrežje (brez gesla)',
     show_password: 'Pokaži geslo',
     hide_password: 'Skrij geslo',
@@ -719,6 +741,7 @@ var WifiQrI18n = {
     password: 'Parole',
     hint: 'Noskenējiet QR kodu, lai izveidotu savienojumu automātiski',
     zoom: 'Palielināt QR kodu',
+    qr_code: 'Wi-Fi QR kods',
     open_network: 'Atvērts tīkls (bez paroles)',
     show_password: 'Rādīt paroli',
     hide_password: 'Slēpt paroli',
@@ -754,6 +777,7 @@ var WifiQrI18n = {
     password: 'Κωδικός πρόσβασης',
     hint: 'Σαρώστε τον κωδικό QR για αυτόματη σύνδεση',
     zoom: 'Μεγέθυνση κωδικού QR',
+    qr_code: 'Κωδικός QR Wi-Fi',
     open_network: 'Ανοιχτό δίκτυο (χωρίς κωδικό)',
     show_password: 'Εμφάνιση κωδικού πρόσβασης',
     hide_password: 'Απόκρυψη κωδικού πρόσβασης',
@@ -929,6 +953,7 @@ class WifiQrCard extends HTMLElement {
       logo: config.logo !== false,
     };
     // Neither the entity nor a static value: no QR code (it would not connect), the entity is named instead.
+    this._pwdSync = null;
     var c = this._config;
     var missing = !c.ssid ? config.ssid_entity : !c.password && c.security !== 'nopass' ? config.password_entity : null;
     if (missing) {
@@ -963,17 +988,48 @@ class WifiQrCard extends HTMLElement {
         if (qr.isDark(r, c)) d += `M${c + quiet} ${r + quiet}h1v1h-1z`;
       }
     }
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${dim} ${dim}" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="${dim}" height="${dim}" fill="${WIFI_BLUE}"/><path fill="#000" d="${d}"/></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${dim} ${dim}" shape-rendering="crispEdges" role="img"><rect width="${dim}" height="${dim}" fill="${WIFI_BLUE}"/><path fill="#000" d="${d}"/></svg>`;
+  }
+
+  // The QR code (8 mask trials) is only rebuilt when its payload or size changes, not on a re-render (language,
+  // revealed password, mini card toggle): one SVG kept per size, the full card's and the mini thumbnail's.
+  // Its accessible name is added afterwards, in the card's language.
+  _qrSvg(text, size) {
+    const key = `${size}|${text}`;
+    this._qrCache ||= new Map();
+    let svg = this._qrCache.get(key);
+    if (svg === undefined) {
+      svg = this._buildQrSvg(text, size);
+      if (this._qrCache.size >= 4) this._qrCache.delete(this._qrCache.keys().next().value);
+      this._qrCache.set(key, svg);
+    }
+    return svg.replace('role="img"', `role="img" aria-label="${wifiQrEsc(this._t('qr_code'))}"`);
+  }
+
+  // The revealed password is masked again after this delay, when the card leaves the page and when the mini card
+  // folds back to its compact view.
+  _maskPassword() {
+    clearTimeout(this._pwdTimer);
+    this._pwdTimer = null;
+    if (!this._pwdShown) return;
+    this._pwdShown = false;
+    this._pwdSync?.();
+  }
+
+  disconnectedCallback() {
+    this._maskPassword();
   }
 
   _render(strict) {
+    // Set again below once the password row is rendered.
+    this._pwdSync = null;
     const c = this._config;
     const isOpen = c.security === 'nopass';
     // A re-render (language or config change) keeps the zoom open and the password revealed.
     const wasZoomed = !!this.shadowRoot.getElementById?.('zoom')?.open;
     let svg;
     try {
-      svg = this._buildQrSvg(wifiQrString(c), c.qr_size || 176);
+      svg = this._qrSvg(wifiQrString(c), c.qr_size || 176);
     } catch (err) {
       if (strict) throw err;
       this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--error-color)">${wifiQrEsc(err.message)}</div></ha-card>`;
@@ -1071,9 +1127,16 @@ class WifiQrCard extends HTMLElement {
         this.shadowRoot.getElementById('ico').setAttribute('icon', shown ? 'mdi:eye-off' : 'mdi:eye');
       };
       btn.onclick = () => {
-        this._pwdShown = !this._pwdShown;
+        if (this._pwdShown) {
+          this._maskPassword();
+          return;
+        }
+        this._pwdShown = true;
         show();
+        clearTimeout(this._pwdTimer);
+        this._pwdTimer = setTimeout(() => this._maskPassword(), WIFI_PWD_REVEAL_MS);
       };
+      this._pwdSync = show;
       if (this._pwdShown) show();
     }
 
@@ -1147,6 +1210,7 @@ class WifiQrMiniCard extends WifiQrCard {
   }
 
   disconnectedCallback() {
+    super.disconnectedCallback();
     document.removeEventListener('click', this._onOutside, true);
   }
 
@@ -1177,6 +1241,8 @@ class WifiQrMiniCard extends WifiQrCard {
   // keyboard: activated with Enter / Space, the focus goes to the button of the new view, without scrolling.
   _setZoom(zoomed, keyboard) {
     this._zoomed = zoomed;
+    // Folded back: the password, revealed in the full view, is masked again.
+    if (!zoomed) this._maskPassword();
     this._render();
     if (keyboard) {
       const target = this.shadowRoot.getElementById(this._configRaw?.zoom === false ? 'qr' : 'zbtn');
@@ -1200,10 +1266,11 @@ class WifiQrMiniCard extends WifiQrCard {
       this._bindZoom();
       return;
     }
+    this._pwdSync = null;
     const c = this._config;
     let svg;
     try {
-      svg = this._buildQrSvg(wifiQrString(c), 64);
+      svg = this._qrSvg(wifiQrString(c), 64);
     } catch (err) {
       if (strict) throw err;
       this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--error-color)">${wifiQrEsc(err.message)}</div></ha-card>`;

@@ -8,6 +8,8 @@ import jsQR from "jsqr";
 
 const BS = "\\"; // one backslash, spelled once to keep the expectations readable
 
+const timers = [];
+
 // Evaluates src/wifi-card.js with just enough browser stubs to reach its functions and classes.
 function loadCard() {
   const defined = {};
@@ -24,6 +26,11 @@ function loadCard() {
     console: { info() {} },
     escape,
     unescape,
+    // Fake timers: the tests fire them by hand.
+    setTimeout: (fn, ms) => timers.push({ fn, ms }),
+    clearTimeout: (id) => {
+      if (timers[id - 1]) timers[id - 1].cleared = true;
+    },
   };
   ctx.window = ctx;
   vm.createContext(ctx);
@@ -132,7 +139,7 @@ test("eye button has a translated accessible name and aria-pressed; the card QR 
   card._applyConfig(true);
   const html = card.shadowRoot.innerHTML;
   assert.match(html, /<button id="btn" aria-label="Show password" aria-pressed="false">/);
-  const qrs = html.match(/<svg [^>]*>/g).filter((t) => t.includes('aria-label="QR code"'));
+  const qrs = html.match(/<svg [^>]*>/g).filter((t) => t.includes('aria-label="WiFi QR code"'));
   assert.equal(qrs.length, 2);
   assert.match(qrs[0], /aria-hidden="true"/);
   assert.doesNotMatch(qrs[1], /aria-hidden/);
@@ -934,4 +941,74 @@ test("editor: entity pickers and the hidden toggle, the SSID no longer required 
     ed._render();
     assert.equal(ed._form.schema.find((f) => f.name === "ssid").required, false);
   }
+});
+
+test("a revealed password is masked again after 30 s; hiding it by hand cancels the timer", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  timers.length = 0;
+  els.btn.onclick();
+  assert.equal(els.pwd.textContent, "secret");
+  assert.equal(timers.length, 1);
+  assert.equal(timers[0].ms, 30000);
+  timers[0].fn();
+  assert.equal(card._pwdShown, false);
+  assert.equal(els.pwd.textContent, "••••••••••••••••");
+  assert.equal(els.btn.attrs["aria-pressed"], "false");
+  els.btn.onclick();
+  els.btn.onclick();
+  assert.equal(timers[1].cleared, true);
+  assert.equal(els.btn.attrs["aria-pressed"], "false");
+});
+
+test("a revealed password is masked again when the card leaves the page", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  timers.length = 0;
+  els.btn.onclick();
+  card.disconnectedCallback();
+  assert.equal(card._pwdShown, false);
+  assert.equal(timers[0].cleared, true);
+  assert.equal(els.pwd.textContent, "••••••••••••••••");
+});
+
+test("mini card: folding back to the compact view masks the revealed password", () => {
+  const { card, els } = stubMini();
+  click(els.zbtn);
+  els.btn.onclick();
+  assert.equal(els.pwd.textContent, "secret-pass");
+  click(els.zbtn);
+  assert.equal(card._pwdShown, false);
+  assert.equal(els.pwd.textContent, "••••••••••••••••");
+  // Detail view again: the password is masked.
+  click(els.zbtn);
+  assert.equal(els.btn.attrs["aria-pressed"], "false");
+  assert.equal(els.pwd.textContent, "••••••••••••••••");
+});
+
+test("the QR SVG is built once per payload and size, not on every re-render", () => {
+  const { card, els } = stubCard();
+  let builds = 0;
+  card._buildQrSvg = function (text, size) {
+    builds++;
+    return WifiQrCard.prototype._buildQrSvg.call(this, text, size);
+  };
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  els.btn.onclick();
+  card.hass = { language: "fr" };
+  assert.equal(builds, 1);
+  card.setConfig({ ssid: "Box", password: "other" });
+  assert.equal(builds, 2);
+  card.setConfig({ ssid: "Box", password: "other", qr_size: 200 });
+  assert.equal(builds, 3);
+});
+
+test("the QR code's accessible name is translated", () => {
+  const { card } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret", language: "fr" });
+  assert.match(card.shadowRoot.innerHTML, /<dialog id="zoom" aria-label="Agrandir le QR code"><svg [^>]*role="img" aria-label="QR code Wifi">/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /aria-label="QR code"/);
 });
