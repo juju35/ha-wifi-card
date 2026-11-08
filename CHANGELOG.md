@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.0 - 2026-11-08
+
+### What's new
+- A copy button next to the eye button copies the password to the clipboard, shows a check mark and announces the result to screen readers, in all 22 languages of the card.
+- The full card's name and description in the card picker are now in the Home Assistant language, like the mini card's.
+
 ## 1.12.1 - 2026-11-07
 
 ### Security

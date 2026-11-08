@@ -11,7 +11,7 @@ const BS = "\\"; // one backslash, spelled once to keep the expectations readabl
 const timers = [];
 
 // Evaluates src/wifi-card.js with just enough browser stubs to reach its functions and classes.
-function loadCard() {
+function loadCard(lang = "en") {
   const defined = {};
   const ctx = {
     HTMLElement: class {},
@@ -22,7 +22,7 @@ function loadCard() {
         defined[n] = c;
       },
     },
-    document: { documentElement: { lang: "en" }, createElement: () => ({}) },
+    document: { documentElement: { lang }, createElement: () => ({}) },
     console: { info() {} },
     escape,
     unescape,
@@ -1011,4 +1011,80 @@ test("the QR code's accessible name is translated", () => {
   card.setConfig({ ssid: "Box", password: "secret", language: "fr" });
   assert.match(card.shadowRoot.innerHTML, /<dialog id="zoom" aria-label="Agrandir le QR code"><svg [^>]*role="img" aria-label="QR code Wifi">/);
   assert.doesNotMatch(card.shadowRoot.innerHTML, /aria-label="QR code"/);
+});
+
+test("the full card is listed in the card picker in the page language, like the mini card", () => {
+  const entry = ctx.customCards.find((c) => c.type === "wifi-qr-card");
+  assert.equal(entry.name, "Wifi QR Card");
+  assert.equal(entry.description, "WiFi QR code — no CDN");
+  const fr = loadCard("fr").ctx.customCards;
+  assert.equal(fr.find((c) => c.type === "wifi-qr-card").name, "Carte QR Wifi");
+  assert.equal(fr.find((c) => c.type === "wifi-qr-card").description, "QR code Wifi — sans CDN");
+  assert.equal(fr.find((c) => c.type === "wifi-qr-mini-card").name, "Mini-carte QR Wifi");
+  for (const lang of LANGS)
+    for (const k of ["card_name", "card_desc", "copy_password", "copied", "copy_failed"])
+      assert.notEqual(ctx.WifiQrI18n[lang][k], ctx.WifiQrI18n.en[k], `${lang}.${k} is not translated`);
+});
+
+test("copy button next to the eye: copies the password, shows and announces the result, then resets", async () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "pa;ss", language: "fr" });
+  const html = card.shadowRoot.innerHTML;
+  assert.match(
+    html,
+    /<button id="btn"[^>]*>.*<\/button>\s*<button id="cbtn" title="Copier le mot de passe" aria-label="Copier le mot de passe"><ha-icon icon="mdi:content-copy" id="cico">/,
+  );
+  assert.match(html, /<span class="sr" id="live" aria-live="polite"><\/span>/);
+  assert.match(html, /\.sr \{[^}]*position: absolute;[^}]*clip: rect\(0 0 0 0\)/);
+  let written;
+  ctx.navigator = {
+    clipboard: {
+      writeText: (t) => {
+        written = t;
+        return Promise.resolve();
+      },
+    },
+  };
+  ctx.isSecureContext = true;
+  const prevCreate = ctx.document.createElement;
+  try {
+    timers.length = 0;
+    els.cbtn.onclick();
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(written, "pa;ss");
+    assert.equal(els.cico.attrs.icon, "mdi:check");
+    assert.equal(els.live.textContent, "Mot de passe copié");
+    assert.equal(timers.at(-1).ms, 1500);
+    timers.at(-1).fn();
+    assert.equal(els.cico.attrs.icon, "mdi:content-copy");
+    assert.equal(els.live.textContent, "");
+    // No clipboard API (insecure context): the legacy fallback, here refused by the browser.
+    ctx.navigator = {};
+    let ta;
+    ctx.document.body = { appendChild: (el) => (ta = el) };
+    ctx.document.createElement = () => ({ style: {}, select() {}, remove() {} });
+    ctx.document.execCommand = () => false;
+    els.cbtn.onclick();
+    assert.equal(ta.value, "pa;ss");
+    assert.equal(els.cico.attrs.icon, "mdi:alert");
+    assert.equal(els.live.textContent, "Impossible de copier le mot de passe");
+    ctx.document.execCommand = () => true;
+    els.cbtn.onclick();
+    assert.equal(els.cico.attrs.icon, "mdi:check");
+    // Leaving the page puts the copy icon back and clears the announcement.
+    card.disconnectedCallback();
+    assert.equal(els.cico.attrs.icon, "mdi:content-copy");
+    assert.equal(els.live.textContent, "");
+  } finally {
+    delete ctx.navigator;
+    delete ctx.isSecureContext;
+    delete ctx.document.body;
+    delete ctx.document.execCommand;
+    ctx.document.createElement = prevCreate;
+  }
+});
+
+test("open network: no copy button", () => {
+  assert.doesNotMatch(renderWith({ security: "nopass", password: "" }), /id="cbtn"/);
 });

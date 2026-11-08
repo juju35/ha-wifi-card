@@ -50,6 +50,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Facultatif : son état remplace la valeur ci-dessus et met à jour le QR code en direct',
     ed_hidden: 'Réseau masqué (SSID non diffusé)',
     entity_unavailable: 'Aucune valeur pour {entity}',
+    card_name: 'Carte QR Wifi',
+    card_desc: 'QR code Wifi — sans CDN',
+    copy_password: 'Copier le mot de passe',
+    copied: 'Mot de passe copié',
+    copy_failed: 'Impossible de copier le mot de passe',
   },
   en: {
     default_title: 'Guest WiFi',
@@ -86,6 +91,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Optional: its state replaces the value above and updates the QR code live',
     ed_hidden: 'Hidden network (SSID not broadcast)',
     entity_unavailable: 'No value from {entity}',
+    card_name: 'Wifi QR Card',
+    card_desc: 'WiFi QR code — no CDN',
+    copy_password: 'Copy password',
+    copied: 'Password copied',
+    copy_failed: 'Could not copy the password',
   },
   de: {
     default_title: 'Gäste-WLAN',
@@ -122,6 +132,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Optional: Ihr Zustand ersetzt den Wert oben und aktualisiert den QR-Code live',
     ed_hidden: 'Verstecktes Netzwerk (SSID wird nicht gesendet)',
     entity_unavailable: 'Kein Wert von {entity}',
+    card_name: 'WLAN-QR-Karte',
+    card_desc: 'WLAN-QR-Code — ohne CDN',
+    copy_password: 'Passwort kopieren',
+    copied: 'Passwort kopiert',
+    copy_failed: 'Passwort konnte nicht kopiert werden',
   },
   es: {
     default_title: 'Wi-Fi de invitados',
@@ -158,6 +173,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opcional: su estado sustituye el valor de arriba y actualiza el código QR en directo',
     ed_hidden: 'Red oculta (SSID no difundido)',
     entity_unavailable: 'Sin valor de {entity}',
+    card_name: 'Tarjeta QR Wi-Fi',
+    card_desc: 'Código QR Wi-Fi — sin CDN',
+    copy_password: 'Copiar contraseña',
+    copied: 'Contraseña copiada',
+    copy_failed: 'No se pudo copiar la contraseña',
   },
   sr: {
     default_title: 'WiFi за госте',
@@ -194,6 +214,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Опционо: његово стање замењује вредност изнад и ажурира QR код уживо',
     ed_hidden: 'Скривена мрежа (SSID се не емитује)',
     entity_unavailable: 'Нема вредности из {entity}',
+    card_name: 'Картица за WiFi QR',
+    card_desc: 'WiFi QR код — без спољних зависности',
+    copy_password: 'Копирај лозинку',
+    copied: 'Лозинка је копирана',
+    copy_failed: 'Копирање лозинке није успело',
   },
   'sr-Latn': {
     default_title: 'WiFi za goste',
@@ -230,6 +255,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opciono: njegovo stanje zamenjuje vrednost iznad i ažurira QR kod uživo',
     ed_hidden: 'Skrivena mreža (SSID se ne emituje)',
     entity_unavailable: 'Nema vrednosti iz {entity}',
+    card_name: 'Kartica za WiFi QR',
+    card_desc: 'WiFi QR kod — bez spoljnih zavisnosti',
+    copy_password: 'Kopiraj lozinku',
+    copied: 'Lozinka je kopirana',
+    copy_failed: 'Kopiranje lozinke nije uspelo',
   },
   it: {
     default_title: 'Wi-Fi ospiti',
@@ -266,6 +296,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Facoltativa: il suo stato sostituisce il valore qui sopra e aggiorna il codice QR in tempo reale',
     ed_hidden: 'Rete nascosta (SSID non trasmesso)',
     entity_unavailable: 'Nessun valore da {entity}',
+    card_name: 'Scheda QR Wi-Fi',
+    card_desc: 'Codice QR Wi-Fi — senza CDN',
+    copy_password: 'Copia password',
+    copied: 'Password copiata',
+    copy_failed: 'Impossibile copiare la password',
   },
   nl: {
     default_title: 'Gastenwifi',
@@ -302,6 +337,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Optioneel: de status vervangt de waarde hierboven en werkt de QR-code live bij',
     ed_hidden: 'Verborgen netwerk (SSID niet uitgezonden)',
     entity_unavailable: 'Geen waarde van {entity}',
+    card_name: 'Wifi-QR-kaart',
+    card_desc: 'Wifi-QR-code — zonder CDN',
+    copy_password: 'Wachtwoord kopiëren',
+    copied: 'Wachtwoord gekopieerd',
+    copy_failed: 'Kan het wachtwoord niet kopiëren',
   },
   pt: {
     default_title: 'Wi-Fi visitas',
@@ -338,6 +378,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opcional: o seu estado substitui o valor acima e atualiza o código QR em tempo real',
     ed_hidden: 'Rede oculta (SSID não difundido)',
     entity_unavailable: 'Sem valor de {entity}',
+    card_name: 'Cartão QR Wi-Fi',
+    card_desc: 'Código QR Wi-Fi — sem CDN',
+    copy_password: 'Copiar palavra-passe',
+    copied: 'Palavra-passe copiada',
+    copy_failed: 'Não foi possível copiar a palavra-passe',
   },
   pl: {
     default_title: 'Wi-Fi dla gości',
@@ -374,6 +419,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opcjonalnie: jej stan zastępuje wartość powyżej i aktualizuje kod QR na żywo',
     ed_hidden: 'Sieć ukryta (SSID nierozgłaszany)',
     entity_unavailable: 'Brak wartości z {entity}',
+    card_name: 'Karta QR Wi-Fi',
+    card_desc: 'Kod QR Wi-Fi — bez CDN',
+    copy_password: 'Kopiuj hasło',
+    copied: 'Hasło skopiowane',
+    copy_failed: 'Nie udało się skopiować hasła',
   },
   ro: {
     default_title: 'Wi-Fi oaspeți',
@@ -410,6 +460,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opțional: starea ei înlocuiește valoarea de mai sus și actualizează codul QR în timp real',
     ed_hidden: 'Rețea ascunsă (SSID nedifuzat)',
     entity_unavailable: 'Nicio valoare de la {entity}',
+    card_name: 'Card QR Wi-Fi',
+    card_desc: 'Cod QR Wi-Fi — fără CDN',
+    copy_password: 'Copiază parola',
+    copied: 'Parola a fost copiată',
+    copy_failed: 'Parola nu a putut fi copiată',
   },
   da: {
     default_title: 'Gæste-wifi',
@@ -446,6 +501,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Valgfri: dens tilstand erstatter værdien ovenfor og opdaterer QR-koden live',
     ed_hidden: 'Skjult netværk (SSID udsendes ikke)',
     entity_unavailable: 'Ingen værdi fra {entity}',
+    card_name: 'Wifi-QR-kort',
+    card_desc: 'Wifi-QR-kode — uden CDN',
+    copy_password: 'Kopiér adgangskode',
+    copied: 'Adgangskode kopieret',
+    copy_failed: 'Adgangskoden kunne ikke kopieres',
   },
   sv: {
     default_title: 'Gäst-wifi',
@@ -482,6 +542,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Valfri: dess tillstånd ersätter värdet ovan och uppdaterar QR-koden direkt',
     ed_hidden: 'Dolt nätverk (SSID sänds inte)',
     entity_unavailable: 'Inget värde från {entity}',
+    card_name: 'Kort för wifi-QR',
+    card_desc: 'QR-kod för wifi — utan CDN',
+    copy_password: 'Kopiera lösenord',
+    copied: 'Lösenordet har kopierats',
+    copy_failed: 'Det gick inte att kopiera lösenordet',
   },
   bg: {
     default_title: 'Wi-Fi за гости',
@@ -518,6 +583,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'По избор: състоянието му замества стойността по-горе и обновява QR кода на живо',
     ed_hidden: 'Скрита мрежа (SSID не се излъчва)',
     entity_unavailable: 'Няма стойност от {entity}',
+    card_name: 'Карта с Wi-Fi QR',
+    card_desc: 'Wi-Fi QR код — без CDN',
+    copy_password: 'Копиране на паролата',
+    copied: 'Паролата е копирана',
+    copy_failed: 'Паролата не можа да бъде копирана',
   },
   ru: {
     default_title: 'Гостевой Wi-Fi',
@@ -554,6 +624,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Необязательно: его состояние заменяет значение выше и обновляет QR-код в реальном времени',
     ed_hidden: 'Скрытая сеть (SSID не транслируется)',
     entity_unavailable: 'Нет значения от {entity}',
+    card_name: 'Карточка Wi-Fi QR',
+    card_desc: 'QR-код Wi-Fi — без CDN',
+    copy_password: 'Копировать пароль',
+    copied: 'Пароль скопирован',
+    copy_failed: 'Не удалось скопировать пароль',
   },
   uk: {
     default_title: 'Гостьовий Wi-Fi',
@@ -590,6 +665,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Необов’язково: її стан замінює значення вище й оновлює QR-код наживо',
     ed_hidden: 'Прихована мережа (SSID не транслюється)',
     entity_unavailable: 'Немає значення від {entity}',
+    card_name: 'Картка Wi-Fi QR',
+    card_desc: 'QR-код Wi-Fi — без CDN',
+    copy_password: 'Копіювати пароль',
+    copied: 'Пароль скопійовано',
+    copy_failed: 'Не вдалося скопіювати пароль',
   },
   hu: {
     default_title: 'Vendég Wi-Fi',
@@ -626,6 +706,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Opcionális: az állapota felülírja a fenti értéket, és élőben frissíti a QR-kódot',
     ed_hidden: 'Rejtett hálózat (az SSID nincs sugározva)',
     entity_unavailable: 'Nincs érték innen: {entity}',
+    card_name: 'Wi-Fi QR kártya',
+    card_desc: 'Wi-Fi QR-kód — CDN nélkül',
+    copy_password: 'Jelszó másolása',
+    copied: 'Jelszó másolva',
+    copy_failed: 'Nem sikerült másolni a jelszót',
   },
   sk: {
     default_title: 'Wi-Fi pre hostí',
@@ -662,6 +747,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Voliteľné: jej stav nahradí hodnotu vyššie a priebežne aktualizuje QR kód',
     ed_hidden: 'Skrytá sieť (SSID sa nevysiela)',
     entity_unavailable: 'Žiadna hodnota z {entity}',
+    card_name: 'Karta Wi-Fi QR',
+    card_desc: 'QR kód Wi-Fi — bez CDN',
+    copy_password: 'Kopírovať heslo',
+    copied: 'Heslo skopírované',
+    copy_failed: 'Heslo sa nepodarilo skopírovať',
   },
   cs: {
     default_title: 'Wi-Fi pro hosty',
@@ -698,6 +788,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Volitelné: její stav nahradí hodnotu výše a průběžně aktualizuje QR kód',
     ed_hidden: 'Skrytá síť (SSID se nevysílá)',
     entity_unavailable: 'Žádná hodnota z {entity}',
+    card_name: 'Karta Wi-Fi QR',
+    card_desc: 'QR kód Wi-Fi — bez CDN',
+    copy_password: 'Kopírovat heslo',
+    copied: 'Heslo zkopírováno',
+    copy_failed: 'Heslo se nepodařilo zkopírovat',
   },
   sl: {
     default_title: 'Wi-Fi za goste',
@@ -734,6 +829,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Neobvezno: njeno stanje nadomesti zgornjo vrednost in sproti posodobi kodo QR',
     ed_hidden: 'Skrito omrežje (SSID se ne oddaja)',
     entity_unavailable: 'Ni vrednosti iz {entity}',
+    card_name: 'Kartica Wi-Fi QR',
+    card_desc: 'Koda QR Wi-Fi — brez CDN',
+    copy_password: 'Kopiraj geslo',
+    copied: 'Geslo kopirano',
+    copy_failed: 'Gesla ni bilo mogoče kopirati',
   },
   lv: {
     default_title: 'Viesu Wi-Fi',
@@ -770,6 +870,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Neobligāti: tās stāvoklis aizstāj vērtību augstāk un tiešsaistē atjaunina QR kodu',
     ed_hidden: 'Slēpts tīkls (SSID netiek pārraidīts)',
     entity_unavailable: 'Nav vērtības no {entity}',
+    card_name: 'Wi-Fi QR karte',
+    card_desc: 'Wi-Fi QR kods — bez CDN',
+    copy_password: 'Kopēt paroli',
+    copied: 'Parole nokopēta',
+    copy_failed: 'Neizdevās nokopēt paroli',
   },
   el: {
     default_title: 'WiFi επισκεπτών',
@@ -806,6 +911,11 @@ var WifiQrI18n = {
     ed_entity_helper: 'Προαιρετικό: η κατάστασή της αντικαθιστά την παραπάνω τιμή και ενημερώνει τον κωδικό QR ζωντανά',
     ed_hidden: 'Κρυφό δίκτυο (το SSID δεν εκπέμπεται)',
     entity_unavailable: 'Καμία τιμή από {entity}',
+    card_name: 'Κάρτα QR Wi-Fi',
+    card_desc: 'Κωδικός QR Wi-Fi — χωρίς CDN',
+    copy_password: 'Αντιγραφή κωδικού πρόσβασης',
+    copied: 'Ο κωδικός πρόσβασης αντιγράφηκε',
+    copy_failed: 'Δεν ήταν δυνατή η αντιγραφή του κωδικού πρόσβασης',
   },
 };
 
@@ -1016,8 +1126,51 @@ class WifiQrCard extends HTMLElement {
     this._pwdSync?.();
   }
 
+  // Copies the password (the clipboard API, else the legacy execCommand in an insecure context), like the Wero
+  // card's copy button: the icon shows the result briefly and the live region announces it.
+  _copyPassword() {
+    var pwd = this._config.password;
+    // Looked up when used: the card may re-render (language change) while the clipboard call runs.
+    var setIcon = (icon) => this.shadowRoot.getElementById('cico')?.setAttribute('icon', icon);
+    var announce = (text) => {
+      var live = this.shadowRoot.getElementById('live');
+      if (live) live.textContent = text;
+    };
+    var flash = (icon, key) => {
+      setIcon(icon);
+      announce(this._t(key));
+      clearTimeout(this._copyTimer);
+      this._copyTimer = setTimeout(() => this._copyReset(), 1500);
+    };
+    var done = () => flash('mdi:check', 'copied');
+    var failed = () => flash('mdi:alert', 'copy_failed');
+    var legacy = () => {
+      var ta = document.createElement('textarea');
+      ta.value = pwd;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (_e) { /* clipboard unavailable */ }
+      ta.remove();
+      if (ok) done();
+      else failed();
+    };
+    if (globalThis.navigator?.clipboard && window.isSecureContext) navigator.clipboard.writeText(pwd).then(done, legacy);
+    else legacy();
+  }
+
+  _copyReset() {
+    clearTimeout(this._copyTimer);
+    this._copyTimer = null;
+    this.shadowRoot.getElementById('cico')?.setAttribute('icon', 'mdi:content-copy');
+    var live = this.shadowRoot.getElementById('live');
+    if (live) live.textContent = '';
+  }
+
   disconnectedCallback() {
     this._maskPassword();
+    this._copyReset();
   }
 
   _render(strict) {
@@ -1083,6 +1236,7 @@ class WifiQrCard extends HTMLElement {
         /* 30 px target (WCAG 2.5.8); the negative margin absorbs the padding so the Password row is not taller than the Network row. */
         button { background: none; border: none; cursor: pointer; padding: 4px; margin: -8px -4px; display: flex; align-items: center; flex: none; }
         .hint { font-size: 11px; color: var(--secondary-text-color); text-align: center; }
+        .sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
         ${this._miniStyle()}
       </style>
       <ha-card>
@@ -1108,10 +1262,12 @@ class WifiQrCard extends HTMLElement {
               : `<div class="pwd-row">
               <div class="val masked" id="pwd">••••••••••••••••</div>
               <button id="btn" aria-label="${this._t('show_password')}" aria-pressed="false"><ha-icon icon="mdi:eye" id="ico"></ha-icon></button>
+              <button id="cbtn" title="${this._t('copy_password')}" aria-label="${this._t('copy_password')}"><ha-icon icon="mdi:content-copy" id="cico"></ha-icon></button>
             </div>`}
           </div>
         </div>
         <div class="hint">${this._t('hint')}</div>
+        <span class="sr" id="live" aria-live="polite"></span>
       </ha-card>`;
 
     if (!isOpen) {
@@ -1136,6 +1292,7 @@ class WifiQrCard extends HTMLElement {
         clearTimeout(this._pwdTimer);
         this._pwdTimer = setTimeout(() => this._maskPassword(), WIFI_PWD_REVEAL_MS);
       };
+      this.shadowRoot.getElementById('cbtn').onclick = () => this._copyPassword();
       this._pwdSync = show;
       if (this._pwdShown) show();
     }
@@ -1504,13 +1661,15 @@ if (!customElements.get('wifi-qr-mini-card-editor')) {
   customElements.define('wifi-qr-mini-card-editor', WifiQrMiniCardEditor);
 }
 
+// The card picker lists both cards in the page language (the HA frontend sets it), like the cards' own texts.
+var wifiQrPickerLang = wifiQrLang(document.documentElement.lang || globalThis.navigator?.language);
 if (!customElements.get('wifi-qr-card')) {
   customElements.define('wifi-qr-card', WifiQrCard);
   window.customCards = window.customCards || [];
   window.customCards.push({
     type: 'wifi-qr-card',
-    name: 'Wifi QR Card',
-    description: 'WiFi QR code — no CDN',
+    name: wifiQrT(wifiQrPickerLang, 'card_name'),
+    description: wifiQrT(wifiQrPickerLang, 'card_desc'),
     preview: true,
     documentationURL: 'https://github.com/juju35/ha-wifi-card',
   });
@@ -1518,8 +1677,6 @@ if (!customElements.get('wifi-qr-card')) {
 }
 if (!customElements.get('wifi-qr-mini-card')) {
   customElements.define('wifi-qr-mini-card', WifiQrMiniCard);
-  // The card picker lists it in the page language (the HA frontend sets it), like the card's own texts.
-  var wifiQrPickerLang = wifiQrLang(document.documentElement.lang || globalThis.navigator?.language);
   window.customCards = window.customCards || [];
   window.customCards.push({
     type: 'wifi-qr-mini-card',
