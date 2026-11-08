@@ -480,6 +480,16 @@ test("the zoom dialog opens centred on the screen, like the Wero card's", () => 
   assert.equal(els.zoom.style.marginTop, undefined);
 });
 
+test("the full screen QR dialog draws no focus ring, in the card and the mini card", () => {
+  // showModal() focuses the dialog: the browser's focus ring would frame the QR code
+  for (const html of [stubCard().card, stubMini().card].map((c) => {
+    c.setConfig({ ssid: "Box", password: "secret" });
+    return c.shadowRoot.innerHTML;
+  })) {
+    assert.match(html, /dialog:focus, dialog:focus-visible \{ outline: none; \}/);
+  }
+});
+
 // Renders the editor with a stub ha-form and returns the data it shows.
 function editorData(config) {
   const ed = new WifiQrCardEditor();

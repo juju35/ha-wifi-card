@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.13.1 - 2026-11-08
+
+### Fixes
+- The full screen QR code no longer shows a focus ring around it (a dark outline drawn by the browser, on phones in particular); Escape still closes it and the focus still returns to the QR code.
+
 ## 1.13.0 - 2026-11-08
 
 ### What's new

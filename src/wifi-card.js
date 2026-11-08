@@ -1221,6 +1221,8 @@ class WifiQrCard extends HTMLElement {
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; width: ${c.qr_size ? `${c.qr_size}px` : '176px'}; }
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
+        /* showModal() focuses the dialog itself: no focus ring around the full screen QR (Escape still closes it) */
+        dialog:focus, dialog:focus-visible { outline: none; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         .info-block { width: 100%; display: flex; flex-direction: column; gap: 6px; }
@@ -1458,6 +1460,8 @@ class WifiQrMiniCard extends WifiQrCard {
         .thumb:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 2px; }
         /* The full screen QR, as on the full card. */
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
+        /* showModal() focuses the dialog itself: no focus ring around the full screen QR (Escape still closes it) */
+        dialog:focus, dialog:focus-visible { outline: none; }
         dialog::backdrop { background: rgba(0,0,0,0.85); }
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
