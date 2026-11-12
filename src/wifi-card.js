@@ -36,6 +36,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zone blanche incluse — 176 px par défaut',
     ed_language_helper: 'Laisser vide pour suivre la langue de Home Assistant',
     ed_logo: 'Afficher le logo WiFi',
+    ed_show_title: 'Afficher le titre',
+    ed_show_subtitle: 'Afficher le sous-titre',
     ed_zoom: 'Bouton détail',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -77,6 +79,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Quiet zone included — defaults to 176 px',
     ed_language_helper: 'Leave empty to follow the Home Assistant language',
     ed_logo: 'Show the WiFi logo',
+    ed_show_title: 'Show title',
+    ed_show_subtitle: 'Show subtitle',
     ed_zoom: 'Detail button',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -118,6 +122,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ruhezone inklusive – standardmäßig 176 px',
     ed_language_helper: 'Leer lassen, um der Sprache von Home Assistant zu folgen',
     ed_logo: 'WLAN-Logo anzeigen',
+    ed_show_title: 'Titel anzeigen',
+    ed_show_subtitle: 'Untertitel anzeigen',
     ed_zoom: 'Detail-Schaltfläche',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -159,6 +165,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona de silencio incluida: 176 px por defecto',
     ed_language_helper: 'Déjalo vacío para seguir el idioma de Home Assistant',
     ed_logo: 'Mostrar el logotipo Wi-Fi',
+    ed_show_title: 'Mostrar el título',
+    ed_show_subtitle: 'Mostrar el subtítulo',
     ed_zoom: 'Botón de detalle',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -200,6 +208,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Укључује и празан простор око кода — подразумевано је 176 px',
     ed_language_helper: 'Остави празно да прати језик Home Assistant-а',
     ed_logo: 'Прикажи WiFi лого',
+    ed_show_title: 'Прикажи наслов',
+    ed_show_subtitle: 'Прикажи поднаслов',
     ed_zoom: 'Дугме за детаље',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -241,6 +251,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Uključuje i prazan prostor oko koda — podrazumevano je 176 px',
     ed_language_helper: 'Ostavi prazno da prati jezik Home Assistant-a',
     ed_logo: 'Prikaži WiFi logo',
+    ed_show_title: 'Prikaži naslov',
+    ed_show_subtitle: 'Prikaži podnaslov',
     ed_zoom: 'Dugme za detalje',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -282,6 +294,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona di rispetto inclusa: 176 px per impostazione predefinita',
     ed_language_helper: 'Lascia vuoto per usare la lingua di Home Assistant',
     ed_logo: 'Mostra il logo Wi-Fi',
+    ed_show_title: 'Mostra il titolo',
+    ed_show_subtitle: 'Mostra il sottotitolo',
     ed_zoom: 'Pulsante dettagli',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -323,6 +337,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inclusief witrand — standaard 176 px',
     ed_language_helper: 'Leeg laten om de taal van Home Assistant te volgen',
     ed_logo: 'Wifilogo tonen',
+    ed_show_title: 'Titel tonen',
+    ed_show_subtitle: 'Ondertitel tonen',
     ed_zoom: 'Detailknop',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -364,6 +380,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Margem de silêncio incluída — 176 px por predefinição',
     ed_language_helper: 'Deixe vazio para seguir o idioma do Home Assistant',
     ed_logo: 'Mostrar o logótipo Wi-Fi',
+    ed_show_title: 'Mostrar o título',
+    ed_show_subtitle: 'Mostrar o subtítulo',
     ed_zoom: 'Botão de detalhe',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -405,6 +423,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ze strefą ciszy — domyślnie 176 px',
     ed_language_helper: 'Pozostaw puste, aby używać języka Home Assistant',
     ed_logo: 'Pokaż logo Wi-Fi',
+    ed_show_title: 'Pokaż tytuł',
+    ed_show_subtitle: 'Pokaż podtytuł',
     ed_zoom: 'Przycisk szczegółów',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -446,6 +466,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Zona liniștită inclusă — implicit 176 px',
     ed_language_helper: 'Lăsați gol pentru a folosi limba din Home Assistant',
     ed_logo: 'Afișează sigla Wi-Fi',
+    ed_show_title: 'Afișează titlul',
+    ed_show_subtitle: 'Afișează subtitlul',
     ed_zoom: 'Buton de detalii',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -487,6 +509,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inklusive frizone – 176 px som standard',
     ed_language_helper: 'Lad feltet stå tomt for at følge sproget i Home Assistant',
     ed_logo: 'Vis wifi-logoet',
+    ed_show_title: 'Vis titel',
+    ed_show_subtitle: 'Vis undertitel',
     ed_zoom: 'Detaljeknap',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -528,6 +552,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Inklusive frizon – 176 px som standard',
     ed_language_helper: 'Lämna tomt för att följa språket i Home Assistant',
     ed_logo: 'Visa wifi-logotypen',
+    ed_show_title: 'Visa rubrik',
+    ed_show_subtitle: 'Visa underrubrik',
     ed_zoom: 'Detaljknapp',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -569,6 +595,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'С включена тиха зона — по подразбиране 176 px',
     ed_language_helper: 'Оставете празно, за да се използва езикът на Home Assistant',
     ed_logo: 'Показване на логото на Wi-Fi',
+    ed_show_title: 'Показване на заглавието',
+    ed_show_subtitle: 'Показване на подзаглавието',
     ed_zoom: 'Бутон за подробности',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -610,6 +638,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'С учётом свободной зоны — по умолчанию 176 px',
     ed_language_helper: 'Оставьте пустым, чтобы использовать язык Home Assistant',
     ed_logo: 'Показывать логотип Wi-Fi',
+    ed_show_title: 'Показывать заголовок',
+    ed_show_subtitle: 'Показывать подзаголовок',
     ed_zoom: 'Кнопка подробностей',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -651,6 +681,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'З урахуванням вільної зони — типово 176 px',
     ed_language_helper: 'Залиште порожнім, щоб використовувати мову Home Assistant',
     ed_logo: 'Показувати логотип Wi-Fi',
+    ed_show_title: 'Показувати заголовок',
+    ed_show_subtitle: 'Показувати підзаголовок',
     ed_zoom: 'Кнопка деталей',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -692,6 +724,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Csendes zónával együtt – alapértelmezés: 176 px',
     ed_language_helper: 'Hagyd üresen, hogy a Home Assistant nyelvét kövesse',
     ed_logo: 'Wi-Fi-logó megjelenítése',
+    ed_show_title: 'Cím megjelenítése',
+    ed_show_subtitle: 'Alcím megjelenítése',
     ed_zoom: 'Részletek gomb',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -733,6 +767,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Vrátane tichej zóny — predvolene 176 px',
     ed_language_helper: 'Nechajte prázdne, ak chcete používať jazyk Home Assistant',
     ed_logo: 'Zobraziť logo Wi-Fi',
+    ed_show_title: 'Zobraziť názov',
+    ed_show_subtitle: 'Zobraziť podnázov',
     ed_zoom: 'Tlačidlo podrobností',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -774,6 +810,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Včetně klidové zóny — výchozí 176 px',
     ed_language_helper: 'Ponechte prázdné, chcete-li používat jazyk Home Assistant',
     ed_logo: 'Zobrazit logo Wi-Fi',
+    ed_show_title: 'Zobrazit název',
+    ed_show_subtitle: 'Zobrazit podnázev',
     ed_zoom: 'Tlačítko podrobností',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -815,6 +853,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Vključno s tiho cono — privzeto 176 px',
     ed_language_helper: 'Pustite prazno, da se uporabi jezik Home Assistant',
     ed_logo: 'Pokaži logotip Wi-Fi',
+    ed_show_title: 'Prikaži naslov',
+    ed_show_subtitle: 'Prikaži podnaslov',
     ed_zoom: 'Gumb za podrobnosti',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -856,6 +896,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Ieskaitot klusuma zonu — pēc noklusējuma 176 px',
     ed_language_helper: 'Atstājiet tukšu, lai izmantotu Home Assistant valodu',
     ed_logo: 'Rādīt Wi-Fi logotipu',
+    ed_show_title: 'Rādīt virsrakstu',
+    ed_show_subtitle: 'Rādīt apakšvirsrakstu',
     ed_zoom: 'Detaļu poga',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -897,6 +939,8 @@ var WifiQrI18n = {
     ed_qr_size_helper: 'Με τη ζώνη ησυχίας — προεπιλογή 176 px',
     ed_language_helper: 'Αφήστε κενό για να ακολουθεί τη γλώσσα του Home Assistant',
     ed_logo: 'Εμφάνιση λογότυπου Wi-Fi',
+    ed_show_title: 'Εμφάνιση τίτλου',
+    ed_show_subtitle: 'Εμφάνιση υπότιτλου',
     ed_zoom: 'Κουμπί λεπτομερειών',
     sec_wpa: 'WPA / WPA2',
     sec_sae: 'WPA3 (SAE)',
@@ -1062,6 +1106,9 @@ class WifiQrCard extends HTMLElement {
       qr_size: Number(config.qr_size) > 0 ? Number(config.qr_size) : null,
       logo: config.logo !== false,
     };
+    // show_title / show_subtitle: the header's title / subtitle, hidden by the stylesheet
+    this.toggleAttribute?.("hide-title", config.show_title === false);
+    this.toggleAttribute?.("hide-subtitle", config.show_subtitle === false);
     // Neither the entity nor a static value: no QR code (it would not connect), the entity is named instead.
     this._pwdSync = null;
     var c = this._config;
@@ -1206,6 +1253,7 @@ class WifiQrCard extends HTMLElement {
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         /* Shrinks with the card but always keeps a few characters of the title visible. */
         .titles { flex: 1 1 0; min-width: 4ch; }
+        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* Phone width at 4 columns (~104 px card): a 32 px badge, as on the mini cards, a 14 px title and 4 px
@@ -1452,6 +1500,7 @@ class WifiQrMiniCard extends WifiQrCard {
         .badge .logo { width: 24px; height: 24px; display: block; }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         .titles { flex: 1 1 0; min-width: 4ch; }
+        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* The big QR code's colours and rounded tile, at thumbnail size. */
@@ -1491,7 +1540,7 @@ class WifiQrMiniCard extends WifiQrCard {
 }
 
 // ── wifi-qr-card-editor (visual editor, built on HA's ha-form) ───────────────
-var WIFI_QR_EDITOR_DEFAULTS = { security: 'WPA', qr_size: 176, logo: true, hidden: false };
+var WIFI_QR_EDITOR_DEFAULTS = { show_title: true, show_subtitle: true, security: 'WPA', qr_size: 176, logo: true, hidden: false };
 // Entities whose state can give the SSID or the password: helpers and router integrations.
 var WIFI_QR_ENTITY_SELECTOR = { entity: { filter: [{ domain: ['input_text', 'text', 'sensor'] }] } };
 
@@ -1530,6 +1579,8 @@ class WifiQrCardEditor extends HTMLElement {
     var t = (k) => wifiQrT(this._lang(), k);
     return [
       { name: 'title', selector: { text: {} } },
+      { name: 'show_title', selector: { boolean: {} } },
+      { name: 'show_subtitle', selector: { boolean: {} } },
       { name: 'logo', selector: { boolean: {} } },
       ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
       // The SSID is only required without an entity giving it.

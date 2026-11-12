@@ -114,6 +114,8 @@ zoom: true
 | `hidden` | ❌ | `false` | The network does not broadcast its SSID: adds `H:true;` to the QR code so phones join it anyway |
 | `security` | ❌ | `WPA` | Security type: `WPA` (WPA/WPA2), `SAE` (WPA3), `WEP`, or `nopass` (open network) |
 | `title` | ❌ | Auto (i18n) | Card title |
+| `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
+| `show_subtitle` | ❌ | `true` | Show the subtitle under the title |
 | `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `zoom` | ❌ | `true` | Mini card only: show the detail button that switches to the full card and back |
