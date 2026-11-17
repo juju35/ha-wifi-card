@@ -21,6 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 ## Features
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
+- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (follows `sun.sun`, else the dark theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value
 - Password hidden by default, revealable with a toggle button (masked again after 30 s or when the card leaves the page), and a button to copy it to the clipboard
 - Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail that opens the QR code full screen, and a detail button that switches to the full card and back
 - Visual editor in the dashboard UI (no YAML needed)
@@ -60,7 +61,7 @@ Or manually:
 
 ### Visual editor
 
-Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, SSID, password (or the entities giving them), hidden network, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
+Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, illustration and its day / night theme, SSID, password (or the entities giving them), hidden network, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
 
 ### Minimal
 
@@ -76,6 +77,8 @@ password: MySecretPassword
 type: custom:wifi-qr-card
 title: Guest WiFi
 logo: true
+illustration: true
+illustration_theme: auto
 ssid: MyNetwork-Guest
 password: MySecretPassword
 security: WPA
@@ -95,7 +98,7 @@ hidden: true
 
 ### Mini card
 
-`wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
+`wifi-qr-mini-card` takes the same options and shows the network on a compact illustrated header: the header icon, the title, the network name and a small QR code framed on the wall beside the router (one plain row with `illustration: false`). The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
 
 ```yaml
 type: custom:wifi-qr-mini-card
@@ -118,7 +121,9 @@ zoom: true
 | `title` | ❌ | Auto (i18n) | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | ❌ | `true` | Show the subtitle under the title |
-| `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
+| `logo` | ❌ | `true` | Show the WiFi logo as a small badge on the header's QR code icon |
+| `illustration` | ❌ | `true` | Both cards: the animated illustrated header (`false` keeps the classic header) |
+| `illustration_theme` | ❌ | `auto` | Both cards: `auto` (night when `sun.sun` is below the horizon, else with the dark theme), `day` or `night` |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `zoom` | ❌ | `true` | Mini card only: show the detail button that switches to the full card and back |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings) |

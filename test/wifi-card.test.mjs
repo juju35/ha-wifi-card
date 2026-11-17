@@ -692,7 +692,8 @@ test("mini card: one compact row, QR thumbnail and detail button, never the pass
   assert.doesNotMatch(cssRule(html, ".zoom"), /background/);
   // The full card's 40 px badge and 24 px glyph, not reduced in the compact view.
   assert.deepEqual(px(cssRule(html, ".badge"), "width"), [40]);
-  assert.deepEqual(px(cssRule(html, ".badge .logo"), "width"), [24]);
+  // The MDI QR code icon, the WiFi logo in its brand badge.
+  assert.match(html, /<div class="badge"><ha-icon icon="mdi:qrcode"><\/ha-icon><span class="brand"><svg class="logo"/);
   // The QR thumbnail still encodes the network.
   const svg = /<div class="thumb"[^>]*>(<svg[\s\S]*?<\/svg>)/.exec(html)[1];
   assert.equal(decodeSvg(svg), "WIFI:T:WPA;S:Home-Guests;P:secret-pass;;");
@@ -907,7 +908,9 @@ test("entities: without a value nor a static fallback, the card names the entity
   const { card } = stubCard();
   card.setConfig({ ssid_entity: "input_text.ssid", password_entity: "input_text.pwd", hidden: true, language: "fr" });
   assert.match(card.shadowRoot.innerHTML, /Aucune valeur pour input_text\.ssid/);
-  assert.doesNotMatch(card.shadowRoot.innerHTML, /<svg/);
+  // No QR code; the banner shows its error status (no waves, red icon).
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /crispEdges|class="wq-waves"/);
+  assert.match(card.shadowRoot.innerHTML, /<div class="banner st-err">/);
   card.hass = hassWith({ "input_text.ssid": "Box", "input_text.pwd": "" });
   assert.match(card.shadowRoot.innerHTML, /Aucune valeur pour input_text\.pwd/);
   card.hass = hassWith({ "input_text.ssid": "Box", "input_text.pwd": "secret" });
@@ -1097,4 +1100,66 @@ test("copy button next to the eye: copies the password, shows and announces the 
 
 test("open network: no copy button", () => {
   assert.doesNotMatch(renderWith({ security: "nopass", password: "" }), /id="cbtn"/);
+});
+
+// ── Illustrated header ────────────────────────────────────────────────────────
+
+test("banner: 90 px, parquet strip, router scene, QR code icon with the WiFi logo badge", () => {
+  const html = renderWith({ title: "Guests" });
+  assert.match(html, /<div class="banner st-ok"><svg class="scene" viewBox="0 0 200 80"/);
+  assert.match(html, /<div class="ground"><\/div>/);
+  assert.deepEqual(px(cssRule(html, ".banner"), "height"), [90]);
+  assert.deepEqual(px(cssRule(html, ".banner .ground"), "height"), [10]);
+  assert.match(html, /<div class="badge"><ha-icon icon="mdi:qrcode"><\/ha-icon><span class="brand"><svg class="logo"/);
+  assert.match(html, /class="wq-waves"/);
+  assert.match(html, /prefers-reduced-motion: reduce/);
+  // logo: false removes the badge, never the QR code icon.
+  const bare = renderWith({ logo: false });
+  assert.match(bare, /<div class="badge"><ha-icon icon="mdi:qrcode"><\/ha-icon><\/div>/);
+  assert.doesNotMatch(bare, /class="brand"/);
+});
+
+test("banner: the status follows the security, the icon takes the status colour", () => {
+  assert.match(renderWith({ security: "nopass" }), /<div class="banner st-warn">/);
+  assert.match(renderWith({ security: "WEP" }), /<div class="banner st-warn">/);
+  assert.match(renderWith({ security: "SAE" }), /<div class="banner st-ok">/);
+  const html = renderWith({});
+  assert.match(cssRule(html, ".banner .badge"), /color: var\(--st\);/);
+  assert.match(html, /\.banner\.st-warn \{ --st: #d48806; \}/);
+  assert.match(html, /\.banner\.st-err \{ --st: #d93025; \}/);
+});
+
+test("banner: night from illustration_theme, sun.sun, then dark mode; illustration: false keeps the classic header", () => {
+  assert.match(renderWith({ illustration_theme: "night" }), /<div class="banner st-ok night">/);
+  assert.match(renderWith({ illustration_theme: "day" }), /<div class="banner st-ok">/);
+  const { card } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en", states: { "sun.sun": { state: "below_horizon" } }, themes: { darkMode: false } };
+  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/);
+  card.hass = { language: "en", states: { "sun.sun": { state: "above_horizon" } }, themes: { darkMode: true } };
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /banner st-ok night/);
+  card.hass = { language: "en", states: {}, themes: { darkMode: true } };
+  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/);
+  const classic = renderWith({ illustration: false, security: "nopass" });
+  assert.doesNotMatch(classic, /class="banner|class="scene/);
+  assert.match(classic, /<div class="header st-warn"><div class="hrow">/);
+  assert.throws(() => renderWith({ illustration_theme: "dusk" }), /illustration_theme must be/);
+});
+
+test("mini card banner: the QR thumbnail on the wall beside the router, the classic row with illustration: false", () => {
+  let html = stubMini({}).card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="banner st-ok"><svg class="scene mini"/);
+  assert.match(html, /<div class="thumb" id="qr"/);
+  assert.doesNotMatch(html, /wq-laptop/);
+  html = stubMini({ illustration: false }).card.shadowRoot.innerHTML;
+  assert.doesNotMatch(html, /class="banner/);
+  assert.match(html, /<div class="row st-ok">/);
+});
+
+test("editor: both cards expose illustration and illustration_theme, dropped from the YAML at their defaults", () => {
+  for (const Ed of [WifiQrCardEditor, WifiQrMiniCardEditor]) {
+    const names = new Ed()._schema.call({ constructor: Ed, _config: {}, _lang: () => "en" }).map((f) => f.name);
+    assert.ok(names.includes("illustration") && names.includes("illustration_theme"), Ed.name);
+  }
+  assert.equal(ctx.wifiQrT("fr", "theme_night"), "Nuit");
 });
