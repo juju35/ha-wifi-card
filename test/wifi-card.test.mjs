@@ -605,24 +605,28 @@ test("header: the title keeps a few characters and its full text is readable in 
 });
 
 test("status pill: a dot and a short label on the title row, in the icon's status colour, translated", () => {
-  const pill = (config) => /<div class="trow"><div class="name"[^>]*>[^<]*<\/div><span class="chip" title="([^"]+)"><span class="dot"><\/span><span class="ptxt">([^<]+)<\/span><\/span><\/div>/.exec(renderWith(config)).slice(1);
+  const pill = (config) => /<div class="trow"><div class="name"[^>]*>[^<]*<\/div><span class="chip" title="([^"]+)" aria-label="[^"]+"><span class="dot"><\/span><span class="ptxt">([^<]+)<\/span><\/span><\/div>/.exec(renderWith(config)).slice(1);
   assert.deepEqual(pill({}), ["Secured", "Secured"]);
   assert.deepEqual(pill({ security: "nopass" }), ["Open", "Open"]);
   assert.deepEqual(pill({ security: "WEP" }), ["Weak", "Weak"]);
   assert.deepEqual(pill({ security: "WEP", language: "fr" }), ["Faible", "Faible"]);
   assert.deepEqual(pill({ illustration: false }), ["Secured", "Secured"]);
   // No value from the entity: the error header says Unavailable, in red
-  assert.match(renderWith({ ssid: "", ssid_entity: "sensor.none" }), /<span class="chip" title="Unavailable">/);
+  assert.match(renderWith({ ssid: "", ssid_entity: "sensor.none" }), /<span class="chip" title="Unavailable" aria-label="Unavailable">/);
   const html = renderWith({});
   assert.match(cssRule(html, ".st-err .chip"), /--c: var\(--error-color, #db4437\)/);
   assert.match(cssRule(html, ".st-warn .chip"), /--c: var\(--warning-color, #ffa600\)/);
   // On the banner: the banner's status colour, frosted on the sky (day) and the night wall
   assert.match(cssRule(html, ".banner .chip"), /--c: var\(--st\); background: color-mix\(in srgb, var\(--c\) 18%, rgba\(255,255,255,\.78\)\)/);
   assert.match(cssRule(html, ".banner.night .chip"), /color-mix\(in srgb, var\(--c\) 35%, #ffffff\)/);
-  // Whole label at most 51 % of the title block; own line at 260 px or less, the dot alone at 200 px or less
-  assert.match(cssRule(html, ".chip"), /flex: none; max-width: 51%/);
-  assert.match(cssRule(html, ".trow .name"), /min-width: 4ch/);
-  assert.match(html, /@container \(max-width: 260px\) \{ \.trow \{ display: contents; \}[^\n]*\.titles \.chip \{ order: 3;/);
+  // Its place is measured (wifiPlacePill): data-wrap puts it on its own line under the subtitle, data-dot keeps its
+  // dot alone; no width tier moves it; the dot alone at 200 px or less
+  assert.match(cssRule(html, ".chip"), /flex: none; max-width: 100%/);
+  assert.match(cssRule(html, ".trow .name"), /min-width: 0/);
+  assert.doesNotMatch(html, /@container \(max-width: (260|340)px\)/);
+  assert.match(cssRule(html, "[data-wrap] .trow"), /display: contents/);
+  assert.match(cssRule(html, "[data-wrap] .titles .chip"), /order: 3;/);
+  assert.match(cssRule(html, "[data-dot] .titles .chip .ptxt"), /position: absolute;/);
   assert.match(html, /@container \(max-width: 200px\) \{[^\n]*\.titles \.chip \.ptxt \{ position: absolute;/);
 });
 
@@ -1203,4 +1207,42 @@ test("mini card: the expand / collapse button sits in the banner's top right cor
   assert.match(style, /\.banner\.night \.zoom \{ color: #fff; background: rgba\(255,255,255,\.12\); box-shadow: inset 0 0 0 1px rgba\(255,255,255,\.2\); \}/);
   assert.match(style, /\.zoom \{ all: unset; flex: none; cursor: pointer; width: 24px; height: 24px;/);
   assert.match(style, /\.zoom ha-icon \{ color: inherit; --mdc-icon-size: 16px; \}/);
+});
+
+// A stub of the header for wifiPlacePill: widths in px (the title's whole text, the pill, the row), the text block's
+// bottom and the ground strip's top, the label cut or not once on its own line.
+function placed({ title, pill, row, cut = false, bottom = 60, ground = 80 }) {
+  const attrs = new Set();
+  const rect = (o) => ({ getBoundingClientRect: () => ({ top: 0, bottom: 0, width: 0, ...o }) });
+  const text = {
+    ...rect({ width: pill - 20 }),
+    get scrollWidth() {
+      return cut && attrs.has("data-wrap") ? 100 : 50;
+    },
+    clientWidth: 50,
+  };
+  const chip = { ...rect({ width: pill }), querySelector: () => text };
+  const name = { ...rect({ width: Math.min(title, row - pill) }), textContent: "Title", scrollWidth: title, clientWidth: Math.min(title, row - pill) };
+  const head = { ...rect({ top: 0 }), setAttribute: (a) => attrs.add(a), removeAttribute: (a) => attrs.delete(a) };
+  const rowEl = {
+    ...rect({ width: row }),
+    querySelector: (s) => (s.includes("chip") ? chip : name),
+    parentElement: { getBoundingClientRect: () => ({ top: 10, bottom: attrs.has("data-wrap") ? bottom : 40 }) },
+  };
+  ctx.getComputedStyle = () => ({ columnGap: "8px" });
+  ctx.wifiPlacePill(head, rowEl, ground == null ? null : rect({ top: ground }));
+  return [...attrs].sort().join(" ");
+}
+
+test("status pill place: beside the whole title, else under the subtitle, else its dot alone", () => {
+  // Whole title (100) + gap (8) + whole pill (60) fit a 200 px row: on the title row
+  assert.equal(placed({ title: 100, pill: 60, row: 200 }), "");
+  // A pixel short: on its own line, whatever the language's label length
+  assert.equal(placed({ title: 133, pill: 60, row: 200 }), "data-wrap");
+  // On its own line its label is still cut: the dot alone, back on the title row
+  assert.equal(placed({ title: 300, pill: 60, row: 200, cut: true }), "data-dot");
+  // On its own line the text block runs over the ground strip: the dot alone
+  assert.equal(placed({ title: 300, pill: 60, row: 200, bottom: 85, ground: 80 }), "data-dot");
+  // The classic header (no ground strip) keeps it on its own line
+  assert.equal(placed({ title: 300, pill: 60, row: 200, bottom: 85, ground: null }), "data-wrap");
 });

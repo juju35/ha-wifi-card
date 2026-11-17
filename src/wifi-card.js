@@ -77,14 +77,15 @@ var WIFI_BANNER_STYLE = `
         @container (max-width: 128px) { .htext { left: 6px; right: 6px; gap: 4px; } .htext .name { font-size: 14px; } .banner .badge { width: 32px; height: 32px; } .banner .badge ha-icon { --mdc-icon-size: 20px; } }`;
 
 // The status pill on the title row (full and mini card, banner or classic header): a dot and a short label in the
-// status colour of the header icon. The title ellipsises first but keeps 4 characters; on a narrow card (260 px or
-// less) the pill goes to its own line under the subtitle, at 200 px or less only its dot shows (the label stays in
-// its tooltip and for screen readers).
+// status colour of the header icon, right after the title only when the whole title and the whole label fit there
+// (measured by the card, see wifiPlacePill); otherwise on its own line under the subtitle; when even that cuts the
+// label or leaves the banner, and at 200 px or less, only its dot shows (the label stays in its tooltip and for
+// screen readers).
 var WIFI_PILL_STYLE = `
         .titles { display: flex; flex-direction: column; min-width: 4ch; }
         .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .trow .name { flex: 0 1 auto; min-width: 4ch; }
-        .chip { --c: ${WIFI_BLUE}; display: inline-flex; align-items: center; gap: 4px; flex: none; max-width: 51%; box-sizing: border-box;
+        .trow .name { flex: 0 1 auto; min-width: 0; }
+        .chip { --c: ${WIFI_BLUE}; display: inline-flex; align-items: center; gap: 4px; flex: none; max-width: 100%; box-sizing: border-box;
                 padding: 1px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; overflow: hidden;
                 background: color-mix(in srgb, var(--c) 15%, transparent); color: color-mix(in srgb, var(--c) 40%, var(--primary-text-color, #212121)); }
         .st-warn .chip { --c: var(--warning-color, #ffa600); }
@@ -93,7 +94,11 @@ var WIFI_PILL_STYLE = `
         .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--c); }
         .banner .chip { --c: var(--st); background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
         .banner.night .chip { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
-        @container (max-width: 260px) { .trow { display: contents; } .titles > .sub { order: 2; } .titles .chip { order: 3; align-self: flex-start; max-width: 100%; margin-top: 2px; } }
+        [data-wrap] .trow { display: contents; }
+        [data-wrap] .titles > .sub { order: 2; }
+        [data-wrap] .titles .chip { order: 3; align-self: flex-start; margin-top: 2px; }
+        [data-dot] .titles .chip { padding: 3px; }
+        [data-dot] .titles .chip .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         @container (max-width: 200px) { .titles .chip { padding: 3px; } .titles .chip .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }`;
 
 // The WiFi logo in a small white tile on the header icon (bottom right), like the brand badge of the other cards.
@@ -1329,6 +1334,33 @@ function wifiQrMinVersion(bytes) {
 }
 
 // ── wifi-qr-card ──────────────────────────────────────────────────────────────
+// The status pill's place, decided by measurement after each render and each new width (the same rule on every
+// card): on the title row, right after the title, only when the whole title and the pill's whole label fit there;
+// otherwise on its own line under the subtitle (one line), the title whole on its row (cut only when it does not fit
+// alone). When the label is still cut there, or the text block leaves the banner or runs over its ground strip, the
+// pill keeps its dot alone, on the title row (its label stays in title and aria-label). A header of 200 px or less
+// shows the dot alone anyway (CSS), beside the title.
+function wifiPlacePill(head, row, ground) {
+  if (!head) return;
+  head.removeAttribute('data-wrap');
+  head.removeAttribute('data-dot');
+  var pill = row.querySelector(':scope > .chip');
+  var text = pill?.querySelector('.ptxt');
+  if (!text?.getBoundingClientRect || text.getBoundingClientRect().width <= 1) return;
+  var name = row.querySelector(':scope > .name');
+  var gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+  var title = name && name.textContent ? (name.scrollWidth > name.clientWidth ? name.scrollWidth : name.getBoundingClientRect().width) + gap : 0;
+  if (title + pill.getBoundingClientRect().width <= row.getBoundingClientRect().width + 0.5) return;
+  head.setAttribute('data-wrap', '');
+  var box = row.parentElement.getBoundingClientRect();
+  var frame = head.getBoundingClientRect();
+  var out = ground && (box.bottom > ground.getBoundingClientRect().top + 0.5 || box.top < frame.top - 0.5);
+  if (text.scrollWidth > text.clientWidth + 0.5 || out) {
+    head.removeAttribute('data-wrap');
+    head.setAttribute('data-dot', '');
+  }
+}
+
 class WifiQrCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('wifi-qr-card-editor');
@@ -1394,7 +1426,7 @@ class WifiQrCard extends HTMLElement {
   _titlesHtml(status, title, sub) {
     var label = wifiQrEsc(this._t(this._pillKey(status)));
     return `<div class="titles">
-            <div class="trow"><div class="name" title="${title}">${title}</div><span class="chip" title="${label}"><span class="dot"></span><span class="ptxt">${label}</span></span></div>
+            <div class="trow"><div class="name" title="${title}">${title}</div><span class="chip" title="${label}" aria-label="${label}"><span class="dot"></span><span class="ptxt">${label}</span></span></div>
             <div class="sub" title="${sub}">${sub}</div>
           </div>`;
   }
@@ -1438,6 +1470,7 @@ class WifiQrCard extends HTMLElement {
         ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE + WIFI_PILL_STYLE}
         .msg-err { padding: 16px; color: ${color}; overflow-wrap: anywhere; }
       </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`;
+    this._fitPill();
   }
 
   // The states of the configured entities, as one comparable string.
@@ -1583,8 +1616,33 @@ class WifiQrCard extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._resize?.disconnect();
+    this._fitWidth = null;
     this._maskPassword();
     this._copyReset();
+  }
+
+  // A new width (or the web font loaded): the status pill is fitted again, in the next frame.
+  connectedCallback() {
+    if (typeof ResizeObserver === 'function') {
+      this._resize ??= new ResizeObserver((entries) => {
+        var w = Math.round(entries[entries.length - 1].contentRect.width);
+        if (w === this._fitWidth) return;
+        this._fitWidth = w;
+        cancelAnimationFrame(this._fitFrame);
+        this._fitFrame = requestAnimationFrame(() => this._fitPill());
+      });
+      this._resize.observe(this);
+    }
+    document.fonts?.ready?.then(() => this._fitPill());
+  }
+
+  // The status pill's place, on the banner and on the classic header (see wifiPlacePill).
+  _fitPill() {
+    var row = this.shadowRoot?.querySelector?.('.titles > .trow');
+    if (!row) return;
+    var banner = row.closest('.banner');
+    wifiPlacePill(banner || row.closest('.header') || row.closest('.row'), row, banner?.querySelector('.ground'));
   }
 
   _render(strict) {
@@ -1685,6 +1743,7 @@ class WifiQrCard extends HTMLElement {
         <div class="hint">${this._t('hint')}</div>
         <span class="sr" id="live" aria-live="polite"></span>
       </ha-card>`;
+    this._fitPill();
 
     if (!isOpen) {
       const btn = this.shadowRoot.getElementById('btn');
@@ -1764,7 +1823,9 @@ var WIFI_MINI_STYLE = `
         .banner.night .zoom:hover { background: rgba(255,255,255,.22); }
         /* Expanded view: the picture steps aside from the button's corner (the compact view sets its own text edge). */
         .banner .scene:not(.mini) { right: 26px; }
-        .banner .htext { right: calc(min(200px, 62%) * .75 + 30px); }`;
+        .banner .htext { right: calc(min(200px, 62%) * .75 + 30px); }
+        /* Narrow card, no picture: the text runs up to the button's corner. */
+        @container (max-width: 300px) { .banner .htext { right: 36px; } }`;
 
 // A click in a dialog opened from the page (a more-info, say) is not a click outside the card.
 function wifiQrInDialog(ev) {
@@ -1788,6 +1849,7 @@ class WifiQrMiniCard extends WifiQrCard {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     document.addEventListener('click', this._onOutside, true);
   }
 
@@ -1894,8 +1956,6 @@ class WifiQrMiniCard extends WifiQrCard {
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
            and a 14 px title keep a few characters of the title. */
-        /* Classic compact row (thumbnail and button beside the text): the pill under the network name already below 340 px. */
-        @container (max-width: 340px) { .row .trow { display: contents; } .row .titles > .sub { order: 2; } .row .titles .chip { order: 3; align-self: flex-start; max-width: 100%; margin-top: 2px; } }
         @container (max-width: 200px) {
           .row { gap: 4px; margin: 0 -4px; }
           .name { font-size: 14px; }
@@ -1926,6 +1986,7 @@ class WifiQrMiniCard extends WifiQrCard {
         </div>`}
         <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
       </ha-card>`;
+    this._fitPill();
     // The thumbnail opens the QR code full screen directly, like the big one of the full card.
     this._bindQr(wasOpen);
     this._bindZoom();
