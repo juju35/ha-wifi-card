@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.17.0 - 2026-11-18
+
+### Features
+- Mini card laid out like the Wero card's: the QR code thumbnail (56 px) at the left of a buttons' column in the banner's top right corner, the router's shelf at its left. The column gains a **copy password** button under the expand button (not for an open network); from 300 px down the buttons go back on one line with the QR under them, and at 200 px or less the copy button hides.
+
 ## 1.16.0 - 2026-11-17
 
 ### Features

@@ -1925,6 +1925,10 @@ class WifiQrMiniCard extends WifiQrCard {
     const zoom = wifiQrEsc(this._t('zoom'));
     const ill = this._configRaw?.illustration !== false;
     const texts = this._titlesHtml(this._status(), title, ssid);
+    // The banner's copy button (not for an open network), under the detail button, like the Wero card's.
+    const copy = ill && c.security !== 'nopass' && c.password
+      ? `<button id="cbtn" title="${this._t('copy_password')}" aria-label="${this._t('copy_password')}"><ha-icon icon="mdi:content-copy" id="cico"></ha-icon></button>`
+      : '';
     const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
     const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
     this.shadowRoot.innerHTML = `
@@ -1962,21 +1966,37 @@ class WifiQrMiniCard extends WifiQrCard {
           .thumb { width: 48px; height: 48px; border-radius: 6px; }
         }
         ${WIFI_BRAND_STYLE + WIFI_PILL_STYLE + (ill ? `${WIFI_BANNER_STYLE}
-        /* The banner fills the compact card: the title on the wall, the QR code framed beside the router's shelf. */
+        /* The banner fills the compact card, laid out like the Wero card's: the title on the wall, the router's shelf,
+           the QR code framed at its right, then the buttons' column in the top right corner (the detail button at the
+           corner, the copy button under it). */
         ha-card.mini { padding: 0; overflow: hidden; justify-content: flex-start; }
-        .banner .htext { right: 112px; }
-        .banner .thumb { position: absolute; z-index: 1; right: 48px; top: 12px; width: 56px; height: 56px;
+        .banner .htext { right: 136px; }
+        .banner .scene.mini { right: 96px; }
+        .banner .hact { position: absolute; z-index: 2; top: 5px; right: 5px; display: flex; flex-direction: column; gap: 4px; }
+        .banner .hact .zoom { position: relative; top: auto; right: auto; }
+        .sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+        .banner #cbtn { all: unset; position: relative; flex: none; cursor: pointer; width: 24px; height: 24px; border-radius: 50%;
+                        display: grid; place-items: center; color: #33506b; background: rgba(255,255,255,.55);
+                        box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+        .banner #cbtn ha-icon { color: inherit; --mdc-icon-size: 16px; }
+        .banner #cbtn:hover { background: rgba(255,255,255,.75); }
+        .banner.night #cbtn { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+        .banner.night #cbtn:hover { background: rgba(255,255,255,.22); }
+        .banner #cbtn:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 2px; }
+        .banner .thumb { position: absolute; z-index: 1; right: 36px; top: 12px; width: 56px; height: 56px;
                          box-shadow: 0 0 0 2px #fff, 0 1px 4px 2px rgba(0,0,0,.18); }
         .banner.night .thumb { box-shadow: 0 0 0 2px #cfd6e0, 0 1px 4px 2px rgba(0,0,0,.4); }
-        /* Narrower: the router's shelf gives way, the QR code under the expand button at the right edge, so that the title
-           stays whole and the status pill keeps its label. */
+        /* Narrower: the router's shelf gives way, the buttons back on one line and the QR code under them at the right
+           edge, so that the title stays whole and the status pill keeps its label. */
         @container (max-width: 300px) {
           .banner .scene.mini { display: none; }
+          .banner .hact { flex-direction: row-reverse; }
           .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
           .banner .htext { right: 60px; }
         }
         @container (max-width: 200px) {
           .banner .scene.mini { display: none; }
+          .banner #cbtn { display: none; }
           .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
           .banner .htext { left: 8px; right: 60px; gap: 6px; }
           .banner .htext .name { font-size: 14px; }
@@ -1984,7 +2004,7 @@ class WifiQrMiniCard extends WifiQrCard {
       </style>
       <ha-card class="mini">
         ${ill ? `<div class="banner ${WIFI_STATUS_CLASS[this._status()]}${this._isNight() ? ' night' : ''}">${wifiQrSceneSvg(this._status(), true)}<div class="ground"></div>
-          <div class="htext"><div class="badge">${this._iconHtml()}</div>${texts}</div>${thumb}${this._zoomButton()}
+          <div class="htext"><div class="badge">${this._iconHtml()}</div>${texts}</div>${thumb}<div class="hact">${this._zoomButton()}${copy}</div>
         </div>` : `<div class="row ${WIFI_STATUS_CLASS[this._status()]}">
           <div class="badge">${this._iconHtml()}</div>
           ${texts}
@@ -1992,8 +2012,14 @@ class WifiQrMiniCard extends WifiQrCard {
           ${this._zoomButton()}
         </div>`}
         <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
+        ${copy ? '<span class="sr" id="live" aria-live="polite"></span>' : ''}
       </ha-card>`;
     this._fitPill();
+    const cbtn = copy && this.shadowRoot.getElementById?.('cbtn');
+    if (cbtn) cbtn.onclick = (ev) => {
+      ev?.stopPropagation?.();
+      this._copyPassword();
+    };
     // The thumbnail opens the QR code full screen directly, like the big one of the full card.
     this._bindQr(wasOpen);
     this._bindZoom();
