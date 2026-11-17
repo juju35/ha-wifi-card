@@ -1156,13 +1156,15 @@ test("banner: the status follows the security, the icon takes the status colour"
   assert.match(html, /\.banner\.st-err \{ --st: #d93025; \}/);
 });
 
-test("banner: night from illustration_theme, else sun.sun below the horizon or dark mode; illustration: false keeps the classic header", () => {
+test("banner: night from illustration_theme, else the dark mode alone; illustration: false keeps the classic header", () => {
   assert.match(renderWith({ illustration_theme: "night" }), /<div class="banner st-ok night">/);
   assert.match(renderWith({ illustration_theme: "day" }), /<div class="banner st-ok">/);
   const { card } = stubCard();
   card.setConfig({ ssid: "Box", password: "secret" });
   card.hass = { language: "en", states: { "sun.sun": { state: "below_horizon" } }, themes: { darkMode: false } };
-  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /banner st-ok night/, "light theme after sunset: day");
+  card.hass = { language: "en", states: { "sun.sun": { state: "below_horizon" } }, themes: { darkMode: true } };
+  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/, "dark theme after sunset: night");
   card.hass = { language: "en", states: { "sun.sun": { state: "above_horizon" } }, themes: { darkMode: true } };
   assert.match(card.shadowRoot.innerHTML, /banner st-ok night/, "dark theme while the sun is up: night");
   card.hass = { language: "en", states: { "sun.sun": { state: "above_horizon" } }, themes: { darkMode: false } };
@@ -1175,7 +1177,7 @@ test("banner: night from illustration_theme, else sun.sun below the horizon or d
   assert.doesNotMatch(card.shadowRoot.innerHTML, /banner st-ok night/, "forced day wins over the dark theme");
   card.setConfig({ ssid: "Box", password: "secret", illustration_theme: "night" });
   card.hass = up(false);
-  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/, "forced night wins over the sun");
+  assert.match(card.shadowRoot.innerHTML, /banner st-ok night/, "forced night wins over the light theme");
   const classic = renderWith({ illustration: false, security: "nopass" });
   assert.doesNotMatch(classic, /class="banner|class="scene/);
   assert.match(classic, /<div class="header st-warn"><div class="hrow">/);
