@@ -134,6 +134,7 @@ zoom: true
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png" alt="card dark" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card.png" alt="mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-dark.png" alt="mini card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-zoom.png" alt="mini card expanded to the full card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-zoom-dark.png" alt="mini card expanded to the full card, dark" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow.png" alt="mini card, narrow" width="200"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow-dark.png" alt="mini card, narrow, dark" width="200"> |
 
 The mini card on a desktop column, then on 6 columns of a phone, where the QR code thumbnail gets smaller.

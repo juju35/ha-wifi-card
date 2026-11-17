@@ -217,6 +217,11 @@ const icons = {
   "arrow-collapse": "M19.5,3.09L15,7.59V4H13V11H20V9H16.41L20.91,4.5L19.5,3.09M4,13V15H7.59L3.09,19.5L4.5,20.91L9,16.41V20H11V13H4Z",
 };
 const config = { ssid: "Home-Guests", password: "correct-horse-battery" };
+// Presses the mini card's expand button (a pointer click: no focus ring left on it)
+const zoomIn = (page) =>
+  page.evaluate(() =>
+    document.querySelector("wifi-qr-mini-card").shadowRoot.querySelector(".zoom").dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, detail: 1 }))
+  );
 
 await render(
   [
@@ -227,6 +232,9 @@ await render(
     { file: "mini-card-dark", type: "wifi-qr-mini-card", theme: "dark", width: 380, config },
     { file: "mini-card-narrow", type: "wifi-qr-mini-card", theme: "light", width: 180, config },
     { file: "mini-card-narrow-dark", type: "wifi-qr-mini-card", theme: "dark", width: 180, config },
+    // The mini card expanded with its top right button: the full card, at the full card's width
+    { file: "mini-card-zoom", type: "wifi-qr-mini-card", theme: "light", width: 460, config, after: zoomIn },
+    { file: "mini-card-zoom-dark", type: "wifi-qr-mini-card", theme: "dark", width: 460, config, after: zoomIn },
   ],
   { icons }
 );
