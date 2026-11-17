@@ -6,6 +6,8 @@
 - **Animated illustrated header** on both cards (90 px): the title on the wall at the left, a router on a shelf sending its WiFi waves to a laptop at the right, above a parquet strip edge to edge; the mini card frames its QR code thumbnail on the wall beside the router. The header icon is now the MDI QR code, with the WiFi logo as a small badge on it (`logo: false` removes the badge).
 - The icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red with no waves when the configured entity has no value (the error is now shown under the header).
 - Night picture following `sun.sun` (else Home Assistant's dark theme), forced with `illustration_theme: day | night`; `illustration: false` keeps the classic header. Animations stop with `prefers-reduced-motion`. Both options are in the visual editor of both cards, in all 22 languages.
+- **Status pill** on the title row of every header (full and mini card, illustrated or classic): a dot and Secured, Open, Weak (WEP) or Unavailable, in the colour of the icon; on its own line under the subtitle on a narrow card, the dot alone at 200 px or less. An open network's subtitle is now the network name (the pill says it is open).
+- Mini card: the expand / collapse button sits in the banner's top right corner (24 px, frosted day and night); the expanded view's picture steps aside from it.
 - README: animated captures (GIF) of the header, secured and open network and mini card, light and dark.
 
 ## 1.15.0 - 2026-11-12

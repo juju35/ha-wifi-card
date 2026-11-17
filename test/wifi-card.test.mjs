@@ -599,8 +599,31 @@ test("header: the title keeps a few characters and its full text is readable in 
   assert.match(cssRule(html, ".badge"), /flex: none;/);
   // Default title, translated, gets the tooltip too.
   assert.match(renderWith({ language: "sr-Latn" }), /<div class="name" title="WiFi za goste">/);
-  // The security subtitle, also truncated on narrow cards (« Brak (sieć otwa… »).
-  assert.match(renderWith({ security: "nopass", language: "pl" }), /<div class="sub" title="Brak \(sieć otwarta\)">/);
+  // The security subtitle, also truncated on narrow cards; an open network is named by the pill, its subtitle is the SSID.
+  assert.match(renderWith({ security: "WEP", language: "pl" }), /<div class="sub" title="WEP">/);
+  assert.match(renderWith({ security: "nopass", language: "pl" }), /<div class="sub" title="Box">/);
+});
+
+test("status pill: a dot and a short label on the title row, in the icon's status colour, translated", () => {
+  const pill = (config) => /<div class="trow"><div class="name"[^>]*>[^<]*<\/div><span class="chip" title="([^"]+)"><span class="dot"><\/span><span class="ptxt">([^<]+)<\/span><\/span><\/div>/.exec(renderWith(config)).slice(1);
+  assert.deepEqual(pill({}), ["Secured", "Secured"]);
+  assert.deepEqual(pill({ security: "nopass" }), ["Open", "Open"]);
+  assert.deepEqual(pill({ security: "WEP" }), ["Weak", "Weak"]);
+  assert.deepEqual(pill({ security: "WEP", language: "fr" }), ["Faible", "Faible"]);
+  assert.deepEqual(pill({ illustration: false }), ["Secured", "Secured"]);
+  // No value from the entity: the error header says Unavailable, in red
+  assert.match(renderWith({ ssid: "", ssid_entity: "sensor.none" }), /<span class="chip" title="Unavailable">/);
+  const html = renderWith({});
+  assert.match(cssRule(html, ".st-err .chip"), /--c: var\(--error-color, #db4437\)/);
+  assert.match(cssRule(html, ".st-warn .chip"), /--c: var\(--warning-color, #ffa600\)/);
+  // On the banner: the banner's status colour, frosted on the sky (day) and the night wall
+  assert.match(cssRule(html, ".banner .chip"), /--c: var\(--st\); background: color-mix\(in srgb, var\(--c\) 18%, rgba\(255,255,255,\.78\)\)/);
+  assert.match(cssRule(html, ".banner.night .chip"), /color-mix\(in srgb, var\(--c\) 35%, #ffffff\)/);
+  // Whole label at most 51 % of the title block; own line at 260 px or less, the dot alone at 200 px or less
+  assert.match(cssRule(html, ".chip"), /flex: none; max-width: 51%/);
+  assert.match(cssRule(html, ".trow .name"), /min-width: 4ch/);
+  assert.match(html, /@container \(max-width: 260px\) \{ \.trow \{ display: contents; \}[^\n]*\.titles \.chip \{ order: 3;/);
+  assert.match(html, /@container \(max-width: 200px\) \{[^\n]*\.titles \.chip \.ptxt \{ position: absolute;/);
 });
 
 test("header at phone width (4 columns, ~104 px card): a smaller badge leaves 4 title characters, nothing overflows", () => {
@@ -1162,4 +1185,13 @@ test("editor: both cards expose illustration and illustration_theme, dropped fro
     assert.ok(names.includes("illustration") && names.includes("illustration_theme"), Ed.name);
   }
   assert.equal(ctx.wifiQrT("fr", "theme_night"), "Nuit");
+});
+
+test("mini card: the expand / collapse button sits in the banner's top right corner, 24 px, frosted day and night", () => {
+  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const style = src.slice(src.indexOf("var WIFI_MINI_STYLE"), src.indexOf("function wifiQrInDialog"));
+  assert.match(style, /\.banner \.zoom \{ position: absolute; z-index: 2; top: 5px; right: 5px; margin: 0; color: #33506b; background: rgba\(255,255,255,\.55\);/);
+  assert.match(style, /\.banner\.night \.zoom \{ color: #fff; background: rgba\(255,255,255,\.12\); box-shadow: inset 0 0 0 1px rgba\(255,255,255,\.2\); \}/);
+  assert.match(style, /\.zoom \{ all: unset; flex: none; cursor: pointer; width: 24px; height: 24px;/);
+  assert.match(style, /\.zoom ha-icon \{ color: inherit; --mdc-icon-size: 16px; \}/);
 });

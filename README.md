@@ -21,7 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 ## Features
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
-- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (follows `sun.sun`, else the dark theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value
+- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (follows `sun.sun`, else the dark theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value; a status pill next to the title says Secured, Open, Weak (WEP) or Unavailable in the same colour
 - Password hidden by default, revealable with a toggle button (masked again after 30 s or when the card leaves the page), and a button to copy it to the clipboard
 - Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail that opens the QR code full screen, and a detail button that switches to the full card and back
 - Visual editor in the dashboard UI (no YAML needed)

@@ -49,7 +49,8 @@ var WIFI_BANNER_STYLE = `
         .banner .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
                           background: repeating-linear-gradient(90deg, #c99a6b 0 38px, #b98a5c 38px 40px); box-shadow: inset 0 2px 0 #a97c50; }
         .banner.night .ground { background: repeating-linear-gradient(90deg, #4a3a2c 0 38px, #3e3024 38px 40px); box-shadow: inset 0 2px 0 #5c4836; }
-        .htext { position: absolute; z-index: 1; left: 12px; top: 0; bottom: 10px; right: calc(min(200px, 62%) + 4px);
+        /* The text runs over the plain wall of the picture, up to the laptop (a quarter of the picture in). */
+        .htext { position: absolute; z-index: 1; left: 12px; top: 0; bottom: 10px; right: calc(min(200px, 62%) * .75 + 4px);
                  display: flex; align-items: center; gap: 10px; min-width: 0; }
         .htext .titles { flex: 1 1 0; min-width: 4ch; }
         .banner .badge { position: relative; color: var(--st); background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(47,128,237,.18); }
@@ -74,6 +75,26 @@ var WIFI_BANNER_STYLE = `
         @container (max-width: 300px) { .banner .scene:not(.mini) { display: none; } .htext { right: 12px; } }
         /* Phone width at 4 columns (~104 px card): a 32 px badge and a 14 px title keep a few characters. */
         @container (max-width: 128px) { .htext { left: 6px; right: 6px; gap: 4px; } .htext .name { font-size: 14px; } .banner .badge { width: 32px; height: 32px; } .banner .badge ha-icon { --mdc-icon-size: 20px; } }`;
+
+// The status pill on the title row (full and mini card, banner or classic header): a dot and a short label in the
+// status colour of the header icon. The title ellipsises first but keeps 4 characters; on a narrow card (260 px or
+// less) the pill goes to its own line under the subtitle, at 200 px or less only its dot shows (the label stays in
+// its tooltip and for screen readers).
+var WIFI_PILL_STYLE = `
+        .titles { display: flex; flex-direction: column; min-width: 4ch; }
+        .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .trow .name { flex: 0 1 auto; min-width: 4ch; }
+        .chip { --c: ${WIFI_BLUE}; display: inline-flex; align-items: center; gap: 4px; flex: none; max-width: 51%; box-sizing: border-box;
+                padding: 1px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; overflow: hidden;
+                background: color-mix(in srgb, var(--c) 15%, transparent); color: color-mix(in srgb, var(--c) 40%, var(--primary-text-color, #212121)); }
+        .st-warn .chip { --c: var(--warning-color, #ffa600); }
+        .st-err .chip { --c: var(--error-color, #db4437); }
+        .chip .ptxt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--c); }
+        .banner .chip { --c: var(--st); background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+        .banner.night .chip { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+        @container (max-width: 260px) { .trow { display: contents; } .titles > .sub { order: 2; } .titles .chip { order: 3; align-self: flex-start; max-width: 100%; margin-top: 2px; } }
+        @container (max-width: 200px) { .titles .chip { padding: 3px; } .titles .chip .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }`;
 
 // The WiFi logo in a small white tile on the header icon (bottom right), like the brand badge of the other cards.
 var WIFI_BRAND_STYLE = `
@@ -118,6 +139,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Aucune (réseau ouvert)',
+    st_ok: 'Sécurisé',
+    st_open: 'Ouvert',
+    st_weak: 'Faible',
+    st_err: 'Indisponible',
     zoom_in: 'Afficher la carte complète',
     zoom_out: 'Revenir à la vue compacte',
     mini_name: 'Mini-carte QR Wifi',
@@ -166,6 +191,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'None (open network)',
+    st_ok: 'Secured',
+    st_open: 'Open',
+    st_weak: 'Weak',
+    st_err: 'Unavailable',
     zoom_in: 'Show the full card',
     zoom_out: 'Back to the compact view',
     mini_name: 'Wifi QR Mini Card',
@@ -214,6 +243,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Keine (offenes Netzwerk)',
+    st_ok: 'Gesichert',
+    st_open: 'Offen',
+    st_weak: 'Schwach',
+    st_err: 'Nicht verfügbar',
     zoom_in: 'Vollständige Karte anzeigen',
     zoom_out: 'Zurück zur kompakten Ansicht',
     mini_name: 'WLAN-QR-Minikarte',
@@ -262,6 +295,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ninguna (red abierta)',
+    st_ok: 'Seguro',
+    st_open: 'Abierto',
+    st_weak: 'Débil',
+    st_err: 'No disponible',
     zoom_in: 'Mostrar la tarjeta completa',
     zoom_out: 'Volver a la vista compacta',
     mini_name: 'Minitarjeta QR Wi-Fi',
@@ -310,6 +347,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нема (отворена мрежа)',
+    st_ok: 'Заштићено',
+    st_open: 'Отворено',
+    st_weak: 'Слабо',
+    st_err: 'Недоступно',
     zoom_in: 'Прикажи целу картицу',
     zoom_out: 'Назад на компактни приказ',
     mini_name: 'Мини картица за WiFi QR',
@@ -358,6 +399,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nema (otvorena mreža)',
+    st_ok: 'Zaštićeno',
+    st_open: 'Otvoreno',
+    st_weak: 'Slabo',
+    st_err: 'Nedostupno',
     zoom_in: 'Prikaži celu karticu',
     zoom_out: 'Nazad na kompaktni prikaz',
     mini_name: 'Mini kartica za WiFi QR',
@@ -406,6 +451,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nessuna (rete aperta)',
+    st_ok: 'Protetto',
+    st_open: 'Aperto',
+    st_weak: 'Debole',
+    st_err: 'Non disponibile',
     zoom_in: 'Mostra la scheda completa',
     zoom_out: 'Torna alla vista compatta',
     mini_name: 'Mini scheda QR Wi-Fi',
@@ -454,6 +503,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Geen (open netwerk)',
+    st_ok: 'Beveiligd',
+    st_open: 'Open',
+    st_weak: 'Zwak',
+    st_err: 'Niet beschikbaar',
     zoom_in: 'Volledige kaart tonen',
     zoom_out: 'Terug naar de compacte weergave',
     mini_name: 'Wifi-QR-minikaart',
@@ -502,6 +555,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nenhuma (rede aberta)',
+    st_ok: 'Protegido',
+    st_open: 'Aberto',
+    st_weak: 'Fraco',
+    st_err: 'Indisponível',
     zoom_in: 'Mostrar o cartão completo',
     zoom_out: 'Voltar à vista compacta',
     mini_name: 'Mini cartão QR Wi-Fi',
@@ -550,6 +607,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brak (sieć otwarta)',
+    st_ok: 'Zabezpieczona',
+    st_open: 'Otwarta',
+    st_weak: 'Słaba',
+    st_err: 'Niedostępna',
     zoom_in: 'Pokaż pełną kartę',
     zoom_out: 'Wróć do widoku kompaktowego',
     mini_name: 'Mini karta QR Wi-Fi',
@@ -598,6 +659,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Fără (rețea deschisă)',
+    st_ok: 'Securizat',
+    st_open: 'Deschis',
+    st_weak: 'Slab',
+    st_err: 'Indisponibil',
     zoom_in: 'Afișează cardul complet',
     zoom_out: 'Înapoi la vizualizarea compactă',
     mini_name: 'Mini card QR Wi-Fi',
@@ -646,6 +711,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (åbent netværk)',
+    st_ok: 'Sikret',
+    st_open: 'Åben',
+    st_weak: 'Svag',
+    st_err: 'Utilgængelig',
     zoom_in: 'Vis hele kortet',
     zoom_out: 'Tilbage til kompakt visning',
     mini_name: 'Wifi-QR-minikort',
@@ -694,6 +763,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (öppet nätverk)',
+    st_ok: 'Skyddat',
+    st_open: 'Öppet',
+    st_weak: 'Svagt',
+    st_err: 'Otillgängligt',
     zoom_in: 'Visa hela kortet',
     zoom_out: 'Tillbaka till kompakt vy',
     mini_name: 'Minikort för wifi-QR',
@@ -742,6 +815,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Без (отворена мрежа)',
+    st_ok: 'Защитена',
+    st_open: 'Отворена',
+    st_weak: 'Слаба',
+    st_err: 'Недостъпна',
     zoom_in: 'Покажи цялата карта',
     zoom_out: 'Обратно към компактния изглед',
     mini_name: 'Мини карта с Wi-Fi QR',
@@ -790,6 +867,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нет (открытая сеть)',
+    st_ok: 'Защищена',
+    st_open: 'Открыта',
+    st_weak: 'Слабая',
+    st_err: 'Недоступна',
     zoom_in: 'Показать полную карточку',
     zoom_out: 'Вернуться к компактному виду',
     mini_name: 'Мини-карточка Wi-Fi QR',
@@ -838,6 +919,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Відкрита мережа',
+    st_ok: 'Захищена',
+    st_open: 'Відкрита',
+    st_weak: 'Слабка',
+    st_err: 'Недоступна',
     zoom_in: 'Показати повну картку',
     zoom_out: 'Повернутися до компактного вигляду',
     mini_name: 'Міні-картка Wi-Fi QR',
@@ -886,6 +971,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nincs (nyílt hálózat)',
+    st_ok: 'Védett',
+    st_open: 'Nyílt',
+    st_weak: 'Gyenge',
+    st_err: 'Nem elérhető',
     zoom_in: 'Teljes kártya megjelenítése',
     zoom_out: 'Vissza a kompakt nézethez',
     mini_name: 'Wi-Fi QR mini kártya',
@@ -934,6 +1023,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žiadne (otvorená sieť)',
+    st_ok: 'Zabezpečená',
+    st_open: 'Otvorená',
+    st_weak: 'Slabá',
+    st_err: 'Nedostupná',
     zoom_in: 'Zobraziť celú kartu',
     zoom_out: 'Späť na kompaktné zobrazenie',
     mini_name: 'Mini karta Wi-Fi QR',
@@ -982,6 +1075,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žádné (otevřená síť)',
+    st_ok: 'Zabezpečená',
+    st_open: 'Otevřená',
+    st_weak: 'Slabá',
+    st_err: 'Nedostupná',
     zoom_in: 'Zobrazit celou kartu',
     zoom_out: 'Zpět na kompaktní zobrazení',
     mini_name: 'Mini karta Wi-Fi QR',
@@ -1030,6 +1127,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brez (odprto omrežje)',
+    st_ok: 'Zaščiteno',
+    st_open: 'Odprto',
+    st_weak: 'Šibko',
+    st_err: 'Ni na voljo',
     zoom_in: 'Prikaži celotno kartico',
     zoom_out: 'Nazaj na kompaktni pogled',
     mini_name: 'Mini kartica Wi-Fi QR',
@@ -1078,6 +1179,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nav (atvērts tīkls)',
+    st_ok: 'Aizsargāts',
+    st_open: 'Atvērts',
+    st_weak: 'Vājš',
+    st_err: 'Nav pieejams',
     zoom_in: 'Rādīt pilno karti',
     zoom_out: 'Atpakaļ uz kompakto skatu',
     mini_name: 'Wi-Fi QR mini karte',
@@ -1126,6 +1231,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Καμία (ανοιχτό δίκτυο)',
+    st_ok: 'Ασφαλές',
+    st_open: 'Ανοιχτό',
+    st_weak: 'Αδύναμο',
+    st_err: 'Μη διαθέσιμο',
     zoom_in: 'Εμφάνιση πλήρους κάρτας',
     zoom_out: 'Επιστροφή στη συμπαγή προβολή',
     mini_name: 'Μίνι κάρτα QR Wi-Fi',
@@ -1274,6 +1383,22 @@ class WifiQrCard extends HTMLElement {
     return sec === 'nopass' || sec === 'WEP' ? 'warn' : 'ok';
   }
 
+  // The pill's label: Unavailable (error), Open (no password), Weak (WEP), else Secured.
+  _pillKey(status) {
+    if (status === 'err') return 'st_err';
+    if (status === 'warn') return this._config?.security === 'nopass' ? 'st_open' : 'st_weak';
+    return 'st_ok';
+  }
+
+  // The header's title and status pill on one row, the subtitle under them.
+  _titlesHtml(status, title, sub) {
+    var label = wifiQrEsc(this._t(this._pillKey(status)));
+    return `<div class="titles">
+            <div class="trow"><div class="name" title="${title}">${title}</div><span class="chip" title="${label}"><span class="dot"></span><span class="ptxt">${label}</span></span></div>
+            <div class="sub" title="${sub}">${sub}</div>
+          </div>`;
+  }
+
   // The round header icon: the MDI QR code, in the status colour, with the WiFi logo as a badge (`logo: false` removes it).
   _iconHtml() {
     return `<ha-icon icon="mdi:qrcode"></ha-icon>${this._config?.logo ? `<span class="brand">${WIFI_LOGO}</span>` : ''}`;
@@ -1282,10 +1407,7 @@ class WifiQrCard extends HTMLElement {
   // The full card's header: the illustrated banner, or the classic header with `illustration: false`.
   _headerHtml(status, title, sub) {
     var st = WIFI_STATUS_CLASS[status];
-    var texts = `<div class="titles">
-            <div class="name" title="${title}">${title}</div>
-            <div class="sub" title="${sub}">${sub}</div>
-          </div>`;
+    var texts = this._titlesHtml(status, title, sub);
     if (this._configRaw?.illustration === false) {
       return `<div class="header ${st}"><div class="hrow">
           <div class="badge">${this._iconHtml()}</div>
@@ -1313,7 +1435,7 @@ class WifiQrCard extends HTMLElement {
         .titles { flex: 1 1 0; min-width: 4ch; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE}
+        ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE + WIFI_PILL_STYLE}
         .msg-err { padding: 16px; color: ${color}; overflow-wrap: anywhere; }
       </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`;
   }
@@ -1483,7 +1605,8 @@ class WifiQrCard extends HTMLElement {
 
     // Escaped once, shown as text and as a tooltip: both are truncated on narrow cards.
     const title = wifiQrEsc(c.title);
-    const sub = wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
+    // The security type; an open network is already named by the pill: its subtitle is the network name.
+    const sub = wifiQrEsc(c.security === 'nopass' ? c.ssid : this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
     const ill = this._configRaw?.illustration !== false;
     this.shadowRoot.innerHTML = `
       <style>
@@ -1500,7 +1623,7 @@ class WifiQrCard extends HTMLElement {
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         /* Shrinks with the card but always keeps a few characters of the title visible. */
         .titles { flex: 1 1 0; min-width: 4ch; }
-        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
+        :host([hide-title]) .titles .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* Phone width at 4 columns (~104 px card): a 32 px badge, as on the mini cards, a 14 px title and 4 px
@@ -1512,7 +1635,7 @@ class WifiQrCard extends HTMLElement {
           .badge ha-icon { --mdc-icon-size: 20px; }
         }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
-        ${WIFI_BRAND_STYLE + (ill ? `${WIFI_BANNER_STYLE}
+        ${WIFI_BRAND_STYLE + WIFI_PILL_STYLE + (ill ? `${WIFI_BANNER_STYLE}
         /* The banner spans the card edge to edge, over the card padding. */
         ha-card { overflow: hidden; }
         .banner { align-self: stretch; margin: -12px -12px 0; }` : '')}
@@ -1633,9 +1756,15 @@ var WIFI_MINI_STYLE = `
         .zoom ha-icon { color: inherit; --mdc-icon-size: 16px; }
         .zoom:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
         .zoom:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 1px; }
-        /* On the banner: top right, on a translucent disc readable over the wall and the waves. */
-        .banner .zoom { position: absolute; z-index: 2; top: 6px; right: 6px; margin: 0; color: #10283f; background: rgba(255,255,255,.55); }
-        .banner.night .zoom { color: #fff; background: rgba(10,20,40,.45); }`;
+        /* On the banner: in the top right corner, a frosted 24 px disc readable over the wall and the waves. */
+        .banner .zoom { position: absolute; z-index: 2; top: 5px; right: 5px; margin: 0; color: #33506b; background: rgba(255,255,255,.55);
+                        box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+        .banner .zoom:hover { background: rgba(255,255,255,.75); }
+        .banner.night .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+        .banner.night .zoom:hover { background: rgba(255,255,255,.22); }
+        /* Expanded view: the picture steps aside from the button's corner (the compact view sets its own text edge). */
+        .banner .scene:not(.mini) { right: 26px; }
+        .banner .htext { right: calc(min(200px, 62%) * .75 + 30px); }`;
 
 // A click in a dialog opened from the page (a more-info, say) is not a click outside the card.
 function wifiQrInDialog(ev) {
@@ -1733,10 +1862,7 @@ class WifiQrMiniCard extends WifiQrCard {
     const ssid = wifiQrEsc(c.ssid);
     const zoom = wifiQrEsc(this._t('zoom'));
     const ill = this._configRaw?.illustration !== false;
-    const texts = `<div class="titles">
-            <div class="name" title="${title}">${title}</div>
-            <div class="sub" title="${ssid}">${ssid}</div>
-          </div>`;
+    const texts = this._titlesHtml(this._status(), title, ssid);
     const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
     const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
     this.shadowRoot.innerHTML = `
@@ -1753,7 +1879,7 @@ class WifiQrMiniCard extends WifiQrCard {
         .st-err .badge { --c: var(--error-color, #db4437); }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         .titles { flex: 1 1 0; min-width: 4ch; }
-        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
+        :host([hide-title]) .titles .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* The big QR code's colours and rounded tile, at thumbnail size. */
@@ -1768,15 +1894,16 @@ class WifiQrMiniCard extends WifiQrCard {
         dialog svg { width: min(90vw, 90vh); height: auto; display: block; }
         /* A very narrow card (6 columns of a phone): a smaller thumbnail, tighter gaps, 4 px taken from the card padding
            and a 14 px title keep a few characters of the title. */
+        /* Classic compact row (thumbnail and button beside the text): the pill under the network name already below 340 px. */
+        @container (max-width: 340px) { .row .trow { display: contents; } .row .titles > .sub { order: 2; } .row .titles .chip { order: 3; align-self: flex-start; max-width: 100%; margin-top: 2px; } }
         @container (max-width: 200px) {
           .row { gap: 4px; margin: 0 -4px; }
           .name { font-size: 14px; }
           .thumb { width: 48px; height: 48px; border-radius: 6px; }
         }
-        ${WIFI_BRAND_STYLE + (ill ? `${WIFI_BANNER_STYLE}
+        ${WIFI_BRAND_STYLE + WIFI_PILL_STYLE + (ill ? `${WIFI_BANNER_STYLE}
         /* The banner fills the compact card: the title on the wall, the QR code framed beside the router's shelf. */
         ha-card.mini { padding: 0; overflow: hidden; justify-content: flex-start; }
-        .banner .zoom { top: 4px; right: 4px; }
         .banner .htext { right: 112px; }
         .banner .thumb { position: absolute; z-index: 1; right: 48px; top: 12px; width: 56px; height: 56px;
                          box-shadow: 0 0 0 2px #fff, 0 1px 4px 2px rgba(0,0,0,.18); }
