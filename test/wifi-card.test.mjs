@@ -1192,6 +1192,17 @@ test("mini card banner: the QR thumbnail on the wall beside the router, the clas
   assert.match(html, /<div class="row st-ok">/);
 });
 
+test("mini card banner: laid out like the Wero card, the QR at the left of a buttons' column with a copy button", () => {
+  const html = stubMini({}).card.shadowRoot.innerHTML;
+  assert.match(html, /<div class="thumb" id="qr"[\s\S]*?<\/div><div class="hact"><button class="zoom" id="zbtn"[\s\S]*?<\/button><button id="cbtn" title="Copy password"/);
+  assert.match(html, /<span class="sr" id="live" aria-live="polite"><\/span>/);
+  assert.match(cssRule(html, ".banner .hact"), /top: 5px; right: 5px; display: flex; flex-direction: column; gap: 4px/);
+  assert.match(cssRule(html, ".banner .thumb"), /right: 36px; top: 12px; width: 56px; height: 56px/);
+  assert.match(html, /\.banner \.scene\.mini \{ right: 96px; \}/);
+  // No password to copy on an open network
+  assert.doesNotMatch(stubMini({ security: "nopass", password: "" }).card.shadowRoot.innerHTML, /id="cbtn"/);
+});
+
 test("editor: both cards expose illustration and illustration_theme, dropped from the YAML at their defaults", () => {
   for (const Ed of [WifiQrCardEditor, WifiQrMiniCardEditor]) {
     const names = new Ed()._schema.call({ constructor: Ed, _config: {}, _lang: () => "en" }).map((f) => f.name);
