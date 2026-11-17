@@ -9,6 +9,107 @@ var WIFI_PWD_REVEAL_MS = 30000;
 // ── WiFi icon (original artwork: rounded-cap waves), shown in the round header badge ─
 var WIFI_LOGO = '<svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="4 4 28 28" role="img" aria-label="WiFi"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M13.76 21.76A6 6 0 0 1 22.24 21.76"/><path d="M10.22 18.22A11 11 0 0 1 25.78 18.22"/><path d="M6.69 14.69A16 16 0 0 1 29.31 14.69"/></g><circle cx="18" cy="26.5" r="2.4" fill="currentColor"/></svg>';
 
+// ── Illustrated header ("banner"): a router on a wall shelf sending its waves to a laptop on the parquet ─────────
+// A 200 × 80 picture drawn at the right of a 90 px banner, above a 10 px parquet strip edge to edge; the title sits on
+// the wall at its left. Status: ok (secured network: blue waves), warn (open or WEP network: amber waves), err (no
+// value from the configured entity, or no QR code: no waves, a red LED). The mini card draws the router alone.
+var WIFI_STATUS_CLASS = { ok: 'st-ok', warn: 'st-warn', err: 'st-err' };
+
+function wifiQrSceneSvg(status, mini) {
+  var waves = status === 'err'
+    ? ''
+    : '<g class="wq-waves"><path class="w1" d="M-8 -24a12 12 0 0 1 16 0"/><path class="w2" d="M-14 -30a20 20 0 0 1 28 0"/><path class="w3" d="M-20 -36a28 28 0 0 1 40 0"/></g>';
+  var router = `<g transform="translate(160 54)"><path class="wq-ant" d="M-10 -8V-18M10 -8V-18"/><rect class="wq-router" x="-14" y="-8" width="28" height="8" rx="2"/><circle class="wq-led" cx="-6" cy="-4" r="1"/><circle class="wq-led l2" cx="-2" cy="-4" r="1"/>${waves}</g>`;
+  if (mini) {
+    return `<svg class="scene mini" viewBox="136 12 48 68" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"><rect class="wq-shelf" x="140" y="54" width="44" height="4"/>${router}</svg>`;
+  }
+  var laptop = '<g class="wq-laptop" transform="translate(70 79)"><rect class="wq-lid" x="-18" y="-22" width="36" height="22" rx="1.5"/><rect class="wq-screen" x="-16" y="-20" width="32" height="18" rx="1"/><rect class="wq-base" x="-22" y="-2" width="44" height="3" rx="1"/></g>';
+  return `<svg class="scene" viewBox="0 0 200 80" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"><rect class="wq-shelf" x="110" y="54" width="86" height="4"/>${router}${laptop}</svg>`;
+}
+
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme (even
+// with the sun up).
+function wifiQrIsNight(hass, config) {
+  var theme = config?.illustration_theme;
+  if (theme === 'night') return true;
+  if (theme === 'day') return false;
+  if (hass?.states?.['sun.sun']?.state === 'below_horizon') return true;
+  return !!hass?.themes?.darkMode;
+}
+
+// The banner's styles, day and night, shared by both cards. The icon's colour is the status colour.
+var WIFI_BANNER_STYLE = `
+        .banner { position: relative; overflow: hidden; height: 90px; flex: none; container-type: inline-size; box-sizing: border-box;
+                  background: #f2eee8; color: #0d2a45; --st: #2f80ed; }
+        .banner.night { background: #2a2f3d; color: #fff; --st: #8fbaff; }
+        .banner.st-warn { --st: #d48806; } .banner.night.st-warn { --st: #ffc046; }
+        .banner.st-err { --st: #d93025; } .banner.night.st-err { --st: #ff8a80; }
+        .banner .scene { position: absolute; right: 0; bottom: 10px; height: 80px; width: min(200px, 62%); }
+        .banner .scene.mini { width: 36px; height: 50px; right: 6px; }
+        .banner .ground { position: absolute; left: 0; right: 0; bottom: 0; height: 10px;
+                          background: repeating-linear-gradient(90deg, #c99a6b 0 38px, #b98a5c 38px 40px); box-shadow: inset 0 2px 0 #a97c50; }
+        .banner.night .ground { background: repeating-linear-gradient(90deg, #4a3a2c 0 38px, #3e3024 38px 40px); box-shadow: inset 0 2px 0 #5c4836; }
+        /* The text runs over the plain wall of the picture, up to the laptop (a quarter of the picture in). */
+        .htext { position: absolute; z-index: 1; left: 12px; top: 0; bottom: 10px; right: calc(min(200px, 62%) * .75 + 4px);
+                 display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .htext .titles { flex: 1 1 0; min-width: 4ch; }
+        .banner .badge { position: relative; color: var(--st); background: rgba(255,255,255,.62); box-shadow: inset 0 0 0 1px rgba(47,128,237,.18); }
+        .banner.night .badge { background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
+        .banner .name { color: inherit; }
+        .banner .sub { font-size: 13px; color: #3b5b78; }
+        .banner.night .sub { color: rgba(255,255,255,.78); }
+        .wq-shelf { fill: #c9b79c; } .night .wq-shelf { fill: #3c4558; }
+        .wq-router { fill: #2a3038; } .night .wq-router { fill: #3a4352; }
+        .wq-ant { stroke: #2a3038; stroke-width: 1.6; stroke-linecap: round; fill: none; } .night .wq-ant { stroke: #5a6577; }
+        .wq-led { fill: #43c463; animation: wq-blink 1.2s steps(2) infinite; } .wq-led.l2 { animation-delay: .3s; }
+        .st-err .wq-led { fill: #e53935; animation: none; }
+        .wq-waves { fill: none; stroke: var(--st); stroke-width: 1.8; stroke-linecap: round; }
+        .wq-waves path { animation: wq-wave 1.5s infinite; } .wq-waves .w2 { animation-delay: .25s; } .wq-waves .w3 { animation-delay: .5s; }
+        .wq-lid { fill: #3a4250; } .wq-screen { fill: #86b9de; } .night .wq-screen { fill: #3d5a8a; }
+        .st-err .wq-screen { fill: #aab4bf; } .night.st-err .wq-screen { fill: #4a5363; }
+        .wq-base { fill: #7d8793; }
+        @keyframes wq-blink { 50% { opacity: .2; } }
+        @keyframes wq-wave { 50% { opacity: .2; } }
+        @media (prefers-reduced-motion: reduce) { .wq-led, .wq-waves path { animation: none !important; } }
+        /* Narrow card: no room for the picture beside the text, the wall alone stays. */
+        @container (max-width: 300px) { .banner .scene:not(.mini) { display: none; } .htext { right: 12px; } }
+        /* Phone width at 4 columns (~104 px card): a 32 px badge and a 14 px title keep a few characters. */
+        @container (max-width: 128px) { .htext { left: 6px; right: 6px; gap: 4px; } .htext .name { font-size: 14px; } .banner .badge { width: 32px; height: 32px; } .banner .badge ha-icon { --mdc-icon-size: 20px; } }`;
+
+// The status pill on the title row (full and mini card, banner or classic header): a dot and a short label in the
+// status colour of the header icon, right after the title only when the whole title and the whole label fit there
+// (measured by the card, see wifiPlacePill); otherwise on its own line under the subtitle; when even that cuts the
+// label or leaves the banner, and at 200 px or less, only its dot shows (the label stays in its tooltip and for
+// screen readers).
+var WIFI_PILL_STYLE = `
+        .titles { display: flex; flex-direction: column; min-width: 4ch; }
+        .trow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .trow .name { flex: 0 1 auto; min-width: 0; }
+        .chip { --c: ${WIFI_BLUE}; display: inline-flex; align-items: center; gap: 4px; flex: none; max-width: 100%; box-sizing: border-box;
+                padding: 1px 8px; border-radius: 12px; font-size: 11px; font-weight: 500; line-height: 16px; white-space: nowrap; overflow: hidden;
+                background: color-mix(in srgb, var(--c) 15%, transparent); color: color-mix(in srgb, var(--c) 40%, var(--primary-text-color, #212121)); }
+        .st-warn .chip { --c: var(--warning-color, #ffa600); }
+        .st-err .chip { --c: var(--error-color, #db4437); }
+        .chip .ptxt { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+        .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--c); }
+        .banner .chip { --c: var(--st); background: color-mix(in srgb, var(--c) 18%, rgba(255,255,255,.78)); color: color-mix(in srgb, var(--c) 45%, #0d2a45); }
+        .banner.night .chip { background: color-mix(in srgb, var(--c) 30%, rgba(8,18,38,.55)); color: color-mix(in srgb, var(--c) 35%, #ffffff); }
+        [data-wrap] .trow { display: contents; }
+        [data-wrap] .titles > .sub { order: 2; }
+        [data-wrap] .titles .chip { order: 3; align-self: flex-start; margin-top: 2px; }
+        [data-dot] .titles .chip { padding: 3px; }
+        [data-dot] .titles .chip .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @container (max-width: 200px) { .titles .chip { padding: 3px; } .titles .chip .ptxt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }`;
+
+// The WiFi logo in a small white tile on the header icon (bottom right), like the brand badge of the other cards.
+var WIFI_BRAND_STYLE = `
+        .badge { position: relative; }
+        .brand { position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 5px; padding: 2px; box-sizing: border-box;
+                 display: grid; place-items: center; background: #fff; color: #1e88e5;
+                 box-shadow: 0 0 0 1px var(--divider-color, rgba(0,0,0,.12)), 0 0 0 2px var(--card-background-color, #fff); }
+        .brand .logo { width: 100%; height: 100%; display: block; }`;
+
+
 // ── QR Code engine (pure JS, Reed-Solomon, no CDN) ───────────────────────────
 // biome-ignore lint: vendored/minified third-party code
 var QRErrorCorrectLevel={L:1,M:0,Q:3,H:2};function QRCodeModel(a,b){this.typeNumber=a;this.errorCorrectLevel=b;this.modules=null;this.moduleCount=0;this.dataCache=null;this.dataList=[]}QRCodeModel.prototype={addData:function(a){this.dataList.push(new QR8bitByte(a));this.dataCache=null},isDark:function(a,b){if(a<0||this.moduleCount<=a||b<0||this.moduleCount<=b)throw new Error(a+","+b);return this.modules[a][b]},getModuleCount:function(){return this.moduleCount},make:function(){this.makeImpl(false,this.getBestMaskPattern())},makeImpl:function(a,b){this.moduleCount=this.typeNumber*4+17;this.modules=function(a){var b=new Array(a);for(var c=0;c<a;c++){b[c]=new Array(a);for(var d=0;d<a;d++)b[c][d]=null}return b}(this.moduleCount);this.setupPositionProbePattern(0,0);this.setupPositionProbePattern(this.moduleCount-7,0);this.setupPositionProbePattern(0,this.moduleCount-7);this.setupPositionAdjustPattern();this.setupTimingPattern();this.setupTypeInfo(a,b);if(this.typeNumber>=7)this.setupTypeNumber(a);if(this.dataCache==null)this.dataCache=QRCodeModel.createData(this.typeNumber,this.errorCorrectLevel,this.dataList);this.mapData(this.dataCache,b)},setupPositionProbePattern:function(a,b){for(var c=-1;c<=7;c++){if(a+c<=-1||this.moduleCount<=a+c)continue;for(var d=-1;d<=7;d++){if(b+d<=-1||this.moduleCount<=b+d)continue;if((0<=c&&c<=6&&(d==0||d==6))||(0<=d&&d<=6&&(c==0||c==6))||(2<=c&&c<=4&&2<=d&&d<=4))this.modules[a+c][b+d]=true;else this.modules[a+c][b+d]=false}}},getBestMaskPattern:function(){var a=0,b=0;for(var c=0;c<8;c++){this.makeImpl(true,c);var d=QRUtil.getLostPoint(this);if(c==0||a>d){a=d;b=c}}return b},setupTimingPattern:function(){for(var a=8;a<this.moduleCount-8;a++)if(this.modules[a][6]==null)this.modules[a][6]=(a%2==0);for(var b=8;b<this.moduleCount-8;b++)if(this.modules[6][b]==null)this.modules[6][b]=(b%2==0)},setupPositionAdjustPattern:function(){var a=QRUtil.getPatternPosition(this.typeNumber);for(var b=0;b<a.length;b++)for(var c=0;c<a.length;c++){var d=a[b],e=a[c];if(this.modules[d][e]!=null)continue;for(var f=-2;f<=2;f++)for(var g=-2;g<=2;g++)if(f==-2||f==2||g==-2||g==2||(f==0&&g==0))this.modules[d+f][e+g]=true;else this.modules[d+f][e+g]=false}},setupTypeNumber:function(a){var b=QRUtil.getBCHTypeNumber(this.typeNumber);for(var c=0;c<18;c++){var d=(!a&&((b>>c)&1)==1);this.modules[Math.floor(c/3)][c%3+this.moduleCount-8-3]=d}for(var c=0;c<18;c++){var d=(!a&&((b>>c)&1)==1);this.modules[c%3+this.moduleCount-8-3][Math.floor(c/3)]=d}},setupTypeInfo:function(a,b){var c=(this.errorCorrectLevel<<3)|b,d=QRUtil.getBCHTypeInfo(c);for(var e=0;e<15;e++){var f=(!a&&((d>>e)&1)==1);if(e<6)this.modules[e][8]=f;else if(e<8)this.modules[e+1][8]=f;else this.modules[this.moduleCount-15+e][8]=f}for(var e=0;e<15;e++){var f=(!a&&((d>>e)&1)==1);if(e<8)this.modules[8][this.moduleCount-e-1]=f;else if(e<9)this.modules[8][15-e-1+1]=f;else this.modules[8][15-e-1]=f}this.modules[this.moduleCount-8][8]=(!a)},mapData:function(a,b){var c=-1,d=this.moduleCount-1,e=7,f=0;for(var g=this.moduleCount-1;g>0;g-=2){if(g==6)g--;while(true){for(var h=0;h<2;h++){if(this.modules[d][g-h]==null){var i=false;if(f<a.length)i=(((a[f]>>>(e))&1)==1);var j=QRUtil.getMask(b,d,g-h);if(j)i=!i;this.modules[d][g-h]=i;e--;if(e==-1){f++;e=7}}}d+=c;if(d<0||this.moduleCount<=d){d-=c;c=-c;break}}}}};QRCodeModel.PAD0=0xEC;QRCodeModel.PAD1=0x11;QRCodeModel.createData=function(a,b,c){var d=QRRSBlock.getRSBlocks(a,b),e=new QRBitBuffer;for(var f=0;f<c.length;f++){var g=c[f];e.put(g.mode,4);e.put(g.getLength(),QRUtil.getLengthInBits(g.mode,a));g.write(e)}var h=0;for(var f=0;f<d.length;f++)h+=d[f].dataCount;if(e.getLengthInBits()>h*8)throw new Error("code length overflow. ("+e.getLengthInBits()+">"+h*8+")");if(e.getLengthInBits()+4<=h*8)e.put(0,4);while(e.getLengthInBits()%8!=0)e.putBit(false);while(true){if(e.getLengthInBits()>=h*8)break;e.put(QRCodeModel.PAD0,8);if(e.getLengthInBits()>=h*8)break;e.put(QRCodeModel.PAD1,8)}return QRCodeModel.createBytes(e,d)};QRCodeModel.createBytes=function(a,b){var c=0,d=0,e=0,f=new Array(b.length),g=new Array(b.length);for(var h=0;h<b.length;h++){var i=b[h].dataCount,j=b[h].totalCount-i;d=Math.max(d,i);e=Math.max(e,j);f[h]=new Array(i);for(var k=0;k<f[h].length;k++)f[h][k]=0xff&a.buffer[k+c];c+=i;var l=QRUtil.getErrorCorrectPolynomial(j),m=new QRPolynomial(f[h],l.getLength()-1),n=m.mod(l);g[h]=new Array(l.getLength()-1);for(var k=0;k<g[h].length;k++){var o=k+n.getLength()-g[h].length;g[h][k]=(o>=0)?n.get(o):0}}var p=0;for(var h=0;h<b.length;h++)p+=b[h].totalCount;var q=new Array(p),r=0;for(var k=0;k<d;k++)for(var h=0;h<b.length;h++)if(k<f[h].length)q[r++]=f[h][k];for(var k=0;k<e;k++)for(var h=0;h<b.length;h++)if(k<g[h].length)q[r++]=g[h][k];return q};var QRUtil={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],getBCHTypeInfo:function(a){var b=a<<10;while(QRUtil.getBCHDigit(b)-QRUtil.getBCHDigit(1335)>=0)b^=(1335<<(QRUtil.getBCHDigit(b)-QRUtil.getBCHDigit(1335)));return((a<<10)|b)^21522},getBCHTypeNumber:function(a){var b=a<<12;while(QRUtil.getBCHDigit(b)-QRUtil.getBCHDigit(7973)>=0)b^=(7973<<(QRUtil.getBCHDigit(b)-QRUtil.getBCHDigit(7973)));return(a<<12)|b},getBCHDigit:function(a){var b=0;while(a!=0){b++;a>>>=1}return b},getPatternPosition:function(a){return QRUtil.PATTERN_POSITION_TABLE[a-1]},getMask:function(a,b,c){switch(a){case 0:return(b+c)%2==0;case 1:return b%2==0;case 2:return c%3==0;case 3:return(b+c)%3==0;case 4:return(Math.floor(b/2)+Math.floor(c/3))%2==0;case 5:return(b*c)%2+(b*c)%3==0;case 6:return((b*c)%2+(b*c)%3)%2==0;case 7:return((b*c)%3+(b+c)%2)%2==0}},getErrorCorrectPolynomial:function(a){var b=new QRPolynomial([1],0);for(var c=0;c<a;c++)b=b.multiply(new QRPolynomial([1,QRMath.gexp(c)],0));return b},getLengthInBits:function(a,b){if(1<=b&&b<10){if(a==1)return 10;if(a==2)return 9;if(a==4)return 8;if(a==8)return 8;throw new Error("mode:"+a)}else if(b<27){if(a==1)return 12;if(a==2)return 11;if(a==4)return 16;if(a==8)return 10;throw new Error("mode:"+a)}else{if(a==1)return 14;if(a==2)return 13;if(a==4)return 16;if(a==8)return 12;throw new Error("mode:"+a)}},getLostPoint:function(a){var b=a.getModuleCount(),c=0;for(var d=0;d<b;d++){for(var e=0;e<b;e++){var f=0,g=a.isDark(d,e);for(var h=-1;h<=1;h++){if(d+h<0||b<=d+h)continue;for(var i=-1;i<=1;i++){if(e+i<0||b<=e+i)continue;if(h==0&&i==0)continue;if(g==a.isDark(d+h,e+i))f++}}if(f>5)c+=(3+f-5)}}for(var d=0;d<b-1;d++){for(var e=0;e<b-1;e++){var j=0;if(a.isDark(d,e))j++;if(a.isDark(d+1,e))j++;if(a.isDark(d,e+1))j++;if(a.isDark(d+1,e+1))j++;if(j==0||j==4)c+=3}}for(var d=0;d<b;d++){for(var e=0;e<b-6;e++){if(a.isDark(d,e)&&!a.isDark(d,e+1)&&a.isDark(d,e+2)&&a.isDark(d,e+3)&&a.isDark(d,e+4)&&!a.isDark(d,e+5)&&a.isDark(d,e+6))c+=40}}for(var e=0;e<b;e++){for(var d=0;d<b-6;d++){if(a.isDark(d,e)&&!a.isDark(d+1,e)&&a.isDark(d+2,e)&&a.isDark(d+3,e)&&a.isDark(d+4,e)&&!a.isDark(d+5,e)&&a.isDark(d+6,e))c+=40}}var k=0;for(var e=0;e<b;e++)for(var d=0;d<b;d++)if(a.isDark(d,e))k++;var l=Math.abs(100*k/b/b-50)/5;c+=l*10;return c}};var QRMath={gexp:function(a){while(a<0)a+=255;while(a>=256)a-=255;return QRMath.EXP_TABLE[a]},glog:function(a){if(a<1)throw new Error("glog("+a+")");return QRMath.LOG_TABLE[a]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)};for(var i=0;i<8;i++)QRMath.EXP_TABLE[i]=1<<i;for(var i=8;i<256;i++)QRMath.EXP_TABLE[i]=QRMath.EXP_TABLE[i-4]^QRMath.EXP_TABLE[i-5]^QRMath.EXP_TABLE[i-6]^QRMath.EXP_TABLE[i-8];for(var i=0;i<255;i++)QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]]=i;function QRPolynomial(a,b){if(a.length==undefined)throw new Error(a.length+"/"+b);var c=0;while(c<a.length&&a[c]==0)c++;this.num=new Array(a.length-c+b);for(var d=0;d<a.length-c;d++)this.num[d]=a[d+c]}QRPolynomial.prototype={get:function(a){return this.num[a]},getLength:function(){return this.num.length},multiply:function(a){var b=new Array(this.getLength()+a.getLength()-1);for(var c=0;c<b.length;c++)b[c]=0;for(var c=0;c<this.getLength();c++)for(var d=0;d<a.getLength();d++)b[c+d]^=QRMath.gexp(QRMath.glog(this.get(c))+QRMath.glog(a.get(d)));return new QRPolynomial(b,0)},mod:function(a){if(this.getLength()-a.getLength()<0)return this;var b=QRMath.glog(this.get(0))-QRMath.glog(a.get(0));var c=new Array(this.getLength());for(var d=0;d<this.getLength();d++)c[d]=this.get(d);for(var d=0;d<a.getLength();d++)c[d]^=QRMath.gexp(QRMath.glog(a.get(d))+b);return new QRPolynomial(c,0).mod(a)}};function QRRSBlock(a,b){this.totalCount=a;this.dataCount=b}QRRSBlock.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]];QRRSBlock.getRSBlocks=function(a,b){var c=QRRSBlock.getRsBlockTable(a,b);if(c==undefined)throw new Error("bad rs block @ typeNumber:"+a+"/errorCorrectLevel:"+b);var d=c.length/3,e=[];for(var f=0;f<d;f++){var g=c[f*3+0],h=c[f*3+1],i=c[f*3+2];for(var j=0;j<g;j++)e.push(new QRRSBlock(h,i))}return e};QRRSBlock.getRsBlockTable=function(a,b){switch(b){case 1:return QRRSBlock.RS_BLOCK_TABLE[(a-1)*4+0];case 0:return QRRSBlock.RS_BLOCK_TABLE[(a-1)*4+1];case 3:return QRRSBlock.RS_BLOCK_TABLE[(a-1)*4+2];case 2:return QRRSBlock.RS_BLOCK_TABLE[(a-1)*4+3]}};function QRBitBuffer(){this.buffer=[];this.length=0}QRBitBuffer.prototype={get:function(a){var b=Math.floor(a/8);return((this.buffer[b]>>>(7-a%8))&1)==1},put:function(a,b){for(var c=0;c<b;c++)this.putBit(((a>>>(b-c-1))&1)==1)},getLengthInBits:function(){return this.length},putBit:function(a){var b=Math.floor(this.length/8);if(this.buffer.length<=b)this.buffer.push(0);if(a)this.buffer[b]|=(0x80>>>(this.length%8));this.length++}};function QR8bitByte(a){this.mode=4;this.data=a}QR8bitByte.prototype={getLength:function(){return unescape(encodeURIComponent(this.data)).length},write:function(a){var b=unescape(encodeURIComponent(this.data));for(var c=0;c<b.length;c++)a.put(b.charCodeAt(c),8)}};
@@ -43,6 +144,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Aucune (réseau ouvert)',
+    st_ok: 'Sécurisé',
+    st_open: 'Ouvert',
+    st_weak: 'Faible',
+    st_err: 'Indisponible',
     zoom_in: 'Afficher la carte complète',
     zoom_out: 'Revenir à la vue compacte',
     mini_name: 'Mini-carte QR Wifi',
@@ -57,6 +162,11 @@ var WifiQrI18n = {
     copy_password: 'Copier le mot de passe',
     copied: 'Mot de passe copié',
     copy_failed: 'Impossible de copier le mot de passe',
+    ed_illustration: 'Illustration animée',
+    ed_illustration_theme: 'Thème de l’illustration',
+    theme_auto: 'Automatique (soleil ou thème sombre)',
+    theme_day: 'Jour',
+    theme_night: 'Nuit',
   },
   en: {
     default_title: 'Guest WiFi',
@@ -86,6 +196,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'None (open network)',
+    st_ok: 'Secured',
+    st_open: 'Open',
+    st_weak: 'Weak',
+    st_err: 'Unavailable',
     zoom_in: 'Show the full card',
     zoom_out: 'Back to the compact view',
     mini_name: 'Wifi QR Mini Card',
@@ -100,6 +214,11 @@ var WifiQrI18n = {
     copy_password: 'Copy password',
     copied: 'Password copied',
     copy_failed: 'Could not copy the password',
+    ed_illustration: 'Animated illustration',
+    ed_illustration_theme: 'Illustration theme',
+    theme_auto: 'Automatic (sun or dark theme)',
+    theme_day: 'Day',
+    theme_night: 'Night',
   },
   de: {
     default_title: 'Gäste-WLAN',
@@ -129,6 +248,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Keine (offenes Netzwerk)',
+    st_ok: 'Gesichert',
+    st_open: 'Offen',
+    st_weak: 'Schwach',
+    st_err: 'Nicht verfügbar',
     zoom_in: 'Vollständige Karte anzeigen',
     zoom_out: 'Zurück zur kompakten Ansicht',
     mini_name: 'WLAN-QR-Minikarte',
@@ -143,6 +266,11 @@ var WifiQrI18n = {
     copy_password: 'Passwort kopieren',
     copied: 'Passwort kopiert',
     copy_failed: 'Passwort konnte nicht kopiert werden',
+    ed_illustration: 'Animierte Illustration',
+    ed_illustration_theme: 'Thema der Illustration',
+    theme_auto: 'Automatisch (Sonne oder dunkles Design)',
+    theme_day: 'Tag',
+    theme_night: 'Nacht',
   },
   es: {
     default_title: 'Wi-Fi de invitados',
@@ -172,6 +300,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ninguna (red abierta)',
+    st_ok: 'Seguro',
+    st_open: 'Abierto',
+    st_weak: 'Débil',
+    st_err: 'No disponible',
     zoom_in: 'Mostrar la tarjeta completa',
     zoom_out: 'Volver a la vista compacta',
     mini_name: 'Minitarjeta QR Wi-Fi',
@@ -186,6 +318,11 @@ var WifiQrI18n = {
     copy_password: 'Copiar contraseña',
     copied: 'Contraseña copiada',
     copy_failed: 'No se pudo copiar la contraseña',
+    ed_illustration: 'Ilustración animada',
+    ed_illustration_theme: 'Tema de la ilustración',
+    theme_auto: 'Automático (sol o tema oscuro)',
+    theme_day: 'Día',
+    theme_night: 'Noche',
   },
   sr: {
     default_title: 'WiFi за госте',
@@ -215,6 +352,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нема (отворена мрежа)',
+    st_ok: 'Заштићено',
+    st_open: 'Отворено',
+    st_weak: 'Слабо',
+    st_err: 'Недоступно',
     zoom_in: 'Прикажи целу картицу',
     zoom_out: 'Назад на компактни приказ',
     mini_name: 'Мини картица за WiFi QR',
@@ -229,6 +370,11 @@ var WifiQrI18n = {
     copy_password: 'Копирај лозинку',
     copied: 'Лозинка је копирана',
     copy_failed: 'Копирање лозинке није успело',
+    ed_illustration: 'Анимирана илустрација',
+    ed_illustration_theme: 'Тема илустрације',
+    theme_auto: 'Аутоматски (сунце или тамна тема)',
+    theme_day: 'Дан',
+    theme_night: 'Ноћ',
   },
   'sr-Latn': {
     default_title: 'WiFi za goste',
@@ -258,6 +404,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nema (otvorena mreža)',
+    st_ok: 'Zaštićeno',
+    st_open: 'Otvoreno',
+    st_weak: 'Slabo',
+    st_err: 'Nedostupno',
     zoom_in: 'Prikaži celu karticu',
     zoom_out: 'Nazad na kompaktni prikaz',
     mini_name: 'Mini kartica za WiFi QR',
@@ -272,6 +422,11 @@ var WifiQrI18n = {
     copy_password: 'Kopiraj lozinku',
     copied: 'Lozinka je kopirana',
     copy_failed: 'Kopiranje lozinke nije uspelo',
+    ed_illustration: 'Animirana ilustracija',
+    ed_illustration_theme: 'Tema ilustracije',
+    theme_auto: 'Automatski (sunce ili tamna tema)',
+    theme_day: 'Dan',
+    theme_night: 'Noć',
   },
   it: {
     default_title: 'Wi-Fi ospiti',
@@ -301,6 +456,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nessuna (rete aperta)',
+    st_ok: 'Protetto',
+    st_open: 'Aperto',
+    st_weak: 'Debole',
+    st_err: 'Non disponibile',
     zoom_in: 'Mostra la scheda completa',
     zoom_out: 'Torna alla vista compatta',
     mini_name: 'Mini scheda QR Wi-Fi',
@@ -315,6 +474,11 @@ var WifiQrI18n = {
     copy_password: 'Copia password',
     copied: 'Password copiata',
     copy_failed: 'Impossibile copiare la password',
+    ed_illustration: 'Illustrazione animata',
+    ed_illustration_theme: 'Tema dell’illustrazione',
+    theme_auto: 'Automatico (sole o tema scuro)',
+    theme_day: 'Giorno',
+    theme_night: 'Notte',
   },
   nl: {
     default_title: 'Gastenwifi',
@@ -344,6 +508,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Geen (open netwerk)',
+    st_ok: 'Beveiligd',
+    st_open: 'Open',
+    st_weak: 'Zwak',
+    st_err: 'Niet beschikbaar',
     zoom_in: 'Volledige kaart tonen',
     zoom_out: 'Terug naar de compacte weergave',
     mini_name: 'Wifi-QR-minikaart',
@@ -358,6 +526,11 @@ var WifiQrI18n = {
     copy_password: 'Wachtwoord kopiëren',
     copied: 'Wachtwoord gekopieerd',
     copy_failed: 'Kan het wachtwoord niet kopiëren',
+    ed_illustration: 'Geanimeerde illustratie',
+    ed_illustration_theme: 'Thema van de illustratie',
+    theme_auto: 'Automatisch (zon of donker thema)',
+    theme_day: 'Dag',
+    theme_night: 'Nacht',
   },
   pt: {
     default_title: 'Wi-Fi visitas',
@@ -387,6 +560,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nenhuma (rede aberta)',
+    st_ok: 'Protegido',
+    st_open: 'Aberto',
+    st_weak: 'Fraco',
+    st_err: 'Indisponível',
     zoom_in: 'Mostrar o cartão completo',
     zoom_out: 'Voltar à vista compacta',
     mini_name: 'Mini cartão QR Wi-Fi',
@@ -401,6 +578,11 @@ var WifiQrI18n = {
     copy_password: 'Copiar palavra-passe',
     copied: 'Palavra-passe copiada',
     copy_failed: 'Não foi possível copiar a palavra-passe',
+    ed_illustration: 'Ilustração animada',
+    ed_illustration_theme: 'Tema da ilustração',
+    theme_auto: 'Automático (sol ou tema escuro)',
+    theme_day: 'Dia',
+    theme_night: 'Noite',
   },
   pl: {
     default_title: 'Wi-Fi dla gości',
@@ -430,6 +612,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brak (sieć otwarta)',
+    st_ok: 'Zabezpieczona',
+    st_open: 'Otwarta',
+    st_weak: 'Słaba',
+    st_err: 'Niedostępna',
     zoom_in: 'Pokaż pełną kartę',
     zoom_out: 'Wróć do widoku kompaktowego',
     mini_name: 'Mini karta QR Wi-Fi',
@@ -444,6 +630,11 @@ var WifiQrI18n = {
     copy_password: 'Kopiuj hasło',
     copied: 'Hasło skopiowane',
     copy_failed: 'Nie udało się skopiować hasła',
+    ed_illustration: 'Animowana ilustracja',
+    ed_illustration_theme: 'Motyw ilustracji',
+    theme_auto: 'Automatycznie (słońce lub ciemny motyw)',
+    theme_day: 'Dzień',
+    theme_night: 'Noc',
   },
   ro: {
     default_title: 'Wi-Fi oaspeți',
@@ -473,6 +664,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Fără (rețea deschisă)',
+    st_ok: 'Securizat',
+    st_open: 'Deschis',
+    st_weak: 'Slab',
+    st_err: 'Indisponibil',
     zoom_in: 'Afișează cardul complet',
     zoom_out: 'Înapoi la vizualizarea compactă',
     mini_name: 'Mini card QR Wi-Fi',
@@ -487,6 +682,11 @@ var WifiQrI18n = {
     copy_password: 'Copiază parola',
     copied: 'Parola a fost copiată',
     copy_failed: 'Parola nu a putut fi copiată',
+    ed_illustration: 'Ilustrație animată',
+    ed_illustration_theme: 'Tema ilustrației',
+    theme_auto: 'Automat (soare sau temă întunecată)',
+    theme_day: 'Zi',
+    theme_night: 'Noapte',
   },
   da: {
     default_title: 'Gæste-wifi',
@@ -516,6 +716,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (åbent netværk)',
+    st_ok: 'Sikret',
+    st_open: 'Åben',
+    st_weak: 'Svag',
+    st_err: 'Utilgængelig',
     zoom_in: 'Vis hele kortet',
     zoom_out: 'Tilbage til kompakt visning',
     mini_name: 'Wifi-QR-minikort',
@@ -530,6 +734,11 @@ var WifiQrI18n = {
     copy_password: 'Kopiér adgangskode',
     copied: 'Adgangskode kopieret',
     copy_failed: 'Adgangskoden kunne ikke kopieres',
+    ed_illustration: 'Animeret illustration',
+    ed_illustration_theme: 'Illustrationens tema',
+    theme_auto: 'Automatisk (sol eller mørkt tema)',
+    theme_day: 'Dag',
+    theme_night: 'Nat',
   },
   sv: {
     default_title: 'Gäst-wifi',
@@ -559,6 +768,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Ingen (öppet nätverk)',
+    st_ok: 'Skyddat',
+    st_open: 'Öppet',
+    st_weak: 'Svagt',
+    st_err: 'Otillgängligt',
     zoom_in: 'Visa hela kortet',
     zoom_out: 'Tillbaka till kompakt vy',
     mini_name: 'Minikort för wifi-QR',
@@ -573,6 +786,11 @@ var WifiQrI18n = {
     copy_password: 'Kopiera lösenord',
     copied: 'Lösenordet har kopierats',
     copy_failed: 'Det gick inte att kopiera lösenordet',
+    ed_illustration: 'Animerad illustration',
+    ed_illustration_theme: 'Illustrationens tema',
+    theme_auto: 'Automatiskt (sol eller mörkt tema)',
+    theme_day: 'Dag',
+    theme_night: 'Natt',
   },
   bg: {
     default_title: 'Wi-Fi за гости',
@@ -602,6 +820,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Без (отворена мрежа)',
+    st_ok: 'Защитена',
+    st_open: 'Отворена',
+    st_weak: 'Слаба',
+    st_err: 'Недостъпна',
     zoom_in: 'Покажи цялата карта',
     zoom_out: 'Обратно към компактния изглед',
     mini_name: 'Мини карта с Wi-Fi QR',
@@ -616,6 +838,11 @@ var WifiQrI18n = {
     copy_password: 'Копиране на паролата',
     copied: 'Паролата е копирана',
     copy_failed: 'Паролата не можа да бъде копирана',
+    ed_illustration: 'Анимирана илюстрация',
+    ed_illustration_theme: 'Тема на илюстрацията',
+    theme_auto: 'Автоматично (слънце или тъмна тема)',
+    theme_day: 'Ден',
+    theme_night: 'Нощ',
   },
   ru: {
     default_title: 'Гостевой Wi-Fi',
@@ -645,6 +872,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Нет (открытая сеть)',
+    st_ok: 'Защищена',
+    st_open: 'Открыта',
+    st_weak: 'Слабая',
+    st_err: 'Недоступна',
     zoom_in: 'Показать полную карточку',
     zoom_out: 'Вернуться к компактному виду',
     mini_name: 'Мини-карточка Wi-Fi QR',
@@ -659,6 +890,11 @@ var WifiQrI18n = {
     copy_password: 'Копировать пароль',
     copied: 'Пароль скопирован',
     copy_failed: 'Не удалось скопировать пароль',
+    ed_illustration: 'Анимированная иллюстрация',
+    ed_illustration_theme: 'Тема иллюстрации',
+    theme_auto: 'Автоматически (солнце или тёмная тема)',
+    theme_day: 'День',
+    theme_night: 'Ночь',
   },
   uk: {
     default_title: 'Гостьовий Wi-Fi',
@@ -688,6 +924,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Відкрита мережа',
+    st_ok: 'Захищена',
+    st_open: 'Відкрита',
+    st_weak: 'Слабка',
+    st_err: 'Недоступна',
     zoom_in: 'Показати повну картку',
     zoom_out: 'Повернутися до компактного вигляду',
     mini_name: 'Міні-картка Wi-Fi QR',
@@ -702,6 +942,11 @@ var WifiQrI18n = {
     copy_password: 'Копіювати пароль',
     copied: 'Пароль скопійовано',
     copy_failed: 'Не вдалося скопіювати пароль',
+    ed_illustration: 'Анімована ілюстрація',
+    ed_illustration_theme: 'Тема ілюстрації',
+    theme_auto: 'Автоматично (сонце або темна тема)',
+    theme_day: 'День',
+    theme_night: 'Ніч',
   },
   hu: {
     default_title: 'Vendég Wi-Fi',
@@ -731,6 +976,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nincs (nyílt hálózat)',
+    st_ok: 'Védett',
+    st_open: 'Nyílt',
+    st_weak: 'Gyenge',
+    st_err: 'Nem elérhető',
     zoom_in: 'Teljes kártya megjelenítése',
     zoom_out: 'Vissza a kompakt nézethez',
     mini_name: 'Wi-Fi QR mini kártya',
@@ -745,6 +994,11 @@ var WifiQrI18n = {
     copy_password: 'Jelszó másolása',
     copied: 'Jelszó másolva',
     copy_failed: 'Nem sikerült másolni a jelszót',
+    ed_illustration: 'Animált illusztráció',
+    ed_illustration_theme: 'Az illusztráció témája',
+    theme_auto: 'Automatikus (nap vagy sötét téma)',
+    theme_day: 'Nappal',
+    theme_night: 'Éjszaka',
   },
   sk: {
     default_title: 'Wi-Fi pre hostí',
@@ -774,6 +1028,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žiadne (otvorená sieť)',
+    st_ok: 'Zabezpečená',
+    st_open: 'Otvorená',
+    st_weak: 'Slabá',
+    st_err: 'Nedostupná',
     zoom_in: 'Zobraziť celú kartu',
     zoom_out: 'Späť na kompaktné zobrazenie',
     mini_name: 'Mini karta Wi-Fi QR',
@@ -788,6 +1046,11 @@ var WifiQrI18n = {
     copy_password: 'Kopírovať heslo',
     copied: 'Heslo skopírované',
     copy_failed: 'Heslo sa nepodarilo skopírovať',
+    ed_illustration: 'Animovaná ilustrácia',
+    ed_illustration_theme: 'Téma ilustrácie',
+    theme_auto: 'Automaticky (slnko alebo tmavá téma)',
+    theme_day: 'Deň',
+    theme_night: 'Noc',
   },
   cs: {
     default_title: 'Wi-Fi pro hosty',
@@ -817,6 +1080,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Žádné (otevřená síť)',
+    st_ok: 'Zabezpečená',
+    st_open: 'Otevřená',
+    st_weak: 'Slabá',
+    st_err: 'Nedostupná',
     zoom_in: 'Zobrazit celou kartu',
     zoom_out: 'Zpět na kompaktní zobrazení',
     mini_name: 'Mini karta Wi-Fi QR',
@@ -831,6 +1098,11 @@ var WifiQrI18n = {
     copy_password: 'Kopírovat heslo',
     copied: 'Heslo zkopírováno',
     copy_failed: 'Heslo se nepodařilo zkopírovat',
+    ed_illustration: 'Animovaná ilustrace',
+    ed_illustration_theme: 'Motiv ilustrace',
+    theme_auto: 'Automaticky (slunce nebo tmavý motiv)',
+    theme_day: 'Den',
+    theme_night: 'Noc',
   },
   sl: {
     default_title: 'Wi-Fi za goste',
@@ -860,6 +1132,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Brez (odprto omrežje)',
+    st_ok: 'Zaščiteno',
+    st_open: 'Odprto',
+    st_weak: 'Šibko',
+    st_err: 'Ni na voljo',
     zoom_in: 'Prikaži celotno kartico',
     zoom_out: 'Nazaj na kompaktni pogled',
     mini_name: 'Mini kartica Wi-Fi QR',
@@ -874,6 +1150,11 @@ var WifiQrI18n = {
     copy_password: 'Kopiraj geslo',
     copied: 'Geslo kopirano',
     copy_failed: 'Gesla ni bilo mogoče kopirati',
+    ed_illustration: 'Animirana ilustracija',
+    ed_illustration_theme: 'Tema ilustracije',
+    theme_auto: 'Samodejno (sonce ali temna tema)',
+    theme_day: 'Dan',
+    theme_night: 'Noč',
   },
   lv: {
     default_title: 'Viesu Wi-Fi',
@@ -903,6 +1184,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Nav (atvērts tīkls)',
+    st_ok: 'Aizsargāts',
+    st_open: 'Atvērts',
+    st_weak: 'Vājš',
+    st_err: 'Nav pieejams',
     zoom_in: 'Rādīt pilno karti',
     zoom_out: 'Atpakaļ uz kompakto skatu',
     mini_name: 'Wi-Fi QR mini karte',
@@ -917,6 +1202,11 @@ var WifiQrI18n = {
     copy_password: 'Kopēt paroli',
     copied: 'Parole nokopēta',
     copy_failed: 'Neizdevās nokopēt paroli',
+    ed_illustration: 'Animēta ilustrācija',
+    ed_illustration_theme: 'Ilustrācijas motīvs',
+    theme_auto: 'Automātiski (saule vai tumšā tēma)',
+    theme_day: 'Diena',
+    theme_night: 'Nakts',
   },
   el: {
     default_title: 'WiFi επισκεπτών',
@@ -946,6 +1236,10 @@ var WifiQrI18n = {
     sec_sae: 'WPA3 (SAE)',
     sec_wep: 'WEP',
     sec_nopass: 'Καμία (ανοιχτό δίκτυο)',
+    st_ok: 'Ασφαλές',
+    st_open: 'Ανοιχτό',
+    st_weak: 'Αδύναμο',
+    st_err: 'Μη διαθέσιμο',
     zoom_in: 'Εμφάνιση πλήρους κάρτας',
     zoom_out: 'Επιστροφή στη συμπαγή προβολή',
     mini_name: 'Μίνι κάρτα QR Wi-Fi',
@@ -960,6 +1254,11 @@ var WifiQrI18n = {
     copy_password: 'Αντιγραφή κωδικού πρόσβασης',
     copied: 'Ο κωδικός πρόσβασης αντιγράφηκε',
     copy_failed: 'Δεν ήταν δυνατή η αντιγραφή του κωδικού πρόσβασης',
+    ed_illustration: 'Κινούμενη εικονογράφηση',
+    ed_illustration_theme: 'Θέμα εικονογράφησης',
+    theme_auto: 'Αυτόματα (ήλιος ή σκούρο θέμα)',
+    theme_day: 'Ημέρα',
+    theme_night: 'Νύχτα',
   },
 };
 
@@ -1035,6 +1334,33 @@ function wifiQrMinVersion(bytes) {
 }
 
 // ── wifi-qr-card ──────────────────────────────────────────────────────────────
+// The status pill's place, decided by measurement after each render and each new width (the same rule on every
+// card): on the title row, right after the title, only when the whole title and the pill's whole label fit there;
+// otherwise on its own line under the subtitle (one line), the title whole on its row (cut only when it does not fit
+// alone). When the label is still cut there, or the text block leaves the banner or runs over its ground strip, the
+// pill keeps its dot alone, on the title row (its label stays in title and aria-label). A header of 200 px or less
+// shows the dot alone anyway (CSS), beside the title.
+function wifiPlacePill(head, row, ground) {
+  if (!head) return;
+  head.removeAttribute('data-wrap');
+  head.removeAttribute('data-dot');
+  var pill = row.querySelector(':scope > .chip');
+  var text = pill?.querySelector('.ptxt');
+  if (!text?.getBoundingClientRect || text.getBoundingClientRect().width <= 1) return;
+  var name = row.querySelector(':scope > .name');
+  var gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+  var title = name && name.textContent ? (name.scrollWidth > name.clientWidth ? name.scrollWidth : name.getBoundingClientRect().width) + gap : 0;
+  if (title + pill.getBoundingClientRect().width <= row.getBoundingClientRect().width + 0.5) return;
+  head.setAttribute('data-wrap', '');
+  var box = row.parentElement.getBoundingClientRect();
+  var frame = head.getBoundingClientRect();
+  var out = ground && (box.bottom > ground.getBoundingClientRect().top + 0.5 || box.top < frame.top - 0.5);
+  if (text.scrollWidth > text.clientWidth + 0.5 || out) {
+    head.removeAttribute('data-wrap');
+    head.setAttribute('data-dot', '');
+  }
+}
+
 class WifiQrCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('wifi-qr-card-editor');
@@ -1048,6 +1374,9 @@ class WifiQrCard extends HTMLElement {
     if ((config.ssid == null || config.ssid === '') && !config.ssid_entity) throw new Error('ssid or ssid_entity is required');
     // Validated before the config is kept: an invalid value must not reach set hass later.
     var security = wifiQrSecurity(config.security);
+    if (config.illustration_theme != null && !['auto', 'day', 'night'].includes(config.illustration_theme)) {
+      throw new Error('illustration_theme must be auto, day or night');
+    }
     if ((config.password == null || config.password === '') && security !== 'nopass' && !config.password_entity) {
       throw new Error('password or password_entity is required');
     }
@@ -1065,12 +1394,83 @@ class WifiQrCard extends HTMLElement {
   set hass(hass) {
     var prevLang = this._configRaw ? this._getLang() : null;
     var prevStates = this._entityStates();
+    var prevNight = this._isNight();
     this._hass = hass;
     // Resolved by wifiQrLang: sr-Latn is kept, a regional locale (fr-BE, en-GB…) falls back to its base.
     this._hassLang = hass?.language ? wifiQrLang(hass.language) : null;
     // Re-render only when the language actually shown changes (not with a forced `language`), or the
     // state of the `ssid_entity` / `password_entity`.
-    if (this._configRaw && (prevLang !== this._getLang() || prevStates !== this._entityStates())) this._applyConfig();
+    if (this._configRaw && (prevLang !== this._getLang() || prevStates !== this._entityStates() || prevNight !== this._isNight())) this._applyConfig();
+  }
+
+  // The banner's night picture (only tracked while the illustration is shown).
+  _isNight() {
+    var raw = this._configRaw;
+    return !!raw && raw.illustration !== false && wifiQrIsNight(this._hass, raw);
+  }
+
+  // The header's status: err (no value from the entity, or no QR code), warn (open or WEP network), else ok.
+  _status() {
+    var sec = this._config?.security;
+    return sec === 'nopass' || sec === 'WEP' ? 'warn' : 'ok';
+  }
+
+  // The pill's label: Unavailable (error), Open (no password), Weak (WEP), else Secured.
+  _pillKey(status) {
+    if (status === 'err') return 'st_err';
+    if (status === 'warn') return this._config?.security === 'nopass' ? 'st_open' : 'st_weak';
+    return 'st_ok';
+  }
+
+  // The header's title and status pill on one row, the subtitle under them.
+  _titlesHtml(status, title, sub) {
+    var label = wifiQrEsc(this._t(this._pillKey(status)));
+    return `<div class="titles">
+            <div class="trow"><div class="name" title="${title}">${title}</div><span class="chip" title="${label}" aria-label="${label}"><span class="dot"></span><span class="ptxt">${label}</span></span></div>
+            <div class="sub" title="${sub}">${sub}</div>
+          </div>`;
+  }
+
+  // The round header icon: the MDI QR code, in the status colour, with the WiFi logo as a badge (`logo: false` removes it).
+  _iconHtml() {
+    return `<ha-icon icon="mdi:qrcode"></ha-icon>${this._config?.logo ? `<span class="brand">${WIFI_LOGO}</span>` : ''}`;
+  }
+
+  // The full card's header: the illustrated banner, or the classic header with `illustration: false`.
+  _headerHtml(status, title, sub) {
+    var st = WIFI_STATUS_CLASS[status];
+    var texts = this._titlesHtml(status, title, sub);
+    if (this._configRaw?.illustration === false) {
+      return `<div class="header ${st}"><div class="hrow">
+          <div class="badge">${this._iconHtml()}</div>
+          ${texts}
+          ${this._zoomButton()}
+        </div></div>`;
+    }
+    return `<div class="banner ${st}${this._isNight() ? ' night' : ''}">${wifiQrSceneSvg(status)}<div class="ground"></div>
+        <div class="htext"><div class="badge">${this._iconHtml()}</div>
+          ${texts}
+        </div>${this._zoomButton()}</div>`;
+  }
+
+  // A card that cannot show its QR code: the header in its error status, then the message.
+  _errorView(message) {
+    var c = this._config || {};
+    var title = wifiQrEsc(c.title || this._t('default_title'));
+    var color = this._configRaw?.illustration === false ? 'var(--secondary-text-color)' : 'var(--error-color, #db4437)';
+    this.shadowRoot.innerHTML = `<style>
+        ha-card { overflow: hidden; }
+        .header { padding: 12px 12px 0; }
+        .hrow { display: flex; align-items: center; gap: 10px; }
+        .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+                 --c: var(--error-color, #db4437); background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
+        .titles { flex: 1 1 0; min-width: 4ch; }
+        .name { font-size: 16px; font-weight: 500; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE + WIFI_PILL_STYLE}
+        .msg-err { padding: 16px; color: ${color}; overflow-wrap: anywhere; }
+      </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`;
+    this._fitPill();
   }
 
   // The states of the configured entities, as one comparable string.
@@ -1114,7 +1514,7 @@ class WifiQrCard extends HTMLElement {
     var c = this._config;
     var missing = !c.ssid ? config.ssid_entity : !c.password && c.security !== 'nopass' ? config.password_entity : null;
     if (missing) {
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--secondary-text-color)">${wifiQrEsc(this._t('entity_unavailable').replace('{entity}', missing))}</div></ha-card>`;
+      this._errorView(this._t('entity_unavailable').replace('{entity}', missing));
       return;
     }
     this._render(strict);
@@ -1216,8 +1616,33 @@ class WifiQrCard extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._resize?.disconnect();
+    this._fitWidth = null;
     this._maskPassword();
     this._copyReset();
+  }
+
+  // A new width (or the web font loaded): the status pill is fitted again, in the next frame.
+  connectedCallback() {
+    if (typeof ResizeObserver === 'function') {
+      this._resize ??= new ResizeObserver((entries) => {
+        var w = Math.round(entries[entries.length - 1].contentRect.width);
+        if (w === this._fitWidth) return;
+        this._fitWidth = w;
+        cancelAnimationFrame(this._fitFrame);
+        this._fitFrame = requestAnimationFrame(() => this._fitPill());
+      });
+      this._resize.observe(this);
+    }
+    document.fonts?.ready?.then(() => this._fitPill());
+  }
+
+  // The status pill's place, on the banner and on the classic header (see wifiPlacePill).
+  _fitPill() {
+    var row = this.shadowRoot?.querySelector?.('.titles > .trow');
+    if (!row) return;
+    var banner = row.closest('.banner');
+    wifiPlacePill(banner || row.closest('.header') || row.closest('.row'), row, banner?.querySelector('.ground'));
   }
 
   _render(strict) {
@@ -1232,13 +1657,15 @@ class WifiQrCard extends HTMLElement {
       svg = this._qrSvg(wifiQrString(c), c.qr_size || 176);
     } catch (err) {
       if (strict) throw err;
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--error-color)">${wifiQrEsc(err.message)}</div></ha-card>`;
+      this._errorView(err.message);
       return;
     }
 
     // Escaped once, shown as text and as a tooltip: both are truncated on narrow cards.
     const title = wifiQrEsc(c.title);
-    const sub = wifiQrEsc(this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
+    // The security type; an open network is already named by the pill: its subtitle is the network name.
+    const sub = wifiQrEsc(c.security === 'nopass' ? c.ssid : this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
+    const ill = this._configRaw?.illustration !== false;
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: block; height: 100%; }
@@ -1249,11 +1676,12 @@ class WifiQrCard extends HTMLElement {
         .hrow { display: flex; align-items: center; gap: 10px; }
         .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
-        .badge .logo { width: 24px; height: 24px; display: block; }
+        .st-warn .badge { --c: var(--warning-color, #ffa600); }
+        .st-err .badge { --c: var(--error-color, #db4437); }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         /* Shrinks with the card but always keeps a few characters of the title visible. */
         .titles { flex: 1 1 0; min-width: 4ch; }
-        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
+        :host([hide-title]) .titles .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* Phone width at 4 columns (~104 px card): a 32 px badge, as on the mini cards, a 14 px title and 4 px
@@ -1262,10 +1690,13 @@ class WifiQrCard extends HTMLElement {
           .hrow { gap: 4px; margin-left: -4px; }
           .name { font-size: 14px; }
           .badge { width: 32px; height: 32px; }
-          .badge .logo { width: 20px; height: 20px; }
           .badge ha-icon { --mdc-icon-size: 20px; }
         }
         ha-icon { color: var(--secondary-text-color); --mdc-icon-size: 22px; }
+        ${WIFI_BRAND_STYLE + WIFI_PILL_STYLE + (ill ? `${WIFI_BANNER_STYLE}
+        /* The banner spans the card edge to edge, over the card padding. */
+        ha-card { overflow: hidden; }
+        .banner { align-self: stretch; margin: -12px -12px 0; }` : '')}
         .qr-wrap { background: ${WIFI_BLUE}; border-radius: 10px; overflow: hidden; line-height: 0; max-width: 100%; cursor: zoom-in; }
         .qr-wrap svg { max-width: 100%; height: auto; width: ${c.qr_size ? `${c.qr_size}px` : '176px'}; }
         dialog { border: none; padding: 0; margin: auto; background: ${WIFI_BLUE}; border-radius: 12px; line-height: 0; overflow: hidden; cursor: zoom-out; }
@@ -1290,14 +1721,7 @@ class WifiQrCard extends HTMLElement {
         ${this._miniStyle()}
       </style>
       <ha-card>
-        <div class="header"><div class="hrow">
-          <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
-          <div class="titles">
-            <div class="name" title="${title}">${title}</div>
-            <div class="sub" title="${sub}">${sub}</div>
-          </div>
-          ${this._zoomButton()}
-        </div></div>
+        ${this._headerHtml(this._status(), title, sub)}
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
         <div class="info-block">
@@ -1319,6 +1743,7 @@ class WifiQrCard extends HTMLElement {
         <div class="hint">${this._t('hint')}</div>
         <span class="sr" id="live" aria-live="polite"></span>
       </ha-card>`;
+    this._fitPill();
 
     if (!isOpen) {
       const btn = this.shadowRoot.getElementById('btn');
@@ -1389,7 +1814,18 @@ var WIFI_MINI_STYLE = `
                 display: grid; place-items: center; color: var(--secondary-text-color); }
         .zoom ha-icon { color: inherit; --mdc-icon-size: 16px; }
         .zoom:hover { background: color-mix(in srgb, var(--secondary-text-color) 14%, transparent); color: var(--primary-text-color); }
-        .zoom:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 1px; }`;
+        .zoom:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); outline-offset: 1px; }
+        /* On the banner: in the top right corner, a frosted 24 px disc readable over the wall and the waves. */
+        .banner .zoom { position: absolute; z-index: 2; top: 5px; right: 5px; margin: 0; color: #33506b; background: rgba(255,255,255,.55);
+                        box-shadow: inset 0 0 0 1px rgba(255,255,255,.7); backdrop-filter: blur(4px); }
+        .banner .zoom:hover { background: rgba(255,255,255,.75); }
+        .banner.night .zoom { color: #fff; background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+        .banner.night .zoom:hover { background: rgba(255,255,255,.22); }
+        /* Expanded view: the picture steps aside from the button's corner (the compact view sets its own text edge). */
+        .banner .scene:not(.mini) { right: 26px; }
+        .banner .htext { right: calc(min(200px, 62%) * .75 + 30px); }
+        /* Narrow card, no picture: the text runs up to the button's corner. */
+        @container (max-width: 300px) { .banner .htext { right: 36px; } }`;
 
 // A click in a dialog opened from the page (a more-info, say) is not a click outside the card.
 function wifiQrInDialog(ev) {
@@ -1413,6 +1849,7 @@ class WifiQrMiniCard extends WifiQrCard {
   }
 
   connectedCallback() {
+    super.connectedCallback();
     document.addEventListener('click', this._onOutside, true);
   }
 
@@ -1480,12 +1917,15 @@ class WifiQrMiniCard extends WifiQrCard {
       svg = this._qrSvg(wifiQrString(c), 64);
     } catch (err) {
       if (strict) throw err;
-      this.shadowRoot.innerHTML = `<ha-card><div style="padding:16px;color:var(--error-color)">${wifiQrEsc(err.message)}</div></ha-card>`;
+      this._errorView(err.message);
       return;
     }
     const title = wifiQrEsc(c.title);
     const ssid = wifiQrEsc(c.ssid);
     const zoom = wifiQrEsc(this._t('zoom'));
+    const ill = this._configRaw?.illustration !== false;
+    const texts = this._titlesHtml(this._status(), title, ssid);
+    const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
     const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
     this.shadowRoot.innerHTML = `
       <style>
@@ -1497,10 +1937,11 @@ class WifiQrMiniCard extends WifiQrCard {
         /* The full card's 40 px header badge, not reduced in the compact view. */
         .badge { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
                  --c: ${WIFI_BLUE}; background: color-mix(in srgb, var(--c) 16%, transparent); color: var(--c); }
-        .badge .logo { width: 24px; height: 24px; display: block; }
+        .st-warn .badge { --c: var(--warning-color, #ffa600); }
+        .st-err .badge { --c: var(--error-color, #db4437); }
         .badge ha-icon { color: inherit; --mdc-icon-size: 24px; }
         .titles { flex: 1 1 0; min-width: 4ch; }
-        :host([hide-title]) .titles > .name, :host([hide-subtitle]) .titles > .sub { display: none; }
+        :host([hide-title]) .titles .name, :host([hide-subtitle]) .titles > .sub { display: none; }
         .name { font-size: 16px; font-weight: 500; line-height: 1.25; color: var(--primary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .sub { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* The big QR code's colours and rounded tile, at thumbnail size. */
@@ -1520,19 +1961,39 @@ class WifiQrMiniCard extends WifiQrCard {
           .name { font-size: 14px; }
           .thumb { width: 48px; height: 48px; border-radius: 6px; }
         }
+        ${WIFI_BRAND_STYLE + WIFI_PILL_STYLE + (ill ? `${WIFI_BANNER_STYLE}
+        /* The banner fills the compact card: the title on the wall, the QR code framed beside the router's shelf. */
+        ha-card.mini { padding: 0; overflow: hidden; justify-content: flex-start; }
+        .banner .htext { right: 112px; }
+        .banner .thumb { position: absolute; z-index: 1; right: 48px; top: 12px; width: 56px; height: 56px;
+                         box-shadow: 0 0 0 2px #fff, 0 1px 4px 2px rgba(0,0,0,.18); }
+        .banner.night .thumb { box-shadow: 0 0 0 2px #cfd6e0, 0 1px 4px 2px rgba(0,0,0,.4); }
+        /* Narrower: the router's shelf gives way, the QR code under the expand button at the right edge, so that the title
+           stays whole and the status pill keeps its label. */
+        @container (max-width: 300px) {
+          .banner .scene.mini { display: none; }
+          .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
+          .banner .htext { right: 60px; }
+        }
+        @container (max-width: 200px) {
+          .banner .scene.mini { display: none; }
+          .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
+          .banner .htext { left: 8px; right: 60px; gap: 6px; }
+          .banner .htext .name { font-size: 14px; }
+        }` : '')}
       </style>
       <ha-card class="mini">
-        <div class="row">
-          <div class="badge">${c.logo ? WIFI_LOGO : '<ha-icon icon="mdi:wifi"></ha-icon>'}</div>
-          <div class="titles">
-            <div class="name" title="${title}">${title}</div>
-            <div class="sub" title="${ssid}">${ssid}</div>
-          </div>
-          <div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
+        ${ill ? `<div class="banner ${WIFI_STATUS_CLASS[this._status()]}${this._isNight() ? ' night' : ''}">${wifiQrSceneSvg(this._status(), true)}<div class="ground"></div>
+          <div class="htext"><div class="badge">${this._iconHtml()}</div>${texts}</div>${thumb}${this._zoomButton()}
+        </div>` : `<div class="row ${WIFI_STATUS_CLASS[this._status()]}">
+          <div class="badge">${this._iconHtml()}</div>
+          ${texts}
+          ${thumb}
           ${this._zoomButton()}
-        </div>
+        </div>`}
         <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
       </ha-card>`;
+    this._fitPill();
     // The thumbnail opens the QR code full screen directly, like the big one of the full card.
     this._bindQr(wasOpen);
     this._bindZoom();
@@ -1540,7 +2001,7 @@ class WifiQrMiniCard extends WifiQrCard {
 }
 
 // ── wifi-qr-card-editor (visual editor, built on HA's ha-form) ───────────────
-var WIFI_QR_EDITOR_DEFAULTS = { show_title: true, show_subtitle: true, security: 'WPA', qr_size: 176, logo: true, hidden: false };
+var WIFI_QR_EDITOR_DEFAULTS = { show_title: true, show_subtitle: true, security: 'WPA', qr_size: 176, logo: true, hidden: false, illustration: true, illustration_theme: 'auto' };
 // Entities whose state can give the SSID or the password: helpers and router integrations.
 var WIFI_QR_ENTITY_SELECTOR = { entity: { filter: [{ domain: ['input_text', 'text', 'sensor'] }] } };
 
@@ -1582,6 +2043,12 @@ class WifiQrCardEditor extends HTMLElement {
       { name: 'show_title', selector: { boolean: {} } },
       { name: 'show_subtitle', selector: { boolean: {} } },
       { name: 'logo', selector: { boolean: {} } },
+      // Both cards: the illustrated banner and its day / night picture.
+      { name: 'illustration', selector: { boolean: {} } },
+      {
+        name: 'illustration_theme',
+        selector: { select: { mode: 'dropdown', options: ['auto', 'day', 'night'].map((v) => ({ value: v, label: t(`theme_${v}`) })) } },
+      },
       ...(this.constructor.mini ? [{ name: 'zoom', selector: { boolean: {} } }] : []),
       // The SSID is only required without an entity giving it.
       { name: 'ssid', required: !this._config?.ssid_entity, selector: { text: {} } },

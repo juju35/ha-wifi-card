@@ -21,6 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 ## Features
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
+- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (night after sunset or with the dark theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value; a status pill next to the title says Secured, Open, Weak (WEP) or Unavailable in the same colour
 - Password hidden by default, revealable with a toggle button (masked again after 30 s or when the card leaves the page), and a button to copy it to the clipboard
 - Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail that opens the QR code full screen, and a detail button that switches to the full card and back
 - Visual editor in the dashboard UI (no YAML needed)
@@ -60,7 +61,7 @@ Or manually:
 
 ### Visual editor
 
-Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, SSID, password (or the entities giving them), hidden network, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
+Add the card from the dashboard (**Add card → Wifi QR Card**, or **Wifi QR Mini Card** for the compact version) and fill in the fields: title, logo, illustration and its day / night theme, SSID, password (or the entities giving them), hidden network, security, QR code size and language (plus the detail button for the mini card). The preview updates live, and empty optional fields are left out of the generated YAML.
 
 ### Minimal
 
@@ -76,6 +77,8 @@ password: MySecretPassword
 type: custom:wifi-qr-card
 title: Guest WiFi
 logo: true
+illustration: true
+illustration_theme: auto
 ssid: MyNetwork-Guest
 password: MySecretPassword
 security: WPA
@@ -95,7 +98,7 @@ hidden: true
 
 ### Mini card
 
-`wifi-qr-mini-card` takes the same options and shows the network on one compact row: the header icon, the title, the network name and a small QR code. The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
+`wifi-qr-mini-card` takes the same options and shows the network on a compact illustrated header: the header icon, the title, the network name and a small QR code framed on the wall beside the router (one plain row with `illustration: false`). The password is never shown. Tap the QR code thumbnail to open it full screen, like the big one of the full card. The detail button (top right) switches to the full card; the button or a click anywhere outside the card brings the compact view back.
 
 ```yaml
 type: custom:wifi-qr-mini-card
@@ -118,7 +121,9 @@ zoom: true
 | `title` | ❌ | Auto (i18n) | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | ❌ | `true` | Show the subtitle under the title |
-| `logo` | ❌ | `true` | Show the WiFi logo in the header badge (`false` shows the `mdi:wifi` icon instead) |
+| `logo` | ❌ | `true` | Show the WiFi logo as a small badge on the header's QR code icon |
+| `illustration` | ❌ | `true` | Both cards: the animated illustrated header (`false` keeps the classic header) |
+| `illustration_theme` | ❌ | `auto` | Both cards: `auto` (night when `sun.sun` is below the horizon or the theme is dark), `day` or `night` |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `zoom` | ❌ | `true` | Mini card only: show the detail button that switches to the full card and back |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings) |
@@ -129,9 +134,32 @@ zoom: true
 |---|---|
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card.png" alt="card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/card-dark.png" alt="card dark" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card.png" alt="mini card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-dark.png" alt="mini card dark" width="400"> |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-zoom.png" alt="mini card expanded to the full card" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-zoom-dark.png" alt="mini card expanded to the full card, dark" width="400"> |
 | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow.png" alt="mini card, narrow" width="200"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-narrow-dark.png" alt="mini card, narrow, dark" width="200"> |
 
 The mini card on a desktop column, then on 6 columns of a phone, where the QR code thumbnail gets smaller.
+
+### Animations
+
+The router's LEDs blink and its waves pulse towards the laptop, in a loop: blue for a secured network, amber for an open or WEP network. When the configured entity has no value, the waves are gone and the LED stays red. With `prefers-reduced-motion`, everything stays still.
+
+Secured network:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-secured.gif" alt="secured network animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-secured-dark.gif" alt="secured network animation, dark theme" width="400"> |
+
+Open network:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-open.gif" alt="open network animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-open-dark.gif" alt="open network animation, dark theme" width="400"> |
+
+Mini card:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-header.gif" alt="mini card animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-header-dark.gif" alt="mini card animation, dark theme" width="400"> |
 
 ## How it works
 
@@ -149,7 +177,7 @@ The QR code engine is a self-contained JavaScript implementation of the QR code 
 npm install
 npm run build        # stamps the version of package.json into dist/wifi-card.js
 npm run check        # builds and checks the card (run in CI)
-npm run screenshots  # renders the card into screenshots/ (a PNG is rewritten only if its pixels change)
+npm run screenshots  # renders the stills (PNG) and the header animations (GIF, needs ffmpeg) into screenshots/ (a file is rewritten only if its pixels change)
 ```
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
