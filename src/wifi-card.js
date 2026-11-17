@@ -1968,6 +1968,13 @@ class WifiQrMiniCard extends WifiQrCard {
         .banner .thumb { position: absolute; z-index: 1; right: 48px; top: 12px; width: 56px; height: 56px;
                          box-shadow: 0 0 0 2px #fff, 0 1px 4px 2px rgba(0,0,0,.18); }
         .banner.night .thumb { box-shadow: 0 0 0 2px #cfd6e0, 0 1px 4px 2px rgba(0,0,0,.4); }
+        /* Narrower: the router's shelf gives way, the QR code under the expand button at the right edge, so that the title
+           stays whole and the status pill keeps its label. */
+        @container (max-width: 300px) {
+          .banner .scene.mini { display: none; }
+          .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
+          .banner .htext { right: 60px; }
+        }
         @container (max-width: 200px) {
           .banner .scene.mini { display: none; }
           .banner .thumb { right: 10px; top: 32px; width: 44px; height: 44px; }
