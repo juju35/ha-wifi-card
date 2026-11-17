@@ -21,7 +21,7 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 ## Features
 
 - QR code generated in pure JS (embedded Reed-Solomon algorithm)
-- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (night after sunset or with the dark theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value; a status pill next to the title says Secured, Open, Weak (WEP) or Unavailable in the same colour
+- Animated illustrated header: a router on a wall shelf sends its WiFi waves to a laptop on the parquet, with a day and a night picture (night with a dark theme, day with a light theme). The QR code icon and the waves take the status colour: blue for a secured network, amber for an open or WEP network, red (no waves) when the configured entity has no value; a status pill next to the title says Secured, Open, Weak (WEP) or Unavailable in the same colour
 - Password hidden by default, revealable with a toggle button (masked again after 30 s or when the card leaves the page), and a button to copy it to the clipboard
 - Mini card (`wifi-qr-mini-card`): one compact row with the network name and a QR code thumbnail that opens the QR code full screen, and a detail button that switches to the full card and back
 - Visual editor in the dashboard UI (no YAML needed)
@@ -123,7 +123,7 @@ zoom: true
 | `show_subtitle` | ❌ | `true` | Show the subtitle under the title |
 | `logo` | ❌ | `true` | Show the WiFi logo as a small badge on the header's QR code icon |
 | `illustration` | ❌ | `true` | Both cards: the animated illustrated header (`false` keeps the classic header) |
-| `illustration_theme` | ❌ | `auto` | Both cards: `auto` (night when `sun.sun` is below the horizon or the theme is dark), `day` or `night` |
+| `illustration_theme` | ❌ | `auto` | Both cards: `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |
 | `qr_size` | ❌ | `176` | QR code size in pixels (quiet zone included) |
 | `zoom` | ❌ | `true` | Mini card only: show the detail button that switches to the full card and back |
 | `language` | ❌ | Auto | Force language: `en`, `fr`, `de`, `es`, `sr`, `sr-Latn`, `it`, `nl`, `pt`, `pl`, `ro`, `da`, `sv`, `bg`, `ru`, `uk`, `hu`, `sk`, `cs`, `sl`, `lv` or `el` (auto-detects from HA settings) |
