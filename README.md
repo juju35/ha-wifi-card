@@ -138,6 +138,28 @@ zoom: true
 
 The mini card on a desktop column, then on 6 columns of a phone, where the QR code thumbnail gets smaller.
 
+### Animations
+
+The router's LEDs blink and its waves pulse towards the laptop, in a loop: blue for a secured network, amber for an open or WEP network. When the configured entity has no value, the waves are gone and the LED stays red. With `prefers-reduced-motion`, everything stays still.
+
+Secured network:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-secured.gif" alt="secured network animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-secured-dark.gif" alt="secured network animation, dark theme" width="400"> |
+
+Open network:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-open.gif" alt="open network animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/header-open-dark.gif" alt="open network animation, dark theme" width="400"> |
+
+Mini card:
+
+| Light | Dark |
+|---|---|
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-header.gif" alt="mini card animation" width="400"> | <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/screenshots/mini-card-header-dark.gif" alt="mini card animation, dark theme" width="400"> |
+
 ## How it works
 
 The card generates a [WiFi QR code](https://en.wikipedia.org/wiki/QR_code#Joining_a_Wi-Fi_network) using the standard `WIFI:T:<security>;S:<ssid>;P:<password>;;` format (`WIFI:T:<security>;S:<ssid>;P:<password>;H:true;;` for a hidden network). When scanned with a phone camera, the device automatically prompts to join the network — no need to type the password manually.
@@ -154,7 +176,7 @@ The QR code engine is a self-contained JavaScript implementation of the QR code 
 npm install
 npm run build        # stamps the version of package.json into dist/wifi-card.js
 npm run check        # builds and checks the card (run in CI)
-npm run screenshots  # renders the card into screenshots/ (a PNG is rewritten only if its pixels change)
+npm run screenshots  # renders the stills (PNG) and the header animations (GIF, needs ffmpeg) into screenshots/ (a file is rewritten only if its pixels change)
 ```
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
