@@ -27,13 +27,13 @@ function wifiQrSceneSvg(status, mini) {
   return `<svg class="scene" viewBox="0 0 200 80" preserveAspectRatio="xMaxYMax meet" aria-hidden="true" focusable="false"><rect class="wq-shelf" x="110" y="54" width="86" height="4"/>${router}${laptop}</svg>`;
 }
 
-// Night picture: forced by illustration_theme, else the sun below the horizon, else Home Assistant's dark mode.
+// Night picture: forced by illustration_theme, else the sun below the horizon or Home Assistant's dark theme (even
+// with the sun up).
 function wifiQrIsNight(hass, config) {
   var theme = config?.illustration_theme;
   if (theme === 'night') return true;
   if (theme === 'day') return false;
-  var sun = hass?.states?.['sun.sun']?.state;
-  if (sun === 'below_horizon' || sun === 'above_horizon') return sun === 'below_horizon';
+  if (hass?.states?.['sun.sun']?.state === 'below_horizon') return true;
   return !!hass?.themes?.darkMode;
 }
 
