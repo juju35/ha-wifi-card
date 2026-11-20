@@ -1703,6 +1703,16 @@ class WifiQrCard extends HTMLElement {
 
   // The status pill's place, on the banner and on the classic header (see wifiPlacePill).
   _fitPill() {
+    // Home Assistant's <ha-card> (a Lit element) shows its content only from its first update, a microtask after it
+    // is connected: measured before, everything is 0 px wide and the pill lands on the wrong line. Fitted then.
+    var haCard = this.shadowRoot?.querySelector?.('ha-card');
+    if (haCard && haCard.hasUpdated === false) {
+      this._pillWait ??= (haCard.updateComplete?.then ? haCard.updateComplete : new Promise((r) => requestAnimationFrame(r))).then(() => {
+        this._pillWait = null;
+        this._fitPill();
+      });
+      return;
+    }
     var row = this.shadowRoot?.querySelector?.('.titles > .trow');
     if (!row) return;
     var banner = row.closest('.banner');
