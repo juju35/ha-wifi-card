@@ -1617,6 +1617,10 @@ class WifiQrCard extends HTMLElement {
   disconnectedCallback() {
     this._resize?.disconnect();
     this._fitWidth = null;
+    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this._fitFrame);
+    // The full screen QR closes with the card: a <dialog> removed from the page keeps its `open` attribute and
+    // would come back inline (not modal) when Home Assistant attaches the card again.
+    this.shadowRoot?.getElementById?.('zoom')?.close?.();
     this._maskPassword();
     this._copyReset();
   }

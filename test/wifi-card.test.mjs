@@ -1002,6 +1002,16 @@ test("a revealed password is masked again after 30 s; hiding it by hand cancels 
   assert.equal(els.btn.attrs["aria-pressed"], "false");
 });
 
+test("the full screen QR closes when the card leaves the page", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  els.qr.onclick();
+  assert.equal(els.zoom.open, true);
+  card.disconnectedCallback();
+  assert.equal(els.zoom.open, false);
+});
+
 test("a revealed password is masked again when the card leaves the page", () => {
   const { card, els } = stubCard();
   card.setConfig({ ssid: "Box", password: "secret" });
