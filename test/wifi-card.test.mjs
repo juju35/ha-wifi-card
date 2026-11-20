@@ -787,7 +787,7 @@ test("mini card: zoom: false removes the detail button", () => {
   assert.equal(els.zoom.open, true);
 });
 
-test("mini card: a click outside the card brings the compact view back, not one inside it or in a dialog", () => {
+test("mini card: a tap outside the card (pointer, for iOS) brings the compact view back, not one inside it or in a dialog", () => {
   const listeners = [];
   const doc = ctx.document;
   doc.addEventListener = (type, fn, capture) => listeners.push({ type, fn, capture });
@@ -798,20 +798,36 @@ test("mini card: a click outside the card brings the compact view back, not one 
   try {
     const { card, els } = stubMini();
     card.connectedCallback();
-    assert.equal(listeners.length, 1);
-    assert.equal(listeners[0].type, "click");
-    assert.equal(listeners[0].capture, true);
-    const fire = (...path) => listeners[0].fn({ composedPath: () => path });
+    assert.deepEqual(listeners.map((l) => `${l.type}:${l.capture}`).sort(), ["click:true", "pointercancel:true", "pointerdown:true", "pointerup:true"]);
+    const on = (type) => listeners.find((l) => l.type === type).fn;
+    const tap = (...path) => {
+      on("pointerdown")({ composedPath: () => path });
+      on("pointerup")({ composedPath: () => path });
+    };
     click(els.zbtn);
-    fire({ localName: "button" }, card, { localName: "body" });
-    assert.equal(card._zoomed, true, "a click inside the card");
-    fire({ localName: "div" }, { localName: "ha-more-info-dialog" }, { localName: "body" });
-    assert.equal(card._zoomed, true, "a click in a dialog");
-    fire({ localName: "div" }, { localName: "body" });
+    tap({ localName: "button" }, card, { localName: "body" });
+    assert.equal(card._zoomed, true, "a tap inside the card");
+    tap({ localName: "div" }, { localName: "ha-more-info-dialog" }, { localName: "body" });
+    assert.equal(card._zoomed, true, "a tap in a dialog");
+    // Pressed in the card and released outside (a drag): stays expanded.
+    on("pointerdown")({ composedPath: () => [card] });
+    on("pointerup")({ composedPath: () => [{ localName: "body" }] });
+    assert.equal(card._zoomed, true, "a drag out of the card");
+    // A mouse click outside goes through the pointer, not counted twice by the click event.
+    on("click")({ composedPath: () => [{ localName: "body" }], detail: 1 });
+    assert.equal(card._zoomed, true);
+    tap({ localName: "div" }, { localName: "body" });
     assert.equal(card._zoomed, false);
     assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+    // A keyboard click outside (no click count) folds it too.
+    click(els.zbtn);
+    on("click")({ composedPath: () => [{ localName: "body" }], detail: 0 });
+    assert.equal(card._zoomed, false);
+    // Leaving the page expanded: back compact.
+    click(els.zbtn);
     card.disconnectedCallback();
     assert.equal(listeners.length, 0);
+    assert.equal(card._zoomed, false);
   } finally {
     delete doc.addEventListener;
     delete doc.removeEventListener;

@@ -1906,6 +1906,47 @@ function wifiQrInDialog(ev) {
   return ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n.localName));
 }
 
+// "A click elsewhere" is caught on the pointer, not only on the click event: on iOS (Safari and the companion app) a
+// tap on something that is not clickable (the background, an empty spot, a card with no action) sends no click to the
+// page. It counts when the press and the release are both outside the card (a drag out of the card does not count),
+// and a scroll does not count (the browser cancels the pointer). Keyboard clicks still go through the click event.
+// `tap(ev)` (a press and a release at the same spot) is for the tests.
+function wifiQrWatchOutside(isOut, handler) {
+  let downOutside = false;
+  const onDown = (ev) => {
+    downOutside = isOut(ev);
+  };
+  const onUp = (ev) => {
+    if (downOutside && isOut(ev)) handler(ev);
+    downOutside = false;
+  };
+  const onCancel = () => {
+    downOutside = false;
+  };
+  const onClick = (ev) => {
+    if (ev.detail === 0 && isOut(ev)) handler(ev);
+  };
+  return {
+    on() {
+      document.addEventListener('pointerdown', onDown, true);
+      document.addEventListener('pointerup', onUp, true);
+      document.addEventListener('pointercancel', onCancel, true);
+      document.addEventListener('click', onClick, true);
+    },
+    tap(ev) {
+      onDown(ev);
+      onUp(ev);
+    },
+    off() {
+      downOutside = false;
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('pointerup', onUp, true);
+      document.removeEventListener('pointercancel', onCancel, true);
+      document.removeEventListener('click', onClick, true);
+    },
+  };
+}
+
 // The mini card extends the full card: one row with the header badge, the title and the network name, and a QR code
 // thumbnail; the password is never shown. Its detail button (top right, `zoom: false` removes it) and the thumbnail
 // switch it to the full card, same configuration; the button or a click anywhere outside the card brings it back.
@@ -1917,19 +1958,27 @@ class WifiQrMiniCard extends WifiQrCard {
   constructor() {
     super();
     this._zoomed = false;
-    this._onOutside = (ev) => {
-      if (this._zoomed && !ev.composedPath().includes(this) && !wifiQrInDialog(ev)) this._setZoom(false);
-    };
+    this._onOutside = wifiQrWatchOutside(
+      (ev) => !ev.composedPath().includes(this) && !wifiQrInDialog(ev),
+      () => {
+        if (this._zoomed) this._setZoom(false);
+      },
+    );
   }
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('click', this._onOutside, true);
+    this._onOutside.on();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._onOutside, true);
+    this._onOutside.off();
+    // Left (another view, a conditional card hidden): back to the compact view, password masked, when it returns.
+    if (this._zoomed) {
+      this._zoomed = false;
+      this._maskPassword();
+    }
   }
 
   setConfig(config) {
