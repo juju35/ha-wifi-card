@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.17.2 - 2026-11-20
+
+### Fixes
+- The status pill is placed from the card's first frame: it was measured before Home Assistant's `<ha-card>` had laid out its content (0 px wide), so for a frame it showed on the wrong line (under the title, or beside it when it belongs under it), sometimes changing the card's height, before jumping to its place. It is now fitted once the card is drawn.
+- Mini card: a tap elsewhere on the page brings the compact view back on iOS too (caught on the pointer: iOS sends no click for a tap on a spot that is not clickable; a press in the card released outside does not count), and the card is back in its compact view, password masked, when it leaves the page.
+- The full screen QR code closes when the card leaves the page (a view change, an edit): Home Assistant attaching the card again no longer shows it inline, outside its modal frame.
+- A state update patches the card in place instead of drawing it again — the banner's picture, the logos and their animations keep their nodes, the revealed password and the full screen QR code stay as they are, and the card keeps its height: a re-created card is laid out again, which can make the dashboard jump (scroll anchoring). Updates of other entities still touch nothing.
+
+### Maintenance
+- Screenshots workflow (Debian 12 container, Chromium, ffmpeg): the README stills and animations are rendered again on each pull request and the changed ones committed back by the `juju35-screenshots[bot]` GitHub App, compared pixel by pixel.
+- README: a `Supported integrations` section (helpers and router entities the SSID and password can come from).
+
 ## 1.17.1 - 2026-11-18
 
 ### Fixes

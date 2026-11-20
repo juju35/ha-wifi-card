@@ -787,7 +787,7 @@ test("mini card: zoom: false removes the detail button", () => {
   assert.equal(els.zoom.open, true);
 });
 
-test("mini card: a click outside the card brings the compact view back, not one inside it or in a dialog", () => {
+test("mini card: a tap outside the card (pointer, for iOS) brings the compact view back, not one inside it or in a dialog", () => {
   const listeners = [];
   const doc = ctx.document;
   doc.addEventListener = (type, fn, capture) => listeners.push({ type, fn, capture });
@@ -798,20 +798,36 @@ test("mini card: a click outside the card brings the compact view back, not one 
   try {
     const { card, els } = stubMini();
     card.connectedCallback();
-    assert.equal(listeners.length, 1);
-    assert.equal(listeners[0].type, "click");
-    assert.equal(listeners[0].capture, true);
-    const fire = (...path) => listeners[0].fn({ composedPath: () => path });
+    assert.deepEqual(listeners.map((l) => `${l.type}:${l.capture}`).sort(), ["click:true", "pointercancel:true", "pointerdown:true", "pointerup:true"]);
+    const on = (type) => listeners.find((l) => l.type === type).fn;
+    const tap = (...path) => {
+      on("pointerdown")({ composedPath: () => path });
+      on("pointerup")({ composedPath: () => path });
+    };
     click(els.zbtn);
-    fire({ localName: "button" }, card, { localName: "body" });
-    assert.equal(card._zoomed, true, "a click inside the card");
-    fire({ localName: "div" }, { localName: "ha-more-info-dialog" }, { localName: "body" });
-    assert.equal(card._zoomed, true, "a click in a dialog");
-    fire({ localName: "div" }, { localName: "body" });
+    tap({ localName: "button" }, card, { localName: "body" });
+    assert.equal(card._zoomed, true, "a tap inside the card");
+    tap({ localName: "div" }, { localName: "ha-more-info-dialog" }, { localName: "body" });
+    assert.equal(card._zoomed, true, "a tap in a dialog");
+    // Pressed in the card and released outside (a drag): stays expanded.
+    on("pointerdown")({ composedPath: () => [card] });
+    on("pointerup")({ composedPath: () => [{ localName: "body" }] });
+    assert.equal(card._zoomed, true, "a drag out of the card");
+    // A mouse click outside goes through the pointer, not counted twice by the click event.
+    on("click")({ composedPath: () => [{ localName: "body" }], detail: 1 });
+    assert.equal(card._zoomed, true);
+    tap({ localName: "div" }, { localName: "body" });
     assert.equal(card._zoomed, false);
     assert.match(card.shadowRoot.innerHTML, /class="mini"/);
+    // A keyboard click outside (no click count) folds it too.
+    click(els.zbtn);
+    on("click")({ composedPath: () => [{ localName: "body" }], detail: 0 });
+    assert.equal(card._zoomed, false);
+    // Leaving the page expanded: back compact.
+    click(els.zbtn);
     card.disconnectedCallback();
     assert.equal(listeners.length, 0);
+    assert.equal(card._zoomed, false);
   } finally {
     delete doc.addEventListener;
     delete doc.removeEventListener;
@@ -1000,6 +1016,16 @@ test("a revealed password is masked again after 30 s; hiding it by hand cancels 
   els.btn.onclick();
   assert.equal(timers[1].cleared, true);
   assert.equal(els.btn.attrs["aria-pressed"], "false");
+});
+
+test("the full screen QR closes when the card leaves the page", () => {
+  const { card, els } = stubCard();
+  card.setConfig({ ssid: "Box", password: "secret" });
+  card.hass = { language: "en" };
+  els.qr.onclick();
+  assert.equal(els.zoom.open, true);
+  card.disconnectedCallback();
+  assert.equal(els.zoom.open, false);
 });
 
 test("a revealed password is masked again when the card leaves the page", () => {
@@ -1258,4 +1284,148 @@ test("status pill place: beside the whole title, else under the subtitle, else i
   assert.equal(placed({ title: 300, pill: 60, row: 200, bottom: 85, ground: 80 }), "data-dot");
   // The classic header (no ground strip) keeps it on its own line
   assert.equal(placed({ title: 300, pill: 60, row: 200, bottom: 85, ground: null }), "data-wrap");
+});
+
+// ── DOM patching (layout shift): a redraw keeps the nodes on the page ───────────────────────────────────────────
+// A tiny DOM, enough for the patch helper: elements with attributes and children, and text nodes.
+class FakeNode {
+  constructor(type, name, value = null) {
+    this.nodeType = type;
+    this.nodeName = name.toUpperCase();
+    this.localName = name.toLowerCase();
+    this.nodeValue = value;
+    this.childNodes = [];
+    this.parentNode = null;
+    this.attrs = new Map();
+  }
+  get attributes() {
+    return [...this.attrs].map(([name, value]) => ({ name, value, namespaceURI: null }));
+  }
+  hasAttribute(n) {
+    return this.attrs.has(n);
+  }
+  getAttribute(n) {
+    return this.attrs.has(n) ? this.attrs.get(n) : null;
+  }
+  setAttribute(n, v) {
+    this.attrs.set(n, String(v));
+  }
+  removeAttribute(n) {
+    this.attrs.delete(n);
+  }
+  get lastChild() {
+    return this.childNodes[this.childNodes.length - 1] || null;
+  }
+  insertBefore(n, ref) {
+    if (n.parentNode) n.parentNode.removeChild(n);
+    const i = ref ? this.childNodes.indexOf(ref) : this.childNodes.length;
+    this.childNodes.splice(i, 0, n);
+    n.parentNode = this;
+    return n;
+  }
+  removeChild(n) {
+    this.childNodes.splice(this.childNodes.indexOf(n), 1);
+    n.parentNode = null;
+    return n;
+  }
+  replaceChild(n, o) {
+    this.insertBefore(n, o);
+    return this.removeChild(o);
+  }
+  get firstChild() {
+    return this.childNodes[0] || null;
+  }
+}
+const fakeEl = (name, attrs = {}, ...kids) => {
+  const e = new FakeNode(1, name);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  for (const k of kids) e.insertBefore(typeof k === "string" ? new FakeNode(3, "#text", k) : k, null);
+  return e;
+};
+
+test("a redraw patches the card in place: pictures, images and texts keep their nodes", () => {
+  const patch = vm.runInContext("wifiQrMorphChildren", ctx);
+  const img = fakeEl("img", { src: "logo.svg", alt: "" });
+  const svg = fakeEl("svg", { class: "scene" }, fakeEl("path", { d: "M0 0" }));
+  const label = fakeEl("span", { class: "t" }, "3 min");
+  const root = fakeEl("div", {}, fakeEl("div", { class: "banner st-ok", "data-wrap": "" }, svg, img), label, fakeEl("p", {}, "gone"));
+  const next = fakeEl("div", {}, fakeEl("div", { class: "banner st-late" }, fakeEl("svg", { class: "scene" }, fakeEl("path", { d: "M0 0" })), fakeEl("img", { src: "logo.svg", alt: "" })), fakeEl("span", { class: "t" }, "2 min"));
+  const banner = root.childNodes[0];
+  const text = label.childNodes[0];
+  patch(root, next);
+  // The same nodes, updated: no picture or image is re-created (they would be laid out again)
+  assert.equal(root.childNodes[0], banner);
+  assert.equal(banner.childNodes[0], svg);
+  assert.equal(banner.childNodes[1], img);
+  assert.equal(root.childNodes[1], label);
+  assert.equal(label.childNodes[0], text);
+  assert.equal(text.nodeValue, "2 min");
+  assert.equal(banner.getAttribute("class"), "banner st-late");
+  assert.equal(banner.hasAttribute("data-wrap"), false);
+  // What the new HTML no longer has is removed
+  assert.equal(root.childNodes.length, 2);
+});
+
+test("a redraw replaces only the nodes whose element changed, and keeps an open dialog open", () => {
+  const patch = vm.runInContext("wifiQrMorphChildren", ctx);
+  const dlg = fakeEl("dialog", { id: "zoom", open: "" });
+  const keep = fakeEl("div", { class: "a" });
+  const root = fakeEl("div", {}, keep, fakeEl("span", {}, "x"), dlg);
+  const fresh = fakeEl("button", { class: "b" });
+  patch(root, fakeEl("div", {}, fakeEl("div", { class: "a" }), fresh, fakeEl("dialog", { id: "zoom" })));
+  assert.deepEqual(root.childNodes.map((n) => n.localName), ["div", "button", "dialog"]);
+  assert.equal(root.childNodes[0], keep);
+  assert.equal(root.childNodes[1], fresh);
+  assert.equal(root.childNodes[2], dlg);
+  // `open` belongs to showModal() / close(), not to the HTML
+  assert.equal(dlg.hasAttribute("open"), true);
+});
+
+test("a redraw keeps what a Home Assistant element drew in itself, and replaces it when its attributes change", () => {
+  const patch = vm.runInContext("wifiQrMorphChildren", ctx);
+  // <ha-icon> draws its own content (and may style its own node): the redraw leaves it alone
+  const icon = fakeEl("ha-icon", { icon: "mdi:refresh", style: "display: inline-flex" }, fakeEl("svg"));
+  const root = fakeEl("div", {}, icon);
+  patch(root, fakeEl("div", {}, fakeEl("ha-icon", { icon: "mdi:refresh" })));
+  assert.equal(root.childNodes[0], icon);
+  assert.equal(icon.childNodes.length, 1);
+  assert.equal(icon.getAttribute("style"), "display: inline-flex");
+  // Another icon: a new element, which draws the new icon
+  patch(root, fakeEl("div", {}, fakeEl("ha-icon", { icon: "mdi:check" })));
+  assert.notEqual(root.childNodes[0], icon);
+  assert.equal(root.childNodes[0].getAttribute("icon"), "mdi:check");
+  // An element we fill ourselves (<ha-card>) is patched like any other
+  const card = fakeEl("ha-card", { class: "mini" }, fakeEl("div", {}, "a"));
+  const host = fakeEl("div", {}, card);
+  patch(host, fakeEl("div", {}, fakeEl("ha-card", {}, fakeEl("div", {}, "b"))));
+  assert.equal(host.childNodes[0], card);
+  assert.equal(card.hasAttribute("class"), false);
+  assert.equal(card.childNodes[0].childNodes[0].nodeValue, "b");
+});
+
+// Home Assistant's <ha-card> is a Lit element: it lays out its content from its first update only, a microtask after it
+// is connected. Measured before, the title and the pill are 0 px wide and the pill lands on the wrong line for a frame:
+// the card waits for that update (updateComplete), then measures once.
+test("the status pill is measured only once <ha-card> has drawn its content", async () => {
+  const card = new WifiQrCard();
+  const asked = [];
+  let drawn;
+  const haCard = { hasUpdated: false, updateComplete: new Promise((done) => (drawn = done)) };
+  const root = {
+    querySelector: (sel) => (sel === "ha-card" ? haCard : (asked.push(sel), null)),
+    querySelectorAll: (sel) => (asked.push(sel), []),
+  };
+  Object.defineProperty(card, "shadowRoot", { value: root });
+  card._fitPill();
+  card._fitPill();
+  await null;
+  assert.deepEqual(asked, [], "nothing measured before <ha-card>'s first update");
+  haCard.hasUpdated = true;
+  drawn(true);
+  await haCard.updateComplete;
+  await null;
+  assert.ok(asked.length > 0, "measured once it is drawn");
+  const once = asked.length;
+  card._fitPill();
+  assert.equal(asked.length, once * 2, "then measured right away, with no wait");
 });

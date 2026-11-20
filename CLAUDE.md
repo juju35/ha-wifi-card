@@ -57,6 +57,12 @@ carries the new version, updated together in one commit:
 ## Supported integrations
 This card sits on top of other Home Assistant integrations, so add a `## Supported integrations` section (title verbatim) listing the HA integrations it works on top of, with a link to each.
 
+## Screenshots — do not edit or commit them by hand
+The Screenshots workflow regenerates them on the PR branch and commits them as the
+`juju35-screenshots[bot]` GitHub App, so the PR checks re-run on that commit by themselves.
+Comparison is exact. They are English, with light/dark twins, neutral/mock data, and never
+real family names. **One GIF per distinct animation/state/variant** (not one per repo).
+
 ## Translations
 - English is the source. Keep every language in sync when a user-facing string changes.
 - Languages to keep in sync: en, fr, de, es, it, nl, pt, pl, sr, sr-Latn, ro, da, sv, bg, ru, uk, hu, sk, cs, sl, lv, el (no Irish or Maltese).

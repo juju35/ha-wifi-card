@@ -33,6 +33,17 @@ Custom Lovelace card for Home Assistant that displays a WiFi QR code for easy gu
 
 Home Assistant 2024.8 or later. The card needs no integration, only the name and password of your network.
 
+## Supported integrations
+
+The card needs no integration: the network name and password can be written in its options. With `ssid_entity` / `password_entity` it reads them from the state of any entity, typically:
+
+| Integration | What the card uses |
+|---|---|
+| [Input text](https://www.home-assistant.io/integrations/input_text/) (core helper) | An `input_text` holding the SSID or the password, edited from the dashboard |
+| [Text](https://www.home-assistant.io/integrations/text/) (core) | A `text` entity of a device or integration exposing the SSID or the password |
+| [Template](https://www.home-assistant.io/integrations/template/) (core) | A template `sensor` built from a router's attributes |
+| Router integrations ([FRITZ!Box](https://www.home-assistant.io/integrations/fritz/), [UniFi Network](https://www.home-assistant.io/integrations/unifi/)…) | Their guest Wi-Fi entities, where they expose the network name or password as a state |
+
 ## Installation
 
 ### Via the Marketplace (recommended)
@@ -179,6 +190,8 @@ npm run build        # stamps the version of package.json into dist/wifi-card.js
 npm run check        # builds and checks the card (run in CI)
 npm run screenshots  # renders the stills (PNG) and the header animations (GIF, needs ffmpeg) into screenshots/ (a file is rewritten only if its pixels change)
 ```
+
+The **Screenshots** workflow renders them again on every pull request that touches the card (Debian 12 container, Chromium) and commits the changed ones back to the pull request's branch as the `juju35-screenshots[bot]` GitHub App: do not edit or commit them by hand.
 
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 

@@ -1360,6 +1360,67 @@ function wifiPlacePill(head, row, ground) {
   }
 }
 
+// Shadow DOM patching: a redraw updates the nodes already on the page (text, attributes, classes) instead of replacing
+// them, so that a state update never re-creates the pictures (SVG scenes, logos) nor restarts their animations, and the
+// card keeps its height (a re-created card is laid out again, which can move the dashboard under the reader's eyes).
+// An open <dialog> keeps its `open` state: it is driven by showModal() / close().
+function wifiQrMorphAttrs(cur, next) {
+  for (var a of Array.from(cur.attributes)) {
+    if (!next.hasAttribute(a.name) && !(a.name === 'open' && cur.localName === 'dialog')) cur.removeAttribute(a.name);
+  }
+  for (var b of Array.from(next.attributes)) {
+    if (cur.getAttribute(b.name) === b.value) continue;
+    if (b.namespaceURI) cur.setAttributeNS(b.namespaceURI, b.name, b.value);
+    else cur.setAttribute(b.name, b.value);
+  }
+}
+
+// A Home Assistant element given no content (<ha-icon>…) draws itself: what it adds to its own node is not ours to
+// remove. It is kept as long as the attributes the HTML gives it do not change, and replaced when they do.
+function wifiQrMorphOwnDrawn(o, n) {
+  if (!n.localName.includes('-') || n.firstChild) return false;
+  var key = Array.from(n.attributes, (a) => `${a.name}=${a.value}`).join('\n');
+  if (o.__morphKey === undefined && Array.from(n.attributes).every((a) => o.getAttribute(a.name) === a.value)) o.__morphKey = key;
+  if (o.__morphKey !== key) {
+    n.__morphKey = key;
+    o.parentNode.replaceChild(n, o);
+  }
+  return true;
+}
+
+function wifiQrMorphChildren(cur, next) {
+  var old = Array.from(cur.childNodes);
+  var fresh = Array.from(next.childNodes);
+  fresh.forEach((n, i) => {
+    var o = old[i];
+    var ref = cur.childNodes[i] || null;
+    if (!o || o.nodeType !== n.nodeType || o.nodeName !== n.nodeName) {
+      cur.insertBefore(n, ref);
+      return;
+    }
+    if (o !== ref) cur.insertBefore(o, ref);
+    if (n.nodeType !== 1) {
+      if (o.nodeValue !== n.nodeValue) o.nodeValue = n.nodeValue;
+    } else if (!wifiQrMorphOwnDrawn(o, n)) {
+      wifiQrMorphAttrs(o, n);
+      wifiQrMorphChildren(o, n);
+    }
+  });
+  while (cur.childNodes.length > fresh.length) cur.removeChild(cur.lastChild);
+}
+
+// Gives `root` (a shadow root or an element) the content of `html`, patching what is already there (a plain
+// innerHTML where there is no DOM to patch, as in the unit tests' stubs).
+function wifiQrMorph(root, html) {
+  var tpl = root.childNodes && typeof document !== 'undefined' && document.createElement?.('template');
+  if (!tpl?.content) {
+    root.innerHTML = html;
+    return;
+  }
+  tpl.innerHTML = html;
+  wifiQrMorphChildren(root, tpl.content);
+}
+
 class WifiQrCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('wifi-qr-card-editor');
@@ -1457,7 +1518,7 @@ class WifiQrCard extends HTMLElement {
     var c = this._config || {};
     var title = wifiQrEsc(c.title || this._t('default_title'));
     var color = this._configRaw?.illustration === false ? 'var(--secondary-text-color)' : 'var(--error-color, #db4437)';
-    this.shadowRoot.innerHTML = `<style>
+    wifiQrMorph(this.shadowRoot, `<style>
         ha-card { overflow: hidden; }
         .header { padding: 12px 12px 0; }
         .hrow { display: flex; align-items: center; gap: 10px; }
@@ -1468,7 +1529,7 @@ class WifiQrCard extends HTMLElement {
         .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE + WIFI_PILL_STYLE}
         .msg-err { padding: 16px; color: ${color}; overflow-wrap: anywhere; }
-      </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`;
+      </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`);
     this._fitPill();
   }
 
@@ -1617,6 +1678,10 @@ class WifiQrCard extends HTMLElement {
   disconnectedCallback() {
     this._resize?.disconnect();
     this._fitWidth = null;
+    if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(this._fitFrame);
+    // The full screen QR closes with the card: a <dialog> removed from the page keeps its `open` attribute and
+    // would come back inline (not modal) when Home Assistant attaches the card again.
+    this.shadowRoot?.getElementById?.('zoom')?.close?.();
     this._maskPassword();
     this._copyReset();
   }
@@ -1638,6 +1703,16 @@ class WifiQrCard extends HTMLElement {
 
   // The status pill's place, on the banner and on the classic header (see wifiPlacePill).
   _fitPill() {
+    // Home Assistant's <ha-card> (a Lit element) shows its content only from its first update, a microtask after it
+    // is connected: measured before, everything is 0 px wide and the pill lands on the wrong line. Fitted then.
+    var haCard = this.shadowRoot?.querySelector?.('ha-card');
+    if (haCard && haCard.hasUpdated === false) {
+      this._pillWait ??= (haCard.updateComplete?.then ? haCard.updateComplete : new Promise((r) => requestAnimationFrame(r))).then(() => {
+        this._pillWait = null;
+        this._fitPill();
+      });
+      return;
+    }
     var row = this.shadowRoot?.querySelector?.('.titles > .trow');
     if (!row) return;
     var banner = row.closest('.banner');
@@ -1665,7 +1740,7 @@ class WifiQrCard extends HTMLElement {
     // The security type; an open network is already named by the pill: its subtitle is the network name.
     const sub = wifiQrEsc(c.security === 'nopass' ? c.ssid : this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
     const ill = this._configRaw?.illustration !== false;
-    this.shadowRoot.innerHTML = `
+    wifiQrMorph(this.shadowRoot, `
       <style>
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
@@ -1741,7 +1816,7 @@ class WifiQrCard extends HTMLElement {
         </div>
         <div class="hint">${this._t('hint')}</div>
         <span class="sr" id="live" aria-live="polite"></span>
-      </ha-card>`;
+      </ha-card>`);
     this._fitPill();
 
     if (!isOpen) {
@@ -1831,6 +1906,47 @@ function wifiQrInDialog(ev) {
   return ev.composedPath().some((n) => ['ha-more-info-dialog', 'ha-dialog', 'dialog'].includes(n.localName));
 }
 
+// "A click elsewhere" is caught on the pointer, not only on the click event: on iOS (Safari and the companion app) a
+// tap on something that is not clickable (the background, an empty spot, a card with no action) sends no click to the
+// page. It counts when the press and the release are both outside the card (a drag out of the card does not count),
+// and a scroll does not count (the browser cancels the pointer). Keyboard clicks still go through the click event.
+// `tap(ev)` (a press and a release at the same spot) is for the tests.
+function wifiQrWatchOutside(isOut, handler) {
+  let downOutside = false;
+  const onDown = (ev) => {
+    downOutside = isOut(ev);
+  };
+  const onUp = (ev) => {
+    if (downOutside && isOut(ev)) handler(ev);
+    downOutside = false;
+  };
+  const onCancel = () => {
+    downOutside = false;
+  };
+  const onClick = (ev) => {
+    if (ev.detail === 0 && isOut(ev)) handler(ev);
+  };
+  return {
+    on() {
+      document.addEventListener('pointerdown', onDown, true);
+      document.addEventListener('pointerup', onUp, true);
+      document.addEventListener('pointercancel', onCancel, true);
+      document.addEventListener('click', onClick, true);
+    },
+    tap(ev) {
+      onDown(ev);
+      onUp(ev);
+    },
+    off() {
+      downOutside = false;
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('pointerup', onUp, true);
+      document.removeEventListener('pointercancel', onCancel, true);
+      document.removeEventListener('click', onClick, true);
+    },
+  };
+}
+
 // The mini card extends the full card: one row with the header badge, the title and the network name, and a QR code
 // thumbnail; the password is never shown. Its detail button (top right, `zoom: false` removes it) and the thumbnail
 // switch it to the full card, same configuration; the button or a click anywhere outside the card brings it back.
@@ -1842,19 +1958,27 @@ class WifiQrMiniCard extends WifiQrCard {
   constructor() {
     super();
     this._zoomed = false;
-    this._onOutside = (ev) => {
-      if (this._zoomed && !ev.composedPath().includes(this) && !wifiQrInDialog(ev)) this._setZoom(false);
-    };
+    this._onOutside = wifiQrWatchOutside(
+      (ev) => !ev.composedPath().includes(this) && !wifiQrInDialog(ev),
+      () => {
+        if (this._zoomed) this._setZoom(false);
+      },
+    );
   }
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('click', this._onOutside, true);
+    this._onOutside.on();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('click', this._onOutside, true);
+    this._onOutside.off();
+    // Left (another view, a conditional card hidden): back to the compact view, password masked, when it returns.
+    if (this._zoomed) {
+      this._zoomed = false;
+      this._maskPassword();
+    }
   }
 
   setConfig(config) {
@@ -1930,7 +2054,7 @@ class WifiQrMiniCard extends WifiQrCard {
       : '';
     const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
     const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
-    this.shadowRoot.innerHTML = `
+    wifiQrMorph(this.shadowRoot, `
       <style>
         :host { height: 100%; }
         ${WIFI_MINI_STYLE}
@@ -2012,7 +2136,7 @@ class WifiQrMiniCard extends WifiQrCard {
         </div>`}
         <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
         ${copy ? '<span class="sr" id="live" aria-live="polite"></span>' : ''}
-      </ha-card>`;
+      </ha-card>`);
     this._fitPill();
     const cbtn = copy && this.shadowRoot.getElementById?.('cbtn');
     if (cbtn) cbtn.onclick = (ev) => {
