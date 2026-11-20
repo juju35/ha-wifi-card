@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.17.2 - 2026-11-20
+
+### Fixes
+- The full screen QR code closes when the card leaves the page (a view change, an edit): Home Assistant attaching the card again no longer shows it inline, outside its modal frame.
+
 ## 1.17.1 - 2026-11-18
 
 ### Fixes
