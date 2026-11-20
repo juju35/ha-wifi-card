@@ -4,6 +4,7 @@
 
 ### Fixes
 - The full screen QR code closes when the card leaves the page (a view change, an edit): Home Assistant attaching the card again no longer shows it inline, outside its modal frame.
+- A state update patches the card in place instead of drawing it again — the banner's picture, the logos and their animations keep their nodes, the revealed password and the full screen QR code stay as they are, and the card keeps its height: a re-created card is laid out again, which can make the dashboard jump (scroll anchoring). Updates of other entities still touch nothing.
 
 ## 1.17.1 - 2026-11-18
 

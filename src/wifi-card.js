@@ -1360,6 +1360,52 @@ function wifiPlacePill(head, row, ground) {
   }
 }
 
+// Shadow DOM patching: a redraw updates the nodes already on the page (text, attributes, classes) instead of replacing
+// them, so that a state update never re-creates the pictures (SVG scenes, logos) nor restarts their animations, and the
+// card keeps its height (a re-created card is laid out again, which can move the dashboard under the reader's eyes).
+// An open <dialog> keeps its `open` state: it is driven by showModal() / close().
+function wifiQrMorphAttrs(cur, next) {
+  for (var a of Array.from(cur.attributes)) {
+    if (!next.hasAttribute(a.name) && !(a.name === 'open' && cur.localName === 'dialog')) cur.removeAttribute(a.name);
+  }
+  for (var b of Array.from(next.attributes)) {
+    if (cur.getAttribute(b.name) === b.value) continue;
+    if (b.namespaceURI) cur.setAttributeNS(b.namespaceURI, b.name, b.value);
+    else cur.setAttribute(b.name, b.value);
+  }
+}
+
+function wifiQrMorphChildren(cur, next) {
+  var old = Array.from(cur.childNodes);
+  var fresh = Array.from(next.childNodes);
+  fresh.forEach((n, i) => {
+    var o = old[i];
+    var ref = cur.childNodes[i] || null;
+    if (!o || o.nodeType !== n.nodeType || o.nodeName !== n.nodeName) {
+      cur.insertBefore(n, ref);
+      return;
+    }
+    if (o !== ref) cur.insertBefore(o, ref);
+    if (n.nodeType === 1) {
+      wifiQrMorphAttrs(o, n);
+      wifiQrMorphChildren(o, n);
+    } else if (o.nodeValue !== n.nodeValue) o.nodeValue = n.nodeValue;
+  });
+  while (cur.childNodes.length > fresh.length) cur.removeChild(cur.lastChild);
+}
+
+// Gives `root` (a shadow root or an element) the content of `html`, patching what is already there (a plain
+// innerHTML where there is no DOM to patch, as in the unit tests' stubs).
+function wifiQrMorph(root, html) {
+  var tpl = root.childNodes && typeof document !== 'undefined' && document.createElement?.('template');
+  if (!tpl?.content) {
+    root.innerHTML = html;
+    return;
+  }
+  tpl.innerHTML = html;
+  wifiQrMorphChildren(root, tpl.content);
+}
+
 class WifiQrCard extends HTMLElement {
   static getConfigElement() {
     return document.createElement('wifi-qr-card-editor');
@@ -1457,7 +1503,7 @@ class WifiQrCard extends HTMLElement {
     var c = this._config || {};
     var title = wifiQrEsc(c.title || this._t('default_title'));
     var color = this._configRaw?.illustration === false ? 'var(--secondary-text-color)' : 'var(--error-color, #db4437)';
-    this.shadowRoot.innerHTML = `<style>
+    wifiQrMorph(this.shadowRoot, `<style>
         ha-card { overflow: hidden; }
         .header { padding: 12px 12px 0; }
         .hrow { display: flex; align-items: center; gap: 10px; }
@@ -1468,7 +1514,7 @@ class WifiQrCard extends HTMLElement {
         .sub { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         ${WIFI_BANNER_STYLE + WIFI_BRAND_STYLE + WIFI_PILL_STYLE}
         .msg-err { padding: 16px; color: ${color}; overflow-wrap: anywhere; }
-      </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`;
+      </style><ha-card>${this._headerHtml('err', title, wifiQrEsc(c.ssid || ''))}<div class="msg-err">${wifiQrEsc(message)}</div></ha-card>`);
     this._fitPill();
   }
 
@@ -1669,7 +1715,7 @@ class WifiQrCard extends HTMLElement {
     // The security type; an open network is already named by the pill: its subtitle is the network name.
     const sub = wifiQrEsc(c.security === 'nopass' ? c.ssid : this._t(SECURITY_KEYS[c.security] || 'sec_wpa'));
     const ill = this._configRaw?.illustration !== false;
-    this.shadowRoot.innerHTML = `
+    wifiQrMorph(this.shadowRoot, `
       <style>
         :host { display: block; height: 100%; }
         ha-card { height: 100%; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; }
@@ -1745,7 +1791,7 @@ class WifiQrCard extends HTMLElement {
         </div>
         <div class="hint">${this._t('hint')}</div>
         <span class="sr" id="live" aria-live="polite"></span>
-      </ha-card>`;
+      </ha-card>`);
     this._fitPill();
 
     if (!isOpen) {
@@ -1934,7 +1980,7 @@ class WifiQrMiniCard extends WifiQrCard {
       : '';
     const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
     const wasOpen = !!this.shadowRoot.getElementById?.('zoom')?.open;
-    this.shadowRoot.innerHTML = `
+    wifiQrMorph(this.shadowRoot, `
       <style>
         :host { height: 100%; }
         ${WIFI_MINI_STYLE}
@@ -2016,7 +2062,7 @@ class WifiQrMiniCard extends WifiQrCard {
         </div>`}
         <dialog id="zoom" aria-label="${zoom}">${svg}</dialog>
         ${copy ? '<span class="sr" id="live" aria-live="polite"></span>' : ''}
-      </ha-card>`;
+      </ha-card>`);
     this._fitPill();
     const cbtn = copy && this.shadowRoot.getElementById?.('cbtn');
     if (cbtn) cbtn.onclick = (ev) => {
