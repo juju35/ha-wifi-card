@@ -847,7 +847,7 @@ test("mini card: registered in the card picker with a translated name", () => {
   assert.ok(entry, "not registered");
   assert.equal(entry.name, "Wifi QR Mini Card");
   assert.equal(entry.description, ctx.WifiQrI18n.en.mini_desc);
-  assert.equal(entry.preview, true);
+  assert.equal(entry.preview, false);
   assert.equal(WifiQrMiniCard.getConfigElement.toString().includes("wifi-qr-mini-card-editor"), true);
   for (const lang of Object.keys(ctx.WifiQrI18n)) {
     if (lang === "en") continue;

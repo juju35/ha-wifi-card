@@ -2341,7 +2341,7 @@ if (!customElements.get('wifi-qr-card')) {
     type: 'wifi-qr-card',
     name: wifiQrT(wifiQrPickerLang, 'card_name'),
     description: wifiQrT(wifiQrPickerLang, 'card_desc'),
-    preview: true,
+    preview: false,
     documentationURL: 'https://github.com/juju35/ha-wifi-card',
   });
   console.info(`%c WIFI-QR-CARD %c v${WIFI_QR_CARD_VERSION} `, 'color:#fff;background:#1976D2;font-weight:700', 'color:#1976D2;background:#fff');
@@ -2353,7 +2353,7 @@ if (!customElements.get('wifi-qr-mini-card')) {
     type: 'wifi-qr-mini-card',
     name: wifiQrT(wifiQrPickerLang, 'mini_name'),
     description: wifiQrT(wifiQrPickerLang, 'mini_desc'),
-    preview: true,
+    preview: false,
     documentationURL: 'https://github.com/juju35/ha-wifi-card',
   });
 }
