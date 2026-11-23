@@ -39,10 +39,10 @@ The card needs no integration: the network name and password can be written in i
 
 | Integration | What the card uses |
 |---|---|
-| [Input text](https://www.home-assistant.io/integrations/input_text/) (core helper) | An `input_text` holding the SSID or the password, edited from the dashboard |
-| [Text](https://www.home-assistant.io/integrations/text/) (core) | A `text` entity of a device or integration exposing the SSID or the password |
-| [Template](https://www.home-assistant.io/integrations/template/) (core) | A template `sensor` built from a router's attributes |
-| Router integrations ([FRITZ!Box](https://www.home-assistant.io/integrations/fritz/), [UniFi Network](https://www.home-assistant.io/integrations/unifi/)…) | Their guest Wi-Fi entities, where they expose the network name or password as a state |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/images/home_assistant.png" alt="" width="16"> [Input text](https://www.home-assistant.io/integrations/input_text/) (core helper) | An `input_text` holding the SSID or the password, edited from the dashboard |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/images/home_assistant.png" alt="" width="16"> [Text](https://www.home-assistant.io/integrations/text/) (core) | A `text` entity of a device or integration exposing the SSID or the password |
+| <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/images/home_assistant.png" alt="" width="16"> [Template](https://www.home-assistant.io/integrations/template/) (core) | A template `sensor` built from a router's attributes |
+| Router integrations (<img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/images/fritz.svg" alt="" width="16"> [FRITZ!Box](https://www.home-assistant.io/integrations/fritz/), <img src="https://raw.githubusercontent.com/juju35/ha-wifi-card/main/images/unifi.png" alt="" width="16"> [UniFi Network](https://www.home-assistant.io/integrations/unifi/)…) | Their guest Wi-Fi entities, where they expose the network name or password as a state |
 
 ## Installation
 
