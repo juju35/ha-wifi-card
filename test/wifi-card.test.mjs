@@ -1,16 +1,16 @@
 // Round-trip tests for the WIFI: string and the embedded QR encoder: build the QR with the card's
 // own code, decode it with jsQR and compare the payload. Run with: npm test
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import vm from "node:vm";
 import jsQR from "jsqr";
+import { source } from "./source.mjs";
 
 const BS = "\\"; // one backslash, spelled once to keep the expectations readable
 
 const timers = [];
 
-// Evaluates src/wifi-card.js with just enough browser stubs to reach its functions and classes.
+// Evaluates the bundled card source (test/source.mjs) with just enough browser stubs to reach its functions and classes.
 function loadCard(lang = "en") {
   const defined = {};
   const ctx = {
@@ -34,7 +34,7 @@ function loadCard(lang = "en") {
   };
   ctx.window = ctx;
   vm.createContext(ctx);
-  vm.runInContext(readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8"), ctx);
+  vm.runInContext(source, ctx);
   return {
     ctx,
     WifiQrCard: defined["wifi-qr-card"],
@@ -658,7 +658,7 @@ test("header at phone width (4 columns, ~104 px card): a smaller badge leaves 4 
 });
 
 test("focus is never moved with scrolling: every focus() call passes preventScroll", () => {
-  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const src = source;
   const calls = src.match(/\.focus\([^)]*\)/g) || [];
   for (const c of calls) assert.match(c, /preventScroll: true/, c);
 });
@@ -835,7 +835,7 @@ test("mini card: a tap outside the card (pointer, for iOS) brings the compact vi
 });
 
 test("mini card: the mini attribute is set by setConfig, never by the constructor", () => {
-  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const src = source;
   const cls = src.slice(src.indexOf("class WifiQrMiniCard extends"), src.indexOf("// ── wifi-qr-card-editor"));
   const ctor = /constructor\(\) \{([\s\S]*?)\n {2}\}/.exec(cls)[1];
   assert.doesNotMatch(ctor, /setAttribute/);
@@ -1240,7 +1240,7 @@ test("editor: both cards expose illustration and illustration_theme, dropped fro
 });
 
 test("mini card: the expand / collapse button sits in the banner's top right corner, 24 px, frosted day and night", () => {
-  const src = readFileSync(new URL("../src/wifi-card.js", import.meta.url), "utf8");
+  const src = source;
   const style = src.slice(src.indexOf("var WIFI_MINI_STYLE"), src.indexOf("function wifiQrInDialog"));
   assert.match(style, /\.banner \.zoom \{ position: absolute; z-index: 2; top: 5px; right: 5px; margin: 0; color: #33506b; background: rgba\(255,255,255,\.55\);/);
   assert.match(style, /\.banner\.night \.zoom \{ color: #fff; background: rgba\(255,255,255,\.12\); box-shadow: inset 0 0 0 1px rgba\(255,255,255,\.2\); \}/);

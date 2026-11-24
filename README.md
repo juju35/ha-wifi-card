@@ -193,6 +193,8 @@ npm run screenshots  # renders the stills (PNG) and the header animations (GIF, 
 
 The **Screenshots** workflow renders them again on every pull request that touches the card (Debian 12 container, Chromium) and commits the changed ones back to the pull request's branch as the `juju35-screenshots[bot]` GitHub App: do not edit or commit them by hand.
 
+The source is split into ES modules under `src/` (entry `src/index.js`); `npm run build` assembles them (`scripts/bundle.mjs`) into the single file the Marketplace serves.
+
 `dist/` is not committed: `npm run build` creates it locally, CI builds it on every push, and the release workflow attaches the built file to the release, which is where the Marketplace installs it from.
 
 ### Releasing
