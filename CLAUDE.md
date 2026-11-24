@@ -63,6 +63,11 @@ The Screenshots workflow regenerates them on the PR branch and commits them as t
 Comparison is exact. They are English, with light/dark twins, neutral/mock data, and never
 real family names. **One GIF per distinct animation/state/variant** (not one per repo).
 
+## Source layout
+- `src/` holds ES modules (entry `src/index.js`), concatenated in the order of the entry file by `scripts/bundle.mjs` (called by `scripts/build.mjs`) into the classic script the card ships as: import lines removed, `export` keywords dropped. Modules share one scope, so keep top-level names unique across modules; a new module must be listed in the entry file.
+- Translations: one file per language in `i18n/<lang>.js` (`export default { … };`), gathered by the table file next to them and rebuilt into a single object literal at build for `scripts/i18n-split.mjs`.
+- Tests evaluate the bundle (`test/source.mjs`), not a source file.
+
 ## Translations
 - English is the source. Keep every language in sync when a user-facing string changes.
 - Languages to keep in sync: en, fr, de, es, it, nl, pt, pl, sr, sr-Latn, ro, da, sv, bg, ru, uk, hu, sk, cs, sl, lv, el (no Irish or Maltese).
