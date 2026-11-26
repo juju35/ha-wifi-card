@@ -4,7 +4,7 @@ import { wifiQrEditorSecurity, wifiQrLang, wifiQrT } from "./i18n-helpers.js";
 import { WifiQrCard } from "./wifi-qr-card.js";
 import { WifiQrMiniCard } from "./wifi-qr-mini.js";
 
-export var WIFI_QR_EDITOR_DEFAULTS = { show_title: true, show_subtitle: true, security: 'WPA', qr_size: 176, logo: true, hidden: false, illustration: true, illustration_theme: 'auto' };
+export var WIFI_QR_EDITOR_DEFAULTS = { show_title: true, show_subtitle: true, show_credentials: true, show_hint: true, security: 'WPA', qr_size: 176, logo: true, hidden: false, illustration: true, illustration_theme: 'auto' };
 // Entities whose state can give the SSID or the password: helpers and router integrations.
 export var WIFI_QR_ENTITY_SELECTOR = { entity: { filter: [{ domain: ['input_text', 'text', 'sensor'] }] } };
 
@@ -45,6 +45,9 @@ export class WifiQrCardEditor extends HTMLElement {
       { name: 'title', selector: { text: {} } },
       { name: 'show_title', selector: { boolean: {} } },
       { name: 'show_subtitle', selector: { boolean: {} } },
+      // Both cards: the full card (and the mini card's expanded view) under the QR code.
+      { name: 'show_credentials', selector: { boolean: {} } },
+      { name: 'show_hint', selector: { boolean: {} } },
       { name: 'logo', selector: { boolean: {} } },
       // Both cards: the illustrated banner and its day / night picture.
       { name: 'illustration', selector: { boolean: {} } },

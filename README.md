@@ -132,6 +132,8 @@ zoom: true
 | `title` | ❌ | Auto (i18n) | Card title |
 | `show_title` | ❌ | `true` | Show the title in the header (e.g. `false` under a section heading of your own) |
 | `show_subtitle` | ❌ | `true` | Show the subtitle under the title |
+| `show_credentials` | ❌ | `true` | Both cards: show the network name and the password (with its eye and copy buttons) under the QR code; `false` keeps the QR code alone, e.g. on a wall or shared screen, and also drops the mini card's copy button |
+| `show_hint` | ❌ | `true` | Both cards: show the "Scan the QR code to connect automatically" line under the QR code |
 | `logo` | ❌ | `true` | Show the WiFi logo as a small badge on the header's QR code icon |
 | `illustration` | ❌ | `true` | Both cards: the animated illustrated header (`false` keeps the classic header) |
 | `illustration_theme` | ❌ | `auto` | Both cards: `auto` (follows the Home Assistant theme: night with a dark theme, day with a light theme), `day` or `night` |

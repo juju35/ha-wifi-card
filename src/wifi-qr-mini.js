@@ -175,8 +175,9 @@ export class WifiQrMiniCard extends WifiQrCard {
     const zoom = wifiQrEsc(this._t('zoom'));
     const ill = this._configRaw?.illustration !== false;
     const texts = this._titlesHtml(this._status(), title, ssid);
-    // The banner's copy button (not for an open network), under the detail button, like the Wero card's.
-    const copy = ill && c.security !== 'nopass' && c.password
+    // The banner's copy button (not for an open network, nor with show_credentials: false), under the
+    // detail button, like the Wero card's.
+    const copy = ill && c.security !== 'nopass' && c.password && this._configRaw?.show_credentials !== false
       ? `<button id="cbtn" title="${this._t('copy_password')}" aria-label="${this._t('copy_password')}"><ha-icon icon="mdi:content-copy" id="cico"></ha-icon></button>`
       : '';
     const thumb = `<div class="thumb" id="qr" role="button" tabindex="0" title="${zoom}" aria-label="${zoom}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>`;
