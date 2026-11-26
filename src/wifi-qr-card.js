@@ -396,6 +396,10 @@ export class WifiQrCard extends HTMLElement {
     this._pwdSync = null;
     const c = this._config;
     const isOpen = c.security === 'nopass';
+    // show_credentials: false keeps the QR code alone (wall / shared screens): no network, password,
+    // eye or copy button in the DOM. show_hint: false drops the "Scan the QR code" line.
+    const showCreds = this._configRaw?.show_credentials !== false;
+    const showHint = this._configRaw?.show_hint !== false;
     // A re-render (language or config change) keeps the zoom open and the password revealed.
     const wasZoomed = !!this.shadowRoot.getElementById?.('zoom')?.open;
     let svg;
@@ -470,7 +474,7 @@ export class WifiQrCard extends HTMLElement {
         ${this._headerHtml(this._status(), title, sub)}
         <div class="qr-wrap" id="qr" role="button" tabindex="0" title="${this._t('zoom')}" aria-label="${this._t('zoom')}">${svg.replace('<svg ', '<svg aria-hidden="true" ')}</div>
         <dialog id="zoom" aria-label="${this._t('zoom')}">${svg}</dialog>
-        <div class="info-block">
+        ${showCreds ? `        <div class="info-block">
           <div class="info-row">
             <div class="lbl">${this._t('network')}</div>
             <div class="val">${wifiQrEsc(c.ssid)}</div>
@@ -485,13 +489,13 @@ export class WifiQrCard extends HTMLElement {
               <button id="cbtn" title="${this._t('copy_password')}" aria-label="${this._t('copy_password')}"><ha-icon icon="mdi:content-copy" id="cico"></ha-icon></button>
             </div>`}
           </div>
-        </div>
-        <div class="hint">${this._t('hint')}</div>
+        </div>` : ''}
+        ${showHint ? `<div class="hint">${this._t('hint')}</div>` : ''}
         <span class="sr" id="live" aria-live="polite"></span>
       </ha-card>`);
     this._fitPill();
 
-    if (!isOpen) {
+    if (!isOpen && showCreds) {
       const btn = this.shadowRoot.getElementById('btn');
       // The password only ever reaches the DOM through textContent, never the innerHTML above.
       const show = () => {

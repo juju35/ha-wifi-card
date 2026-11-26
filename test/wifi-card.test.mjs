@@ -1155,6 +1155,23 @@ test("open network: no copy button", () => {
   assert.doesNotMatch(renderWith({ security: "nopass", password: "" }), /id="cbtn"/);
 });
 
+test("show_credentials: false keeps the QR code alone, without the network, the password or its buttons", () => {
+  const html = renderWith({ show_credentials: false });
+  assert.match(html, /class="qr-wrap" id="qr"/);
+  assert.doesNotMatch(html, /class="info-block"|id="pwd"|id="btn"|id="cbtn"/);
+  assert.match(html, /<div class="hint">/, "the hint stays");
+  assert.match(renderWith({}), /class="info-block"[\s\S]*id="cbtn"/, "shown by default");
+  // The mini card's banner copy button follows it too
+  assert.doesNotMatch(stubMini({ show_credentials: false }).card.shadowRoot.innerHTML, /id="cbtn"/);
+});
+
+test("show_hint: false drops the hint line only", () => {
+  const html = renderWith({ show_hint: false });
+  assert.doesNotMatch(html, /<div class="hint">/);
+  assert.match(html, /class="info-block"/);
+  assert.match(renderWith({}), /<div class="hint">/);
+});
+
 // ── Illustrated header ────────────────────────────────────────────────────────
 
 test("banner: 90 px, parquet strip, router scene, QR code icon with the WiFi logo badge", () => {

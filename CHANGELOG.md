@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.18.0 - 2026-11-26
+
+### Features
+- `show_credentials` option (both cards, visual editor included): `false` keeps the QR code alone, without the network name, the password or its eye and copy buttons — for a wall or shared screen. The mini card drops its copy button too. (#68)
+- `show_hint` option: `false` drops the "Scan the QR code to connect automatically" line. (#68)
+
 ## 1.17.5 - 2026-11-24
 
 ### Maintenance
