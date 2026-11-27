@@ -59,6 +59,8 @@ Or manually:
 3. Open **Wifi QR Card** and click **Install**
 4. Clear your browser cache and refresh
 
+The Marketplace registers the dashboard resource for you: `/local/community/ha-wifi-card/wifi-card.js`.
+
 ### Manual
 
 1. Download `wifi-card.js` and the `wifi-card.i18n.*.js` translation files from the [latest release](https://github.com/juju35/ha-wifi-card/releases/latest)
